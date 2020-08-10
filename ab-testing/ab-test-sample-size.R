@@ -1,6 +1,8 @@
 # https://www.statmethods.net/stats/power.html
 # https://medium.com/swlh/determining-sample-sizes-for-a-b-testing-using-power-analysis-34719ce9e0e9
 
+library(pwr)
+
 #########################
 # Calculate Sample Size #
 #########################
