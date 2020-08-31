@@ -1,0 +1,25 @@
+---
+title: "Reinforcement Learning / Bandit Testing"
+---
+
+In this model, I am trying different algorithms to optimize the reward for the dataset in the Ads_CTR_Optimisation.csv file.
+
+The data in the CSV and inspiration for the various solutions come from the [Machine Learning A-Z™: Hands-On Python & R In Data Science] (https://www.udemy.com/course/machinelearning) course on Udemy.
+
+In this dataset, we are shown if users would click on a given ad variation if they were shown the ad. 
+
+For example, the data for the first three rows looks like this:
+
+```
+Ad 1,Ad 2,Ad 3,Ad 4,Ad 5,Ad 6,Ad 7,Ad 8,Ad 9,Ad 10
+1,0,0,0,1,0,0,0,1,0
+0,0,0,0,0,0,0,0,1,0
+0,0,0,0,0,0,0,0,0,0
+```
+
+The first user is shown an ad, and they will click on it if ad 1, 5, or 9 is shown. The second user will only click on ad 9. And the third user will not click on any ad, regardless of whih one is shown to them.
+
+My objective is to:
+- determine which ad performs the best (explore)
+- maximize the reward that we earn (exploit)
+
