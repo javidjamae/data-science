@@ -1,3 +1,5 @@
+# https://www.coursera.org/learn/statistical-inferences
+# 
 #Load pwr package to easily calculate the statistical power
 if(!require(pwr)){install.packages('pwr')}
 library(pwr)
