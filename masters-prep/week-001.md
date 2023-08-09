@@ -1,4 +1,4 @@
-# Week 1
+# Week 1 - July 10, 2023 - July 16, 2023
 
 Goals
 - [x] Finish watching 3blue1brown video series on [linear algebra](https://www.youtube.com/playlist?list=plzhqobowtqdpd3mizzm2xvfitgf8he_ab)

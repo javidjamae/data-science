@@ -1,4 +1,4 @@
-# Week 3
+# Week 3 - July 24, 2023 - July 30, 2023
 
 Goals
 https://trello.com/b/RgY7rRZt/masters-in-ai-prep

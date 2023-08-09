@@ -1,4 +1,4 @@
-# Week 2
+# Week 2 - July 17, 2023 - July 23, 2023
 
 
 ## July 17, 2023
