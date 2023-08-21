@@ -1,7 +1,29 @@
-# Types of Problems in Machine Learning
+# High-Level Concepts
+
+Here are several key concepts in Machine Learning:
+- **Learning:** The process by which algorithms adjust and adapt to find patterns and regularities in data.
+- **Learning Paradigm:** The overarching strategy or method that guides how a learning algorithm interacts with data and trains a model. Examples include Supervised Learning, Unsupervised Learning, Batch Learning, and Online Learning.
+- **Learning Algorithm:** A method that processes data to find underlying patterns, updating the model's parameters to improve performance.
+- **Problem:** The specific task or question that the learning algorithm is trying to solve or answer.
+- **Model:** The mathematical representation of a real-world process, with parameters tuned based on data.
+- **Data:** The raw information used by the learning algorithm, often divided into training, validation, and testing sets.
+- **Evaluation Metrics:** Criteria used to assess the performance of a model, such as accuracy or mean squared error.
+- **Hyperparameters:** Parameters of the learning algorithm itself, set before the training process.
+- **Features:** Individual measurable properties or characteristics used as input for the model.
+
+The following describes how they're related:
+- **Learning** is achieved through a **Learning Algorithm**, adapting the **Model** to find patterns in the **Data**.
+- A **Learning Paradigm** guides the overall approach and strategy of the learning process, influencing how the **Learning Algorithm** interacts with the **Data** and defines the way the **Model** is trained.
+- The **Problem** defines the task that the **Learning Algorithm** and **Model** aim to accomplish, setting the context and objectives.
+- The **Learning Algorithm** uses the **Data** and **Features** and trains a **Model** to solve it the defined **Problem**, guided by **Hyperparameters**.
+- **Evaluation Metrics** are used to assess how well the **Model** is performing in solving the **Problem**, guiding further **Learning**.
+- **Hyperparameters** influence the behavior of the **Learning Algorithm**, affecting how it trains the **Model**.
+- **Features** represent the aspects of the **Data** that the **Learning Algorithm** uses to train the **Model** and address the **Problem**.
+
+
+# Types of Problems
 
 Machine learning tackles a wide array of problems, and these problems can be broadly categorized into several major types based on the nature of the output and the data. Here are some predominant terminologies used in the field to summarize these problem spaces:
-
 
 ## Supervised Learning Problems
    ### Classification
@@ -39,7 +61,7 @@ Machine learning tackles a wide array of problems, and these problems can be bro
    - Recommending items or actions based on user behavior or item attributes. Examples include recommending products on e-commerce sites or movies on streaming platforms.
 
 
-# Types of Learning in Machine Learning
+# Learning Paradigms
 
 ## Batch Learning
    - **Definition**: The model is trained on the entire dataset at once.
