@@ -1,11 +1,15 @@
-# Month 1: Machine Learning Basics, Linear Algebra, and History of AI
+# Overview
+I am preparing for a [Masters in AI](https://cdso.utexas.edu/msai) program. The following is a high-level plan for areas that I can study in order to prepare for this program.
+
+
+## Month 1: Machine Learning Basics, Linear Algebra, and History of AI
 
 * Machine Learning Fundamentals (40 hours): Supervised and unsupervised learning, regression, classification, clustering, neural networks, SVMs, decision trees, ensemble methods
 * Linear Algebra (15 hours): Vectors, matrices, operations on matrices, eigenvectors, eigenvalues
 * History of AI (5 hours): Significant milestones and influential figures in AI
 
 
-# Month 2: Deep Learning, Calculus, Deep Learning Libraries, and Ethical Theories
+## Month 2: Deep Learning, Calculus, Deep Learning Libraries, and Ethical Theories
 
 * Deep Learning Fundamentals (30 hours):
   * Neural networks, deep feedforward networks, regularization for deep learning, optimization for training deep models, convolutional networks, sequence modeling (RNNs, LSTMs)
@@ -25,7 +29,7 @@
 * Ethical Theories (5 hours):
   * Overview of different ethical perspectives, application to AI
 
-# Month 3: Ethics in AI, Automated Logical Reasoning, Probability/Statistics, and AI Biases
+## Month 3: Ethics in AI, Automated Logical Reasoning, Probability/Statistics, and AI Biases
 
 * Ethics in AI (20 hours): Responsible AI practices, implications of AI in society
 * Automated Logical Reasoning (25 hours)
@@ -43,14 +47,14 @@
 * Probability and Statistics (10 hours): Probability distributions, expectation, variance, covariance, hypothesis testing, Bayesian statistics
 * AI Biases (5 hours): Understanding and mitigating biases in AI systems
 
-# Month 4: Reinforcement Learning, Planning, Search, Reasoning Under Uncertainty, Optimization, and Fairness in AI
+## Month 4: Reinforcement Learning, Planning, Search, Reasoning Under Uncertainty, Optimization, and Fairness in AI
 
 * Reinforcement Learning (30 hours): Q-learning, policy gradients, deep RL, multi-agent RL
 * Planning, Search, and Reasoning Under Uncertainty (30 hours): Search algorithms, MDPs, POMDPs, game theory, probabilistic reasoning
 * Optimization (10 hours): Convex optimization, gradient descent, conjugate gradient, Newton's method
 * Fairness in AI (10 hours): Understanding, assessing, and enhancing fairness in AI models
 
-# Month 5: Natural Language Processing, Case Studies in Machine Learning, Discrete Mathematics, and Accountability and Transparency in AI
+## Month 5: Natural Language Processing, Case Studies in Machine Learning, Discrete Mathematics, and Accountability and Transparency in AI
 
 * NLP Basics (30 hours):
   * Linguistic fundamentals: Syntax, lexical and distributional semantics (3 hours)
@@ -78,7 +82,7 @@
 * Discrete Mathematics (10 hours): Propositional logic, first-order logic, boolean algebra, graph theory
 * Accountability and Transparency in AI (10 hours): Principles and practices for creating accountable and transparent AI systems
 
-# Month 6: Online Learning, Optimization, Numerical Computation, Power and Agency in AI, and Convex Optimization
+## Month 6: Online Learning, Optimization, Numerical Computation, Power and Agency in AI, and Convex Optimization
 
 * Online Learning and Optimization (30 hours):
   * Techniques for convex optimization such as gradient descent and its variants (10 hours)
@@ -92,21 +96,21 @@
 * Numerical Computation (10 hours): Issues of precision, numerical stability, vectorization, matrix factorization, Eigen-decomposition
 * Power and Agency in AI (10 hours): Understanding and navigating power dynamics in AI, agency of AI systems and their implications
 
-# Month 7: Review and Deep Dives into Specialized Libraries, and AI Ethics Guidelines
+## Month 7: Review and Deep Dives into Specialized Libraries, and AI Ethics Guidelines
 
 * Review and Self-assessment (15 hours): Review all topics, identify areas of weakness, and revise accordingly
 * Deep Dive into Scikit-Learn (15 hours): Working with data in Scikit-Learn, supervised learning methods, unsupervised learning methods, model evaluation and improvement
 * Deep Dive into Pandas, NumPy (10 hours): Data manipulation and analysis with Pandas, numerical operations with NumPy
 * AI Ethics Guidelines (10 hours): Exploring guidelines and best practices for ethical AI development
 
-# Month 8: Final Review and Advanced Topics, and Value Sensitive Design
+## Month 8: Final Review and Advanced Topics, and Value Sensitive Design
 
 * Advanced ML/DL Models and Algorithms (25 hours): Advanced topics in machine learning and deep learning, such as GANs, attention mechanisms, transformers, etc.
 * Final Review and Self-assessment (20 hours): Comprehensive review of all topics, practice problems, project work to consolidate learning
 * Value Sensitive Design (10 hours): Principles and methodologies for creating AI systems that respect human values and ethical principles
 
 
-# Other Prerequisites
+## Other Prerequisites
 
 * Discrete Math for Computer Science (CS 311)
 * Introduction to Programming (CS 312)
@@ -115,7 +119,7 @@
 * Introduction to Data Mining (CS 363D)
 * Linear Algebra and Matrix Theory (M341)
 
-# References
+## References
 
 * [MSAI Application Guide](https://cdso.utexas.edu/sites/default/files/2023-05/MSAI_Application_Guide.pdf)
 * [MSAI Webpage](https://cdso.utexas.edu/msai)
