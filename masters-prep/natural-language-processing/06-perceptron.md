@@ -1,6 +1,6 @@
 # Perceptron
 
-These are my notes from [this lecture](https://www.youtube.com/watch?v=tMGv5ZcuVP4&list=PLofp2YXfp7Tbk88uH4jejfXPd2OpWuSLq&index=5). 
+These are my notes from [this lecture](https://www.youtube.com/watch?v=tMGv5ZcuVP4&list=PLofp2YXfp7TZZ5c7HEChs0_wfEfewLDs7&index=6) that is part of [this course](https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html). 
 
 ## Lecture Notes
 

@@ -1,6 +1,6 @@
 # Basics of Learning, Gradient Descent
 
-These are my notes from [this lecture](https://www.youtube.com/watch?v=_We4tlPkaj0&list=PLofp2YXfp7Tbk88uH4jejfXPd2OpWuSLq&index=4). 
+These are my notes from [this lecture](https://www.youtube.com/watch?v=_We4tlPkaj0&list=PLofp2YXfp7TZZ5c7HEChs0_wfEfewLDs7&index=5) that is part of [this course](https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html). 
 
 ## Lecture Notes
 
