@@ -31,7 +31,24 @@ class UnigramFeatureExtractor(FeatureExtractor):
     and any additional preprocessing you want to do.
     """
     def __init__(self, indexer: Indexer):
-        raise Exception("Must be implemented")
+        self.indexer = indexer
+
+    def get_indexer(self):
+        return self.indexer
+
+    def extract_features(self, sentence: List[str], add_to_indexer: bool=False) -> Counter:
+        """
+        The indexer assigns unique indices to words, ensuring consistent numeric representation.
+        The Counter stores word counts using index/count pairs. For example, if we extract
+            "hi Javid hi", hi would get indexed at 0 and Javid would get indexed at 1, and we'd
+            get a Counter with { 0:2, 1:1 }.
+        """
+        counter = Counter()
+        for word in sentence:
+            index = self.indexer.add_and_get_index( word, add=add_to_indexer )
+            if index >= 0: # Only consider words that are present in the indexer
+                counter[index] += 1
+        return counter
 
 
 class BigramFeatureExtractor(FeatureExtractor):
@@ -76,8 +93,21 @@ class PerceptronClassifier(SentimentClassifier):
     superclass. Hint: you'll probably need this class to wrap both the weight vector and featurizer -- feel free to
     modify the constructor to pass these in.
     """
-    def __init__(self):
-        raise Exception("Must be implemented")
+    # def __init__(self, weights, featurizer):
+    def __init__(self, weights, featurizer):
+        self.weights = weights
+        self.featurizer = featurizer
+
+    def predict(self, sentence: List[str]) -> int:
+        # Extract features using the featurizer
+        features = self.featurizer.extract_features(sentence)
+
+        # Perform the prediction based on features and weights
+        score = sum(self.weights[index] * value for index, value in features.items())
+        if score >= 0:
+            return 1  # Positive class
+        else:
+            return 0  # Negative class
 
 
 class LogisticRegressionClassifier(SentimentClassifier):
@@ -97,7 +127,29 @@ def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureE
     :param feat_extractor: feature extractor to use
     :return: trained PerceptronClassifier model
     """
+    epochs = 20
+
     raise Exception("Must be implemented")
+
+    # Initialize feature vector lists
+    #feature_vectors = []
+    #labels = []
+
+    # Loop through training examples
+    #for example in train_exs:
+    #    features = feat_extractor.extract_features(example.words)
+    #    feature_vectors.append(features)
+    #    labels.append(example.label)
+
+    # Convert feature vectors to sparse format suitable for your ML library
+    # ...
+
+    # Train your Perceptron model using the prepared feature vectors and labels
+    # classifier = PerceptronClassifier(weights, featurizer)
+    # ...
+
+    # Return trained model
+    #return model
 
 
 def train_logistic_regression(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor) -> LogisticRegressionClassifier:
