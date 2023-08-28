@@ -30,12 +30,12 @@ Here is how we would implement the perceptron algorithm for linear binary classi
     * $y_{\text{pred}} = \text{sign}(\overline{w}^T \cdot f(\overline{x}^{[i]}))$
     * $\overline{w} \leftarrow \overline{w} + \alpha y^{[i]} f(\overline{x}^{[i]})$ if $y_{\text{pred}} \neq y^{[i]}$
 
-* $\overline{w} \leftarrow \overline{w} + \alpha y^{[i]} f(\overline{x}^{[i]})$ if $y_{\text{pred}} \neq y^{[i]}$
-
 Where:
 * $y_{\text{pred}}$ is our predicted $y$ classification value
 * $y_{\text{pred}} = y^{[i]}$ means we predicted the example right and we don't update the weights
 * $\alpha$ is the step size (or learning rate) and is a hyperparameter used by the algorithm while training the model.
+* $y^{[i]}$ is the true label $+1$ or $-1$ value for the $i$th example
+* $f(\overline{x}^{[i]})$ is the features for the $i$th example
 * $D$ is the total number of training examples
 * the sign function will return $+1$ if its argument is greater than $0$, and 
 $−1$ if its argument is less than or equal to $0$.

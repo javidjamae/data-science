@@ -39,9 +39,10 @@ class UnigramFeatureExtractor(FeatureExtractor):
     def extract_features(self, sentence: List[str], add_to_indexer: bool=False) -> Counter:
         """
         The indexer assigns unique indices to words, ensuring consistent numeric representation.
-        The Counter stores word counts using index/count pairs. For example, if we extract
-            "hi Javid hi", hi would get indexed at 0 and Javid would get indexed at 1, and we'd
-            get a Counter with { 0:2, 1:1 }.
+        The Counter stores word counts for the current sentence using index/count pairs. For example,
+            if we extract "hi Javid hi", hi would get indexed at 0 and Javid would get indexed at 1,
+            and we'd get a Counter with { 0:2, 1:1 }. If we call it again with "bye Javid bye Javid",
+            it would index bye as 2 and we'd get { 1:2, 2,2 }.
         """
         counter = Counter()
         for word in sentence:
@@ -94,12 +95,12 @@ class PerceptronClassifier(SentimentClassifier):
     modify the constructor to pass these in.
     """
     # def __init__(self, weights, featurizer):
-    def __init__(self, weights, featurizer):
+    def __init__(self, weights: List[float], featurizer):
         self.weights = weights
         self.featurizer = featurizer
 
     def predict(self, sentence: List[str]) -> int:
-        # Extract features using the featurizer
+        # Extract features using the featurizer, which will return the Counter
         features = self.featurizer.extract_features(sentence)
 
         # Perform the prediction based on features and weights
@@ -109,6 +110,19 @@ class PerceptronClassifier(SentimentClassifier):
         else:
             return 0  # Negative class
 
+    def update_weights(self, features: Counter, prediction: int, true_label: int, alpha: float):
+        """
+        Update the weights of the Perceptron based on the prediction and true label.
+        :param features: Dictionary of features extracted from the input data
+        :param prediction: The predicted label (0 or 1)
+        :param true_label: The true label (0 or 1)
+        :param alpha: Learning rate
+        """
+        if prediction != true_label:
+            adjusted_true_label = 2 * true_label - 1  # Map 0 to -1 and 1 to +1
+            for index, value in features.items():
+                # value is the word count
+                self.weights[index] += alpha * adjusted_true_label * value
 
 class LogisticRegressionClassifier(SentimentClassifier):
     """
