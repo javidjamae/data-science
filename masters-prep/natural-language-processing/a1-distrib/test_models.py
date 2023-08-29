@@ -1,9 +1,17 @@
 import unittest
+import numpy as np
+import logging
+
+from numpy.testing import *
 from sentiment_data import *
 from utils import *
 from models import UnigramFeatureExtractor, PerceptronClassifier, train_perceptron
 from collections import Counter
 from unittest.mock import Mock
+
+# Configure logging to use DEBUG level
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class TestUnigramFeatureExtractor(unittest.TestCase):
 
@@ -89,6 +97,9 @@ class TestPerceptronClassifier(unittest.TestCase):
     def setUp(self):
         # Initialize any required resources or mock objects
         self.featurizer = Mock()  # You can create a mock featurizer here
+        self.indexer = Indexer()
+        self.featurizer.get_indexer.return_value = self.indexer  # Mock the behavior of get_indexer()
+
 
     def test_init(self):
         # Test the initialization of the PerceptronClassifier
@@ -100,7 +111,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         weights = [1, 0]
         self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
         perceptron = PerceptronClassifier(weights, self.featurizer)
-        predicted_label = perceptron.predict(sentence)
+        predicted_label = perceptron.predict(sentence, True)
         self.assertEqual(predicted_label, 1, "Predicted label should be 1 for positive sentiment")
 
     def test_predict_negative(self):
@@ -108,22 +119,26 @@ class TestPerceptronClassifier(unittest.TestCase):
         weights = [-1, 0]
         self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
         perceptron = PerceptronClassifier(weights, self.featurizer)
-        predicted_label = perceptron.predict(sentence)
+        predicted_label = perceptron.predict(sentence, True)
         self.assertEqual(predicted_label, 0, "Predicted label should be 0 for negative sentiment")
 
     def test_update_weights_true_label_positive(self):
         # Create a PerceptronClassifier instance
-        weights = [1, 0]
+        weights = [0, -1]
+        self.featurizer.extract_features.return_value = {0:1, 1:2}  # Define the expected feature
         classifier = PerceptronClassifier(weights, self.featurizer)
 
-        # Initialize some example values
-        features = Counter({0: 1, 1: 2})
-        prediction = 0
+        # given the weights, the prediction should come back as 0
+        prediction = classifier.predict([ "hi bye bye"], True)
+        self.assertEqual(prediction, 0)
+
+        # We set the true_label to 1 so that it doesn't match the prediction. Because the true label
+        # is positive, we should increase the weights.
         true_label = 1
         alpha = 0.1
 
         # Update weights using the function
-        classifier.update_weights(features, prediction, true_label, alpha)
+        classifier.update_weights(prediction, true_label, alpha)
 
         # Check if weights have been updated correctly
         # Weight update equation: w_new = w_old + alpha * true_label * feature_value
@@ -131,29 +146,26 @@ class TestPerceptronClassifier(unittest.TestCase):
         #     true_label is +1/-1
         #     feature_value is the word count from the Counter
         # For the first feature (index 0):
-        # Updated weight at index 0: 1 + 0.1 * 1 * 1 = 1.1
+        # Updated weight at index 0: 0 + 0.1 * 1 * 1 = 0.1
 
         # For the second feature (index 1):
-        # Updated weight at index 1: 0 + 0.1 * 1 * 2 = 0.2
-
-        # So, the updated weights should be: [1.1, 0.2].
-        updated_weights = classifier.weights
-        expected_weights = [1.1, 0.2]
-        self.assertEqual(updated_weights, expected_weights)
+        # Updated weight at index 1: -1 + 0.1 * 1 * 2 = -0.8
+        expected_weights = [0.1, -0.8]
+        self.assertEqual(classifier.weights, expected_weights)
 
     def test_update_weights_true_label_negative(self):
         # Create a PerceptronClassifier instance
         weights = [1, 0]
+        self.featurizer.extract_features.return_value = {0:1, 1:2}  # Define the expected feature
         classifier = PerceptronClassifier(weights, self.featurizer)
 
         # Initialize some example values
-        features = Counter({0: 1, 1: 2})
-        prediction = 1
+        prediction = classifier.predict([ "hi bye bye"], True)
         true_label = 0
         alpha = 0.1
 
         # Update weights using the function
-        classifier.update_weights(features, prediction, true_label, alpha)
+        classifier.update_weights(prediction, true_label, alpha)
 
         # Check if weights have been updated correctly
         # Weight update equation: w_new = w_old + alpha * true_label * feature_value
@@ -183,7 +195,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         alpha = 0.1
 
         # Update weights using the function
-        classifier.update_weights(features, prediction, true_label, alpha)
+        classifier.update_weights(prediction, true_label, alpha)
 
         # Ensure the weights didn't change
         updated_weights = classifier.weights
@@ -208,7 +220,7 @@ class TestTrainPerceptron(unittest.TestCase):
         ]
         # You might need to initialize other objects required for testing train_perceptron
 
-    def no_test_train_perceptron(self):
+    def test_no_training_examples(self):
         # Test the train_perceptron function
         no_train_exs = []
 
@@ -218,9 +230,31 @@ class TestTrainPerceptron(unittest.TestCase):
         # Check if the returned model is of the correct type
         self.assertIsInstance(perceptron_model, PerceptronClassifier, "Model type is incorrect")
 
-        # You can add more specific assertions to check the behavior of train_perceptron
-        # For example, you might want to test whether the model is trained correctly on the given examples
+    def test_single_training_examples(self):
+        # Test the train_perceptron function
+        train_exs = [
+            SentimentExample(["i", "love", "this", "movie"], 1),
+        ]
+
+        # Call the train_perceptron function
+        epochs = 1
+        seed = 42
+        alpha = 0.1
+        perceptron_model = train_perceptron(train_exs, self.fe_extractor, epochs, seed, alpha)
+
+        # Define the expected weights based on the known seed
+        expected_weights = np.array([0.37454 , 0.950714, 0.731994, 0.598658])
+
+        # Assert that the model's weights match the expected values
+        #self.assertTrue(np.array_equal(perceptron_model.weights, expected_weights))
+        #assert_array_equal(perceptron_model.weights, expected_weights)
+        assert_allclose(perceptron_model.weights, expected_weights, rtol=1e-6, atol=1e-6)
+
 
 if __name__ == '__main__':
     unittest.main()
+    #loader = unittest.TestLoader()
+    #suite = loader.loadTestsFromName('test_models.TestTrainPerceptron.test_single_training_examples')
+    #runner = unittest.TextTestRunner(verbosity=0)
+    #result = runner.run(suite)
 

@@ -2,8 +2,23 @@
 
 from sentiment_data import *
 from utils import *
+import numpy as np
 
 from collections import Counter
+import logging
+
+# Configure logging to use DEBUG level
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Define a module-level variable for the random seed
+RANDOM_SEED = None
+
+def set_random_seed(seed):
+    global RANDOM_SEED
+    RANDOM_SEED = seed
+    np.random.seed(RANDOM_SEED)
+
 
 class FeatureExtractor(object):
     """
@@ -44,11 +59,14 @@ class UnigramFeatureExtractor(FeatureExtractor):
             and we'd get a Counter with { 0:2, 1:1 }. If we call it again with "bye Javid bye Javid",
             it would index bye as 2 and we'd get { 1:2, 2,2 }.
         """
+        logger.debug(f"UnigramFeatureExtractor::extract_features -- sentence: {sentence}")
         counter = Counter()
         for word in sentence:
             index = self.indexer.add_and_get_index( word, add=add_to_indexer )
             if index >= 0: # Only consider words that are present in the indexer
                 counter[index] += 1
+
+        logger.debug(f"UnigramFeatureExtractor::extract_features -- counter: {counter}")
         return counter
 
 
@@ -94,23 +112,37 @@ class PerceptronClassifier(SentimentClassifier):
     superclass. Hint: you'll probably need this class to wrap both the weight vector and featurizer -- feel free to
     modify the constructor to pass these in.
     """
-    # def __init__(self, weights, featurizer):
-    def __init__(self, weights: List[float], featurizer):
+    def __init__(self, weights: List[float], featurizer: FeatureExtractor):
         self.weights = weights
         self.featurizer = featurizer
+        self.prediction_features = None
 
-    def predict(self, sentence: List[str]) -> int:
+    def predict(self, sentence: List[str], is_training: bool = False) -> int:
         # Extract features using the featurizer, which will return the Counter
-        features = self.featurizer.extract_features(sentence)
+        logger.debug(f"PerceptronClassifier::predict -- sentence: {sentence}, seed: {RANDOM_SEED}")
+
+        self.prediction_features = self.featurizer.extract_features(sentence, is_training)
+        logger.debug(f"PerceptronClassifier::predict -- prediction_features: {self.prediction_features}, count: {len(self.prediction_features)}")
+
+        num_features = len(self.featurizer.get_indexer())
+
+        # Update the size of the weights array if needed
+        if num_features > len(self.weights):
+            additional_weights = np.random.random(num_features - len(self.weights))
+            self.weights = np.concatenate((self.weights, additional_weights))
 
         # Perform the prediction based on features and weights
-        score = sum(self.weights[index] * value for index, value in features.items())
+        score = sum(self.weights[index] * value for index, value in self.prediction_features.items())
         if score >= 0:
-            return 1  # Positive class
+            predicted_label = 1  # Positive class
         else:
-            return 0  # Negative class
+            predicted_label = 0  # Negative class
 
-    def update_weights(self, features: Counter, prediction: int, true_label: int, alpha: float):
+        logger.debug(f"PerceptronClassifier::predict -- num_features: {num_features}, Weights: {self.weights}, Score: {score}, Predicted Label: {predicted_label}")
+
+        return predicted_label
+
+    def update_weights(self, prediction: int, true_label: int, alpha: float):
         """
         Update the weights of the Perceptron based on the prediction and true label.
         :param features: Dictionary of features extracted from the input data
@@ -118,9 +150,13 @@ class PerceptronClassifier(SentimentClassifier):
         :param true_label: The true label (0 or 1)
         :param alpha: Learning rate
         """
+        logger.debug(f"PerceptronClassifier::update_weights - Predicted Label: {prediction}, True Label: {true_label}, Alpha: {alpha}")
+
         if prediction != true_label:
             adjusted_true_label = 2 * true_label - 1  # Map 0 to -1 and 1 to +1
-            for index, value in features.items():
+            logger.debug(f"PerceptronClassifier::update_weights - Adjusted True Label: {adjusted_true_label}")
+
+            for index, value in self.prediction_features.items():
                 # value is the word count
                 self.weights[index] += alpha * adjusted_true_label * value
 
@@ -134,36 +170,31 @@ class LogisticRegressionClassifier(SentimentClassifier):
         raise Exception("Must be implemented")
 
 
-def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor) -> PerceptronClassifier:
+def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 10, seed: int = None, alpha: float = 0.1) -> PerceptronClassifier:
     """
     Train a classifier with the perceptron.
     :param train_exs: training set, List of SentimentExample objects
     :param feat_extractor: feature extractor to use
+    :param epochs: number of training epochs (optional)
+    :param seed: random seed for reproducibility (optional)
     :return: trained PerceptronClassifier model
     """
-    epochs = 20
+    if seed is not None:
+        set_random_seed(seed)
 
-    raise Exception("Must be implemented")
 
-    # Initialize feature vector lists
-    #feature_vectors = []
-    #labels = []
+    logger.debug(f"train_perceptron:: seed: {RANDOM_SEED}")
 
-    # Loop through training examples
-    #for example in train_exs:
-    #    features = feat_extractor.extract_features(example.words)
-    #    feature_vectors.append(features)
-    #    labels.append(example.label)
+    weights = np.array([])  # Initialize weights with an empty array
+    classifier = PerceptronClassifier( weights, feat_extractor )
 
-    # Convert feature vectors to sparse format suitable for your ML library
-    # ...
+    for t in range( epochs ):
+        for index, example in enumerate(train_exs):
+            prediction = classifier.predict( example.words, True )
+            classifier.update_weights( prediction, example.label, alpha )
+            logger.debug(f"train_perceptron:: Index: {index}, Example: {example.words}, Label: {example.label}, Prediction: {prediction}, Updated Weights: {classifier.weights}")
 
-    # Train your Perceptron model using the prepared feature vectors and labels
-    # classifier = PerceptronClassifier(weights, featurizer)
-    # ...
-
-    # Return trained model
-    #return model
+    return classifier
 
 
 def train_logistic_regression(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor) -> LogisticRegressionClassifier:
