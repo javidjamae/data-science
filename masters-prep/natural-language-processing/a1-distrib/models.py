@@ -7,7 +7,7 @@ import numpy as np
 from collections import Counter
 import logging
 
-# Configure logging to use DEBUG level
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -142,13 +142,14 @@ class PerceptronClassifier(SentimentClassifier):
 
         return predicted_label
 
-    def update_weights(self, prediction: int, true_label: int, alpha: float):
+    def update_weights(self, prediction: int, true_label: int, alpha: float) -> bool:
         """
         Update the weights of the Perceptron based on the prediction and true label.
         :param features: Dictionary of features extracted from the input data
         :param prediction: The predicted label (0 or 1)
         :param true_label: The true label (0 or 1)
         :param alpha: Learning rate
+        :return: true if the weights were updated, false if they were not
         """
         logger.debug(f"PerceptronClassifier::update_weights - Predicted Label: {prediction}, True Label: {true_label}, Alpha: {alpha}")
 
@@ -159,6 +160,9 @@ class PerceptronClassifier(SentimentClassifier):
             for index, value in self.prediction_features.items():
                 # value is the word count
                 self.weights[index] += alpha * adjusted_true_label * value
+            return True
+        else:
+            return False
 
 class LogisticRegressionClassifier(SentimentClassifier):
     """
@@ -169,6 +173,36 @@ class LogisticRegressionClassifier(SentimentClassifier):
     def __init__(self):
         raise Exception("Must be implemented")
 
+class PerceptronTrainer():
+    def __init__(self, train_exs:List[SentimentExample], feat_extractor:FeatureExtractor, epochs:int = 10, seed:int =None, alpha:float=0.1,):
+        self.train_exs = train_exs
+        self.feat_extractor = feat_extractor
+        self.epochs = epochs
+        self.alpha = alpha
+        self.number_correct_in_current_epoch = 0
+        self.weights = np.array([])  # Initialize weights with an empty array
+        self.classifier = PerceptronClassifier( self.weights, self.feat_extractor )
+        self.converged = False
+        if seed is not None:
+            set_random_seed(seed)
+
+    def train(self):
+        for t in range( self.epochs ):
+            logger.debug("--------------------------------------")
+            logger.debug(f"PerceptronTrainer.train:: epoch: {t}")
+            self.number_correct_in_current_epoch = 0
+            for index, example in enumerate(self.train_exs):
+                prediction = self.classifier.predict( example.words, True )
+                is_weight_updated = self.classifier.update_weights( prediction, example.label, self.alpha )
+                logger.debug(f"PerceptronTrainer.train:: Index: {index}, Example: {example.words}, Label: {example.label}, Prediction: {prediction}, Updated Weights: {self.classifier.weights}, is_weight_updated: {is_weight_updated}")
+                if( not is_weight_updated ):
+                    self.number_correct_in_current_epoch += 1
+
+            if ( self.number_correct_in_current_epoch == len( self.train_exs ) ):
+                logger.debug(f"PerceptronTrainer.train:: CONVERGED!! Exiting on epoch {t}")
+                self.converged = True
+                break
+        return self.classifier
 
 def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 10, seed: int = None, alpha: float = 0.1) -> PerceptronClassifier:
     """
@@ -179,22 +213,7 @@ def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureE
     :param seed: random seed for reproducibility (optional)
     :return: trained PerceptronClassifier model
     """
-    if seed is not None:
-        set_random_seed(seed)
-
-
-    logger.debug(f"train_perceptron:: seed: {RANDOM_SEED}")
-
-    weights = np.array([])  # Initialize weights with an empty array
-    classifier = PerceptronClassifier( weights, feat_extractor )
-
-    for t in range( epochs ):
-        for index, example in enumerate(train_exs):
-            prediction = classifier.predict( example.words, True )
-            classifier.update_weights( prediction, example.label, alpha )
-            logger.debug(f"train_perceptron:: Index: {index}, Example: {example.words}, Label: {example.label}, Prediction: {prediction}, Updated Weights: {classifier.weights}")
-
-    return classifier
+    return PerceptronTrainer(train_exs, feat_extractor, epochs, seed, alpha).train()
 
 
 def train_logistic_regression(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor) -> LogisticRegressionClassifier:
