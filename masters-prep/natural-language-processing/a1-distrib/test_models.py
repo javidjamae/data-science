@@ -1,13 +1,13 @@
-import unittest
-import numpy as np
-import logging
-
+from collections import Counter
+from models import UnigramFeatureExtractor, PerceptronClassifier, train_perceptron, PerceptronTrainer
 from numpy.testing import *
 from sentiment_data import *
-from utils import *
-from models import UnigramFeatureExtractor, PerceptronClassifier, train_perceptron, PerceptronTrainer
-from collections import Counter
 from unittest.mock import Mock
+from utils import *
+
+import logging
+import numpy as np
+import unittest
 
 # Configure logging to use DEBUG level
 logging.basicConfig(level=logging.DEBUG)
@@ -255,7 +255,7 @@ class TestPerceptronTrainer(unittest.TestCase):
         ]
 
         # Call the train_perceptron function
-        trainer = PerceptronTrainer(train_exs, self.fe_extractor, epochs=100, seed=42, alpha=0.1)
+        trainer = PerceptronTrainer(train_exs, self.fe_extractor, epochs=100, seed=42, alpha=0.1, shuffle=False)
         perceptron_model = trainer.train()
 
         # Define the expected weights based on the known seed

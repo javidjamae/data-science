@@ -1,11 +1,10 @@
 # models.py
-
+from collections import Counter
 from sentiment_data import *
 from utils import *
-import numpy as np
-
-from collections import Counter
 import logging
+import numpy as np
+import random
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -173,8 +172,28 @@ class LogisticRegressionClassifier(SentimentClassifier):
     def __init__(self):
         raise Exception("Must be implemented")
 
+class LearningRateSchedule():
+    def get_new_rate( epoch:int ):
+        raise( "instantiate this in the subclass" )
+
+class FixedLearningRateSchedule( LearningRateSchedule ):
+    def __init__( self, initial_rate:float = 1 ):
+        self.rate = initial_rate
+
+    def get_new_rate( self, epoch:int ):
+        return self.rate
+
+class OneOverTeeLearningRateSchedule(LearningRateSchedule):
+    def __init__( self, initial_rate:float = 1 ):
+        self.rate = initial_rate
+
+    def get_new_rate( self, epoch:int ):
+        if ( epoch > 0 ):
+            self.rate = 1 / epoch
+        return self.rate
+
 class PerceptronTrainer():
-    def __init__(self, train_exs:List[SentimentExample], feat_extractor:FeatureExtractor, epochs:int = 10, seed:int =None, alpha:float=0.1,):
+    def __init__(self, train_exs:List[SentimentExample], feat_extractor:FeatureExtractor, epochs:int=10, seed:int=None, alpha:float=0.1, shuffle:bool=True, learning_rate_schedule:LearningRateSchedule=None):
         self.train_exs = train_exs
         self.feat_extractor = feat_extractor
         self.epochs = epochs
@@ -183,14 +202,26 @@ class PerceptronTrainer():
         self.weights = np.array([])  # Initialize weights with an empty array
         self.classifier = PerceptronClassifier( self.weights, self.feat_extractor )
         self.converged = False
+        self.shuffle = shuffle
+
         if seed is not None:
             set_random_seed(seed)
 
+        if learning_rate_schedule is not None:
+            self.learning_rate_schedule = learning_rate_schedule
+        else: # no schedule provided, keep it the same across epochs
+            self.learning_rate_schedule = FixedLearningRateSchedule(alpha)
+
     def train(self):
-        for t in range( self.epochs ):
+        for t in range( 1, self.epochs + 1 ):
             logger.debug("--------------------------------------")
             logger.debug(f"PerceptronTrainer.train:: epoch: {t}")
             self.number_correct_in_current_epoch = 0
+            self.alpha = self.learning_rate_schedule.get_new_rate( t )
+
+            if( self.shuffle ):
+                random.shuffle(self.train_exs)
+
             for index, example in enumerate(self.train_exs):
                 prediction = self.classifier.predict( example.words, True )
                 is_weight_updated = self.classifier.update_weights( prediction, example.label, self.alpha )
@@ -204,7 +235,7 @@ class PerceptronTrainer():
                 break
         return self.classifier
 
-def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 10, seed: int = None, alpha: float = 0.1) -> PerceptronClassifier:
+def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 40, seed: int = None, alpha: float = 0.1) -> PerceptronClassifier:
     """
     Train a classifier with the perceptron.
     :param train_exs: training set, List of SentimentExample objects
@@ -213,7 +244,9 @@ def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureE
     :param seed: random seed for reproducibility (optional)
     :return: trained PerceptronClassifier model
     """
-    return PerceptronTrainer(train_exs, feat_extractor, epochs, seed, alpha).train()
+    learning_rate_schedule = OneOverTeeLearningRateSchedule(1)
+    #learning_rate_schedule = None
+    return PerceptronTrainer(train_exs, feat_extractor, epochs=epochs, seed=seed, alpha=alpha, shuffle=True, learning_rate_schedule=learning_rate_schedule).train()
 
 
 def train_logistic_regression(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor) -> LogisticRegressionClassifier:

@@ -151,6 +151,24 @@ It can help prevent overfitting by constraining the weights but does not general
 
 Elastic Net combines L1 and L2 regularization. It's useful when there are multiple correlated features.
 
+### Newton's Method
+
+#### Intuition
+The intuition behind Newton's Method is that it takes into account not only the gradient (first derivative) of the objective function (cost function) but also the curvature (second derivative) at the current solution. This allows the algorithm to take larger steps when the curvature is gentle and smaller steps when the curvature is steep, resulting in faster convergence toward the optimal solution.
+
+However, there are some important considerations with Newton's Method:
+
+- **Computational Cost:** Calculating and inverting the Hessian matrix can be computationally expensive, especially when dealing with high-dimensional problems.
+- **Convergence Issues:** Newton's Method might not always converge, especially when the Hessian is ill-conditioned or the initial guess is far from the optimum.
+- **Positive Definiteness:** The Hessian matrix must be positive definite for the optimization process to work properly.
+
+Newton's Method can be applied to various optimization problems, including both linear and non-linear cases. In the context of machine learning and optimization, Newton's Method can be very effective for certain types of problems but might not be suitable for all scenarios due to its computational demands and potential convergence issues. In practice, approximate versions like the Quasi-Newton L-BFGS algorithm are often used to mitigate these challenges.
+
+#### Compared to Perceptron
+Newton's Method and the Perceptron algorithm serve different purposes and have different underlying principles. The Perceptron algorithm is specifically designed for binary classification tasks and focuses on updating weights based on misclassified instances. It's a simple and fast algorithm that aims to find a linear decision boundary that separates two classes. 
+
+On the other hand, Newton's Method is a more general optimization algorithm that can be used to find the minimum (or maximum) of any differentiable function, not just for classification tasks. While Newton's Method can theoretically be applied to optimization problems in machine learning, it's not commonly used for training classifiers due to its computational complexity, convergence issues, and suitability for high-dimensional problems.
+
 ### Adaptive Methods
 
 Here is a summary of some of the Adaptive Methods for selecting the $\alpha$ hyperparameter.

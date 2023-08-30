@@ -1,0 +1,87 @@
+---------------------------------------------------------
+epochs=30, shuffling=False, learning_rate_schedule=Fixed
+---------------------------------------------------------
+14:43 $ python3 sentiment_classifier.py --model PERCEPTRON --no_run_on_test
+Namespace(model='PERCEPTRON', feats='UNIGRAM', train_path='data/train.txt', dev_path='data/dev.txt', blind_test_path='data/test-blind.txt', test_output_path='test-blind.output.txt', run_on_test=False)
+6920 / 872 / 1821 train/dev/test examples
+=====Train Accuracy=====
+Accuracy: 5133 / 6920 = 0.741763
+Precision (fraction of predicted positives that are correct): 1991 / 2159 = 0.922186; Recall (fraction of true positives predicted correctly): 1991 / 3610 = 0.551524; F1 (harmonic mean of precision and recall): 0.690241
+=====Dev Accuracy=====
+Accuracy: 536 / 872 = 0.614679
+Precision (fraction of predicted positives that are correct): 156 / 204 = 0.764706; Recall (fraction of true positives predicted correctly): 156 / 444 = 0.351351; F1 (harmonic mean of precision and recall): 0.481481
+Time for training and evaluation: 15.96 seconds
+
+----------------------------------------------------------
+epochs=1000, shuffling=False, learning_rate_schedule=Fixed
+----------------------------------------------------------
+Namespace(model='PERCEPTRON', feats='UNIGRAM', train_path='data/train.txt', dev_path='data/dev.txt', blind_test_path='data/test-blind.txt', test_output_path='test-blind.output.txt', run_on_test=False)
+6920 / 872 / 1821 train/dev/test examples
+=====Train Accuracy=====
+Accuracy: 6920 / 6920 = 1.000000
+Precision (fraction of predicted positives that are correct): 3610 / 3610 = 1.000000; Recall (fraction of true positives predicted correctly): 3610 / 3610 = 1.000000; F1 (harmonic mean of precision and recall): 1.000000
+=====Dev Accuracy=====
+Accuracy: 624 / 872 = 0.715596
+Precision (fraction of predicted positives that are correct): 311 / 426 = 0.730047; Recall (fraction of true positives predicted correctly): 311 / 444 = 0.700450; F1 (harmonic mean of precision and recall): 0.714943
+Time for training and evaluation: 426.42 seconds
+
+-------------------------------------------------------
+epochs=30, shuffling=True, learning_rate_schedule=Fixed
+-------------------------------------------------------
+14:41 $ python3 sentiment_classifier.py --model PERCEPTRON --no_run_on_test
+Namespace(model='PERCEPTRON', feats='UNIGRAM', train_path='data/train.txt', dev_path='data/dev.txt', blind_test_path='data/test-blind.txt', test_output_path='test-blind.output.txt', run_on_test=False)
+6920 / 872 / 1821 train/dev/test examples
+=====Train Accuracy=====
+Accuracy: 6755 / 6920 = 0.976156
+Precision (fraction of predicted positives that are correct): 3609 / 3773 = 0.956533; Recall (fraction of true positives predicted correctly): 3609 / 3610 = 0.999723; F1 (harmonic mean of precision and recall): 0.977651
+=====Dev Accuracy=====
+Accuracy: 636 / 872 = 0.729358
+Precision (fraction of predicted positives that are correct): 339 / 470 = 0.721277; Recall (fraction of true positives predicted correctly): 339 / 444 = 0.763514; F1 (harmonic mean of precision and recall): 0.741794
+Time for training and evaluation: 16.07 seconds
+
+
+-------------------------------------------------------
+epochs=30, shuffling=True, learning_rate_schedule=1/t
+-------------------------------------------------------
+14:49 $ python3 sentiment_classifier.py --model PERCEPTRON --no_run_on_test
+Namespace(model='PERCEPTRON', feats='UNIGRAM', train_path='data/train.txt', dev_path='data/dev.txt', blind_test_path='data/test-blind.txt', test_output_path='test-blind.output.txt', run_on_test=False)
+6920 / 872 / 1821 train/dev/test examples
+=====Train Accuracy=====
+Accuracy: 6906 / 6920 = 0.997977
+Precision (fraction of predicted positives that are correct): 3597 / 3598 = 0.999722; Recall (fraction of true positives predicted correctly): 3597 / 3610 = 0.996399; F1 (harmonic mean of precision and recall): 0.998058
+=====Dev Accuracy=====
+Accuracy: 647 / 872 = 0.741972
+Precision (fraction of predicted positives that are correct): 331 / 443 = 0.747178; Recall (fraction of true positives predicted correctly): 331 / 444 = 0.745495; F1 (harmonic mean of precision and recall): 0.746336
+Time for training and evaluation: 15.88 seconds
+
+
+
+-------------------------------------------------------
+epochs=40, shuffling=True, learning_rate_schedule=1/t
+-------------------------------------------------------
+14:52 $ python3 sentiment_classifier.py --model PERCEPTRON --no_run_on_test
+Namespace(model='PERCEPTRON', feats='UNIGRAM', train_path='data/train.txt', dev_path='data/dev.txt', blind_test_path='data/test-blind.txt', test_output_path='test-blind.output.txt', run_on_test=False)
+6920 / 872 / 1821 train/dev/test examples
+=====Train Accuracy=====
+Accuracy: 6918 / 6920 = 0.999711
+Precision (fraction of predicted positives that are correct): 3608 / 3608 = 1.000000; Recall (fraction of true positives predicted correctly): 3608 / 3610 = 0.999446; F1 (harmonic mean of precision and recall): 0.999723
+=====Dev Accuracy=====
+Accuracy: 641 / 872 = 0.735092
+Precision (fraction of predicted positives that are correct): 331 / 449 = 0.737194; Recall (fraction of true positives predicted correctly): 331 / 444 = 0.745495; F1 (harmonic mean of precision and recall): 0.741321
+Time for training and evaluation: 21.11 seconds
+
+
+
+-------------------------------------------------------
+epochs=40, shuffling=True, learning_rate_schedule=1/t
+-------------------------------------------------------
+14:54 $ python3 sentiment_classifier.py --model PERCEPTRON
+Namespace(model='PERCEPTRON', feats='UNIGRAM', train_path='data/train.txt', dev_path='data/dev.txt', blind_test_path='data/test-blind.txt', test_output_path='test-blind.output.txt', run_on_test=True)
+6920 / 872 / 1821 train/dev/test examples
+=====Train Accuracy=====
+Accuracy: 6918 / 6920 = 0.999711
+Precision (fraction of predicted positives that are correct): 3608 / 3608 = 1.000000; Recall (fraction of true positives predicted correctly): 3608 / 3610 = 0.999446; F1 (harmonic mean of precision and recall): 0.999723
+=====Dev Accuracy=====
+Accuracy: 654 / 872 = 0.750000
+Precision (fraction of predicted positives that are correct): 335 / 444 = 0.754505; Recall (fraction of true positives predicted correctly): 335 / 444 = 0.754505; F1 (harmonic mean of precision and recall): 0.754505
+Time for training and evaluation: 21.23 seconds

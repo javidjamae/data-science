@@ -1,6 +1,6 @@
 # Assignment 1: Sentiment Classification
 
-This assignment is from [this course](https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html) and the original assignment [is here](https://www.cs.utexas.edu/~gdurrett/courses/online-course/a1.pdf).
+This assignment is from [this course](https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html) and the original assignment [is here](https://www.cs.utexas.edu/~gdurrett/courses/online-course/a1.pdf). The code is in the [a1-distrib](./a1-distrib/README.md) folder.
 
 ## Overview
 
@@ -128,3 +128,42 @@ Richard Socher, Alex Perelygin, Jean Wu, Jason Chuang, Christopher D. Manning, A
 
 2. Our autograder hardware is fairly powerful and we will be lenient about rounding, so don’t worry if you’re close to this
 threshold.
+
+# Solution Notes
+
+## Part 1: Perceptron 
+
+### Code Overview
+
+These are the key elements that I created or updated in the models.py code:
+- **UnigramFeatureExtractor**: Extracts unigram bag-of-words features from sentences. It indexes the unigrams and then creates a Counter for the given example with the unigram indices as the keys and the unigram counts as the values.
+- **PerceptronClassifier**: Predicts sentiment labels using the perceptron algorithm, also maintains the weight vector and updates it.
+- **PerceptronTrainer**: Handles training process for the perceptron classifier. Uses on-the-fly weight vector resizing during training. Optionally shuffles training examples each epoch.
+- **LearningRateSchedule**: Abstract class encapsulating learning rate schedules, with the following subclasses:
+  - **FixedLearningRateSchedule**: Supports a fixed learning rate (i.e. alpha stays the same across epochs).
+  - **OneOverTeeLearningRateSchedule**: Supports a learning rate that is inversely proportional to the epoch number (i.e. 1/t, where t is the epoch number).
+- **train_perceptron**: Trains a perceptron classifier by merely delegating to the PerceptronTrainer.
+
+### Results
+
+Totals: 6920 / 872 / 1821 train/dev/test examples
+
+| Epochs | Learning Rate Schedule | Example Shuffle | Accuracy | Precision | Recall | F1 | Total Time |
+|--------|------------------------|-----------------|----------|-----------|--------|----|------------|
+|   30   |        Fixed           |   False         |   0.741763 / 0.614679       |  0.922186 / 0.764706         |  0.551524 / 0.351351      | 0.690241 / 0.481481   |     15.96 seconds       |
+| 1000 | Fixed | False | 1.000000 / 0.715596 | 1.000000 / 0.730047 | 1.000000 / 0.700450 | 1.000000 / 0.714943 | 426.42 seconds |
+| 30 | Fixed | True | 0.976156 / 0.729358 | 0.956533 / 0.721277 | 0.999723 / 0.763514 | 0.977651 / 0.741794 |  16.07 seconds |
+| 30 | 1/t | True |  0.997977 / 0.741972 | 0.999722 / 0.747178 | 0.996399 / 0.745495 | 0.998058 / 0.746336 | 15.88 seconds | 
+| 40 | 1/t | True | 0.999711 / 0.735092 | 1.000000 / 0.737194 | 0.999446 / 0.745495 | 0.999723 / 0.741321 | 21.11 seconds |
+
+
+Where:
+- **Epochs** is the max number of epochs that the training will go through
+- **Learning Rate Schedule** is how alpha is updated across epochs
+- **Example Shuffle** is whether or not the examples are shuffled between epochs
+- **Accuracy** is the number correct predictions to actual labels (training/dev/test)
+- **Precision** is the fraction of predicted positives that are correct (training/dev/test)
+- **Recall** is the fraction of true positives predicted correctly (training/dev/test)
+- **F1** is the harmonic mean of precision and recall (training/dev/test)
+- **Total Time** is the time for training and evaluation
+
