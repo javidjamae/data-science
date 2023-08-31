@@ -10,7 +10,9 @@ These meight be the weights associated with a linear binary classifier, or the p
 
 With supervised learning, we'll assume we have access to labeled data, in this form:
 
-$$(\overline{x}^{[i]}, y^{[i]}) \text{ from } i=i \text{ to } D$$
+$$
+\bigg(\overline{x}^{[i]}, y^{[i]}\bigg) \vphantom{\sum_{i=1}^{D}} _{i=1}^D
+$$
 
 where:
 
@@ -47,7 +49,7 @@ Stochastic Gradient Descent:
 * for $t$ up to num epochs:
   * for $i$ up to $D$:
     * sample $j$ from $[1, D]$
-    * $ \overline{w} \leftarrow \overline{w} - \alpha \frac{\partial}{\partial \overline{w}} \text{loss}(\overline{x}^{[j]}, y^{[j]}, \overline{w}) $
+    * $ \overline{w} \leftarrow \overline{w} - \alpha \frac{\partial}{\partial \overline{w}} \text{loss}(\overline{x}^{[j]}, y^{[j]}, \overline{w})$
 
 The partial derivative is the gradient of the loss with respect to $\overline{w}$. This points towards $\overline{w}$ that give higher loss. So we subtract it to reduce the loss, multiplied by a step size (or learning rate) $\alpha$, where $\alpha$ is used to control how far (or fast) we move during gradient descent for each $t$.
 

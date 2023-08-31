@@ -132,3 +132,63 @@ Some additional or specialized types of learning might include:
 ### Federated Learning
    - **Definition**: Training models across decentralized devices or servers holding local data samples, without exchanging them.
    - **Usage**: Preserving privacy and reducing the need for transferring large amounts of data.
+
+# Models
+
+## Characteristics of a Model:
+
+1. **Parameters**: A model has adjustable parameters that are trained using a learning algorithm. For instance, in linear regression, the parameters are the slope and intercept.
+  
+2. **Function**: It embodies a mathematical function that performs mapping from input to output. For instance, logistic regression uses a logistic function to map input features to an output between 0 and 1.
+  
+3. **Scope**: A model has a defined scope within which it makes predictions. It can be as simple as a single-variable linear equation or as complex as a deep neural network trained to recognize human speech.
+
+4. **Data-Driven**: A model's effectiveness is evaluated based on how well it performs on unseen data, making it inherently empirical.
+
+5. **Interpretable or Black-Box**: Some models like decision trees are interpretable because you can see the decision-making process. Others like neural networks are often considered "black boxes" because their decision-making process is not easily understandable.
+
+6. **Generalization**: A key goal is for the model to generalize well from the training data to new, unseen data.
+
+7. **Objective Function**: Models often have an associated objective function that the learning algorithm tries to optimize. For example, minimizing the mean squared error in regression models.
+
+## Identifying a Model
+
+1. **Input-Output Mapping**: If it takes input features and maps them to an output, it's a model.
+  
+2. **Trainability**: If its parameters can be adjusted based on data to improve its predictive performance, it's a model.
+  
+3. **Evaluation**: If its performance can be measured using specific metrics (like accuracy, precision, recall, etc.), it's a model.
+  
+4. **Algorithmic Basis**: If it employs a mathematical or algorithmic basis for making predictions or decisions, it's likely a model.
+  
+5. **Context**: If it's described within the framework of solving a specific problem through learning from data, it's a model.
+
+## Blueprint vs Instance
+
+In machine learning, the term "model" can refer to different concepts depending on the context. The term "model" can refer to both an "instance" and a "blueprint," depending on the context in which it's used.
+
+In many discussions, people shift between these two meanings of "model" based on context. When they're talking about the general process or algorithm, they mean the blueprint. When discussing the results of a training process, they're referring to the specific "instance".
+
+> Note: The terms blueprint and instance are not common ML vernacular, I'm just using them to explain the idea of these separate contexts.
+
+### Model as a Blueprint
+
+- **Algorithmic Framework**: When you say "linear regression model" or "neural network model," you are often referring to the general algorithmic structure. This is the blueprint that describes how input data should be transformed into output but does not specify the exact transformations until trained.
+
+- **Model Architecture**: Describes the layout or topology of the model. For example, in a neural network, the architecture specifies the number of layers, types of layers (convolutional, recurrent, etc.), and how they are connected.
+
+- **Model Family**: Refers to a general class of models that share a common structure but have different parameters. Examples include "linear regression models" or "decision trees."
+
+- **Hyperparameters**: At the blueprint level, you may define hyperparameters that shape the structure of the model but are not learned from the data.
+
+- **Untuned**: At this stage, the model is essentially an abstract concept awaiting instantiation through training.
+
+### Model as an Instance
+
+- **Trained Model**: Once you train a model on data, you populate its blueprint with specific parameters. This "trained model" is an instance of the general algorithmic framework, fine-tuned for a specific task.
+
+- **Model Parameters**: These include specific coefficients in a linear regression model, weights in a neural network, or splits in a decision tree that have been learned from the data.
+
+- **Data-Specific**: This instance works well for the data it was trained on and, hopefully, for similar unseen data.
+
+- **Evaluatable**: An instantiated model can be evaluated using metrics like accuracy or mean squared error to quantify how well it performs its intended task.
