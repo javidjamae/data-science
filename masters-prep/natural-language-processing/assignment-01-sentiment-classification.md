@@ -167,3 +167,20 @@ Where:
 - **F1** is the harmonic mean of precision and recall (training/dev/test)
 - **Total Time** is the time for training and evaluation
 
+
+### Hugging Face Autotrain
+
+I thought it would be interesting to try out Hugging Face's Autotrain feature to see if I could get similar results with their binary classifier.
+
+I created [this text classification model](https://huggingface.co/javidjamae/autotrain-movie-sentiment-86557143111) by uploading the first 2000 records of the training set and the development set, and was able to train it and get similar results:
+
+**Validation Metrics**
+* Loss: 0.736
+* Accuracy: 0.747
+* Precision: 0.669
+* Recall: 0.993
+* AUC: 0.932
+* F1: 0.800
+
+
+
