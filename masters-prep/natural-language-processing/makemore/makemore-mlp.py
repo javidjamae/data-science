@@ -2,6 +2,10 @@ import torch
 import random
 import torch.nn.functional as F
 import itertools
+import logging
+
+
+print(torch.__version__)
 
 # read in all the words
 words = open('names.txt', 'r').read().splitlines()
@@ -11,7 +15,10 @@ stoi = { s:i+1 for i,s in enumerate(chars) }
 stoi['.'] = 0
 itos = { i:s for s,i in stoi.items() }
 
+VOCAB_SIZE=27
 
+
+@torch.no_grad()
 def reset_model(hidden_layer=None, embedding_dimensions=None, block_size=None):
     if hidden_layer is None or embedding_dimensions is None or block_size is None:
         raise ValueError("All parameters (hidden_layer, embedding_dimensions, block_size) must be provided.")
@@ -19,16 +26,19 @@ def reset_model(hidden_layer=None, embedding_dimensions=None, block_size=None):
     global g, C, W1, b1, W2, b2, parameters
 
     g = torch.Generator().manual_seed(2147843647)
-    C = torch.randn(( 27, embedding_dimensions ), generator=g, requires_grad=True)
-    W1 = torch.randn((block_size*embedding_dimensions, hidden_layer), generator=g, requires_grad=True)
-    b1 = torch.randn(hidden_layer, generator=g, requires_grad=True)
-    W2 = torch.randn((hidden_layer, 27), requires_grad=True)
-    b2 = torch.randn(27, requires_grad=True)
-    parameters = [C, W1, b1, W2, b2]
-    num_params = sum(p.nelement() for p in parameters)
-    return num_params
+    C = torch.randn( ( VOCAB_SIZE, embedding_dimensions ), generator=g )
+    # Using the Kaiming initialization with a 5/3 gain for the tanh.
+    W1 = torch.randn( ( block_size * embedding_dimensions, hidden_layer ), generator=g ) * (5/3) / (block_size * embedding_dimensions)**0.5
+    b1 = torch.randn( hidden_layer, generator=g) * 0.01
+    W2 = torch.randn( ( hidden_layer, VOCAB_SIZE), generator=g ) * 0.01
+    b2 = torch.randn( VOCAB_SIZE, generator=g ) * 0.01
+    parameters = [ C, W1, b1, W2, b2 ]
+
+    for p in parameters:
+        p.requires_grad = True
 
 
+@torch.no_grad()
 def build_dataset(words, block_size=None):
     if block_size is None:
         raise ValueError("All parameters (block_size) must be provided.")
@@ -48,8 +58,8 @@ def build_dataset(words, block_size=None):
 
     return X, Y
 
-
-def calculate_loss( X, Y, block_size=None):
+@torch.no_grad()
+def calculate_loss( X, Y, C, block_size=None):
     if block_size is None:
         raise ValueError("All parameters (block_size) must be provided.")
 
@@ -60,6 +70,7 @@ def calculate_loss( X, Y, block_size=None):
     return full_loss.item()
 
 
+@torch.no_grad()
 def calculate_learning_rate( total_epochs, current_epoch, initial_lr, decay_factor=None ):
     if decay_factor is None:
         raise ValueError("All parameters (decay_factor) must be provided.")
@@ -74,7 +85,7 @@ def train(X, Y, epochs=50000, batch_size=64, block_size=3, embedding_dimensions=
 
     for i in range(1, epochs + 1):
         # minibatch construct
-        ix = torch.randint(0, X.shape[0], (batch_size,))
+        ix = torch.randint(0, X.shape[0], (batch_size,), generator=g)
 
         # forward pass
         emb = C[X[ix]] # (batch_size, block_size, embedding_dimensions)
@@ -96,14 +107,14 @@ def train(X, Y, epochs=50000, batch_size=64, block_size=3, embedding_dimensions=
         stepi.append(i)
         lossi.append(loss.item())
 
-
-def calculate_losses( Xtr, Ytr, Xdev, Ydev, Xte, Yte ):
-    training_loss = calculate_loss( Xtr, Ytr, block_size=block_size )
-    dev_loss = calculate_loss( Xdev, Ydev, block_size=block_size )
-    test_loss = calculate_loss( Xte, Yte, block_size=block_size )
+@torch.no_grad()
+def calculate_losses( Xtr, Ytr, Xdev, Ydev, Xte, Yte, block_size, C ):
+    training_loss = calculate_loss( Xtr, Ytr, C, block_size=block_size )
+    dev_loss = calculate_loss( Xdev, Ydev, C, block_size=block_size )
+    test_loss = calculate_loss( Xte, Yte, C, block_size=block_size )
     return training_loss, dev_loss, test_loss
 
-
+@torch.no_grad()
 def print_row( block_size, num_params, embedding_dimensions, hidden_layer, epochs, initial_lr, batch_size, decay_factor, training_loss, dev_loss, test_loss ):
     print(f'|{block_size}|{num_params}|{embedding_dimensions}|{hidden_layer}|{epochs}|{initial_lr}|{batch_size}|{decay_factor}|{training_loss:.4f}|{dev_loss:.4f}|{test_loss:.4f}|')
 
@@ -132,6 +143,7 @@ print("|------------|------------|----------------------|--------------|--------
       # hidden_layer=hidden_layer
       # )
 
+@torch.no_grad()
 def get_datasets(block_size):
     cached_datasets = {}
     if block_size not in cached_datasets:
@@ -143,7 +155,7 @@ def get_datasets(block_size):
 
 
 # Define the hyperparameter ranges
-epoch_range = [100000, 300000]
+epoch_range = [100000]
 embedding_dimensions_range = [2, 6, 10, 20]
 initial_lr_values = [0.5, 0.1, 0.05]
 batch_size_values = [32, 64, 128, 256]
@@ -151,27 +163,28 @@ decay_factor_values = [3, 2, 1.5, 1.25]
 hidden_layer_values = [100, 200, 300, 500]
 block_size = [3, 4]
 
-hyperparameter_combinations = list(itertools.product(block_size, embedding_dimensions_range, initial_lr_values, batch_size_values, decay_factor_values, hidden_layer_values))
+hyperparameter_combinations = list(itertools.product(epoch_range, block_size, embedding_dimensions_range, initial_lr_values, batch_size_values, decay_factor_values, hidden_layer_values))
 random.shuffle(hyperparameter_combinations)
 
 # Iterate through the hyperparameter combinations
-for epochs in epoch_range:
-    for combination in hyperparameter_combinations:
-        block_size, embedding_dimensions, initial_lr, batch_size, decay_factor, hidden_layer = combination
+for combination in hyperparameter_combinations:
+    epochs, block_size, embedding_dimensions, initial_lr, batch_size, decay_factor, hidden_layer = combination
 
-        (Xtr, Ytr, Xdev, Ydev, Xte, Yte) = get_datasets(block_size)
+    (Xtr, Ytr, Xdev, Ydev, Xte, Yte) = get_datasets(block_size)
 
-        num_params = reset_model(hidden_layer=hidden_layer, embedding_dimensions=embedding_dimensions, block_size=block_size)
-        train(Xtr,
-              Ytr,
-              epochs=epochs,
-              block_size=block_size,
-              embedding_dimensions=embedding_dimensions,
-              initial_lr=initial_lr,
-              batch_size=batch_size,
-              decay_factor=decay_factor,
-              hidden_layer=hidden_layer
-              )
-        training_loss, dev_loss, test_loss = calculate_losses( Xtr, Ytr, Xdev, Ydev, Xte, Yte )
+    reset_model(hidden_layer=hidden_layer, embedding_dimensions=embedding_dimensions, block_size=block_size)
 
-        print_row( block_size, num_params, embedding_dimensions, hidden_layer, epochs, initial_lr, batch_size, decay_factor, training_loss, dev_loss, test_loss )
+    train(Xtr,
+          Ytr,
+          epochs=epochs,
+          block_size=block_size,
+          embedding_dimensions=embedding_dimensions,
+          initial_lr=initial_lr,
+          batch_size=batch_size,
+          decay_factor=decay_factor,
+          hidden_layer=hidden_layer
+          )
+    training_loss, dev_loss, test_loss = calculate_losses( Xtr, Ytr, Xdev, Ydev, Xte, Yte, block_size, C )
+
+    num_params = sum(p.nelement() for p in parameters)
+    print_row( block_size, num_params, embedding_dimensions, hidden_layer, epochs, initial_lr, batch_size, decay_factor, training_loss, dev_loss, test_loss )
