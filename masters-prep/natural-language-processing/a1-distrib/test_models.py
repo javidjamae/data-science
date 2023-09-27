@@ -1,5 +1,5 @@
 from collections import Counter
-from models import UnigramFeatureExtractor, PerceptronClassifier, train_perceptron, PerceptronTrainer
+from models import *
 from numpy.testing import *
 from sentiment_data import *
 from unittest.mock import Mock
@@ -12,6 +12,82 @@ import unittest
 # Configure logging to use DEBUG level
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+class TestBigramFeatureExtractor(unittest.TestCase):
+
+    def setUp(self):
+        # Initialize any required resources or mock objects
+        self.indexer = Indexer()
+        self.fe_extractor = BigramFeatureExtractor(self.indexer)
+
+    def test_init(self):
+        # Test the initialization of the BigramFeatureExtractor
+        self.assertIsInstance(self.fe_extractor, BigramFeatureExtractor)
+    
+    def test_get_indexer(self):
+        # Test the get_indexer method
+        retrieved_indexer = self.fe_extractor.get_indexer()
+        self.assertIs(retrieved_indexer, self.indexer, "get_indexer should return the same Indexer instance")
+
+    def test_extract_features_empty_sentence(self):
+        empty_sentence = []
+
+        # Extract features from empty sentence using the initialized feature extractor
+        features = self.fe_extractor.extract_features(empty_sentence)
+
+        # Ensure that the features extracted from an empty sentence are also empty
+        self.assertEqual(len(features), 0, "Extracted features should be empty for an empty sentence")
+
+    def test_extract_features_single_word(self):
+        sentence = ["love"]
+
+        # Extract features from the sentence using the initialized feature extractor
+        features = self.fe_extractor.extract_features(sentence, add_to_indexer=True)  # Adding to indexer
+
+        # Check if the feature extraction produced the expected output
+        expected_features = Counter()
+        self.assertEqual(features, expected_features, "Extracted features are not as expected")
+
+        # Check if the indexer is being used correctly
+        indexer = self.fe_extractor.get_indexer()
+        actual_index = indexer.index_of("love")
+        self.assertEqual(actual_index, -1, "Word 'love' should not have been found in indexer")
+
+    def test_extract_features_add_to_indexer_false(self):
+        sentence = ["love", "hate"]
+
+        # Extract features from the sentence using the initialized feature extractor
+        features = self.fe_extractor.extract_features(sentence)  # add_to_indexer is False by default
+
+        expected_features = Counter()
+        self.assertEqual(features, expected_features, "Extracted features are not as expected")
+
+        # Check if the indexer is being used correctly
+        indexer = self.fe_extractor.get_indexer()
+        actual_index = indexer.index_of("love hate")
+        expected_index = -1
+        self.assertEqual(actual_index, expected_index, "Indexer and expected index mismatch")
+
+    def test_extract_features_two_words(self):
+        sentence = ["love", "hate"]
+
+        # Extract features from the sentence using the initialized feature extractor
+        features = self.fe_extractor.extract_features(sentence, add_to_indexer=True)  # Adding to indexer
+
+        # Check if the feature extraction produced the expected output
+        expected_features = Counter({0:1})
+        self.assertEqual(features, expected_features, "Extracted features are not as expected")
+
+        # Check if the indexer is being used correctly
+        indexer = self.fe_extractor.get_indexer()
+        love_index = indexer.index_of("love hate")
+        self.assertNotEqual(love_index, 1, "bigram 'love hate' not found in indexer")
+        love_index = indexer.index_of("love")
+        self.assertEqual(love_index, -1, "Word 'love' should not have been found in indexer")
+        hate_index = indexer.index_of("hate")
+        self.assertEqual(hate_index, -1, "Word 'hate' should not have been found in indexer")
+
+
 
 class TestUnigramFeatureExtractor(unittest.TestCase):
 

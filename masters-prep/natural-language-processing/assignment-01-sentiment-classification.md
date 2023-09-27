@@ -144,13 +144,25 @@ These are the key elements that I created or updated in the models.py code:
   - **OneOverTeeLearningRateSchedule**: Supports a learning rate that is inversely proportional to the epoch number (i.e. 1/t, where t is the epoch number).
 - **train_perceptron**: Trains a perceptron classifier by merely delegating to the PerceptronTrainer.
 
+### Exploration: Learning Rate Schedules
+> Try at least two different “schedules” for the step size for perceptron (having one be the constant schedule is fine). One common one is to decrease the step size by some factor every epoch or few; another is to decrease it like $\frac{1}{t}$. How do the results change?
+
+I tried out two different learning rate schedules as described in the code summary above:
+  - **FixedLearningRateSchedule**
+  - **OneOverTeeLearningRateSchedule**
+
+### Exploration: Training vs. Development
+> Compare the training accuracy and development accuracy of the model. Think about why this might be happening.
+
+It appears that generally the accuracy of the training data and development data are quite different. The training accuracy is very high (near 100%) and the development accuracy is much lower, between 70-75%. My guess is that the model is overfitting on the training data, which is causing the training accuracy to be very high, while the accuracy against data the model hasn't been trained on is considerably lower. 
+
 ### Results
 
 Totals: 6920 / 872 / 1821 train/dev/test examples
 
 | Epochs | Learning Rate Schedule | Example Shuffle | Accuracy | Precision | Recall | F1 | Total Time |
 |--------|------------------------|-----------------|----------|-----------|--------|----|------------|
-|   30   |        Fixed           |   False         |   0.741763 / 0.614679       |  0.922186 / 0.764706         |  0.551524 / 0.351351      | 0.690241 / 0.481481   |     15.96 seconds       |
+| 30 | Fixed | False | 0.741763 / 0.614679 | 0.922186 / 0.764706 | 0.551524 / 0.351351 | 0.690241 / 0.481481 | 15.96 seconds |
 | 1000 | Fixed | False | 1.000000 / 0.715596 | 1.000000 / 0.730047 | 1.000000 / 0.700450 | 1.000000 / 0.714943 | 426.42 seconds |
 | 30 | Fixed | True | 0.976156 / 0.729358 | 0.956533 / 0.721277 | 0.999723 / 0.763514 | 0.977651 / 0.741794 |  16.07 seconds |
 | 30 | 1/t | True |  0.997977 / 0.741972 | 0.999722 / 0.747178 | 0.996399 / 0.745495 | 0.998058 / 0.746336 | 15.88 seconds | 

@@ -10,6 +10,22 @@ import random
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+try:
+    import nltk
+    nltk.download('stopwords')
+    logger.info("Downloaded stopwords from nltk...")
+except ImportError:
+    logger.error("nltk not available. Couldn't download the stopword list.")
+    
+try:
+    from nltk.corpus import stopwords
+    stop_words = set(stopwords.words('english'))
+    logger.info("Loaded stopwords from nltk...")
+except ImportError:
+    logger.error("nltk.corpus.stopwords not available. Using a fallback list.")
+    stop_words = set(['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', "aren't", 'couldn', "couldn't", 'didn', "didn't", 'doesn', "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"])
+    logger.info("Using fallback stopwords list...")
+
 # Define a module-level variable for the random seed
 RANDOM_SEED = None
 
@@ -74,7 +90,29 @@ class BigramFeatureExtractor(FeatureExtractor):
     Bigram feature extractor analogous to the unigram one.
     """
     def __init__(self, indexer: Indexer):
-        raise Exception("Must be implemented")
+        self.indexer = indexer
+
+    def get_indexer(self):
+        return self.indexer
+    
+    def extract_features(self, sentence: List[str], add_to_indexer: bool=False) -> Counter:
+        """
+        The indexer assigns unique indices to words, ensuring consistent numeric representation.
+        The Counter stores word counts for the current sentence using index/count pairs. For example,
+            if we extract "hi Javid hi", hi would get indexed at 0 and Javid would get indexed at 1,
+            and we'd get a Counter with { 0:2, 1:1 }. If we call it again with "bye Javid bye Javid",
+            it would index bye as 2 and we'd get { 1:2, 2,2 }.
+        """
+        logger.debug(f"BigramFeatureExtractor::extract_features -- sentence: {sentence}")
+        counter = Counter()
+        for i in range(len(sentence) - 1):
+            index = self.indexer.add_and_get_index( sentence[i] + " " + sentence[i+1], add=add_to_indexer )
+            if index >= 0: # Only consider words that are present in the indexer
+                counter[index] += 1
+
+        logger.debug(f"BigramFeatureExtractor::extract_features -- counter: {counter}")
+        return counter
+
 
 
 class BetterFeatureExtractor(FeatureExtractor):
