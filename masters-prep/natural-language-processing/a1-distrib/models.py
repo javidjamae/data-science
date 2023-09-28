@@ -178,7 +178,69 @@ class BetterFeatureExtractor(FeatureExtractor):
     Better feature extractor...try whatever you can think of!
     """
     def __init__(self, indexer: Indexer):
-        raise Exception("Must be implemented")
+        self.indexer = indexer
+
+    def get_indexer(self):
+        return self.indexer
+
+    def get_num_features(self) -> int:
+        """
+        Returns the total number of indexed features (Bigrams) across all training examples that have been processed by this FeatureExtractor.
+
+        :return: An integer representing the number of bigrams.
+        :rtype: int
+        """
+        return len(self.indexer)
+    
+    def extract_features(self, sentence: List[str], add_to_indexer: bool=False) -> Counter:
+        """
+        The indexer assigns unique indices to words, ensuring consistent numeric representation.
+        The Counter stores word counts for the current sentence using index/count pairs. For example,
+            if we extract "hi Javid hi", hi would get indexed at 0 and Javid would get indexed at 1,
+            and we'd get a Counter with { 0:2, 1:1 }. If we call it again with "bye Javid bye Javid",
+            it would index bye as 2 and we'd get { 1:2, 2,2 }.
+        """
+        self.logger.debug(f"sentence: {sentence}")
+        counter = Counter()
+
+        #unigrams
+        for word in sentence:
+            # skip to the next iteration if the word is contained in stop_words
+            if word in stop_words:
+                continue
+
+            if random.random() < 0.90:
+                continue
+
+            index = self.indexer.add_and_get_index( word, add=add_to_indexer )
+            if index >= 0: # Only consider words that are present in the indexer
+                counter[index] += 1
+
+        #bigrams
+        for i in range(len(sentence) - 1):
+            if word in stop_words:
+                continue
+            if random.random() < 0.99:
+                continue
+
+            index = self.indexer.add_and_get_index( sentence[i] + " " + sentence[i+1], add=add_to_indexer )
+            if index >= 0: # Only consider words that are present in the indexer
+                counter[index] += 1
+
+        # #3-grams
+        # for i in range(len(sentence) - 2):
+        #     if word in stop_words:
+        #         continue
+        #     if random.random() < 0.99:
+        #         continue
+
+        #     index = self.indexer.add_and_get_index( sentence[i] + " " + sentence[i+1] + " " + sentence[i+2], add=add_to_indexer )
+        #     if index >= 0: # Only consider words that are present in the indexer
+        #         counter[index] += 1
+
+        self.logger.debug(f"counter: {counter}")
+        return counter
+
 
 
 @create_logger
@@ -238,7 +300,11 @@ class LogisticRegressionClassifier(SentimentClassifier):
             self.weights = np.concatenate((self.weights, additional_weights))
 
         # Perform the prediction based on features and weights
-        score = sum(self.weights[index] * value for index, value in self.prediction_features.items())
+        #score = sum(self.weights[index] * value for index, value in self.prediction_features.items())
+
+        # Perform the prediction based on just the presence of words, but not their counts
+        score = sum(self.weights[index] for index, _ in self.prediction_features.items())
+
         if score >= 0:
             predicted_label = 1  # Positive class
         else:
@@ -369,8 +435,9 @@ class LogisticRegressionTrainer():
 
     def train(self):
         for t in range( 1, self.epochs + 1 ):
-            self.logger.debug("--------------------------------------")
-            self.logger.debug(f"epoch: {t}")
+            self.logger.info("--------------------------------------")
+            self.logger.info(f"epoch: {t}")
+            self.logger.info(f"num features: {self.feat_extractor.get_num_features()}")
             self.number_correct_in_current_epoch = 0
             self.alpha = self.learning_rate_schedule.get_new_rate( t )
 
@@ -386,7 +453,7 @@ class LogisticRegressionTrainer():
                     self.number_correct_in_current_epoch += 1
 
             if ( self.number_correct_in_current_epoch == len( self.train_exs ) ):
-                self.logger.debug(f"CONVERGED!! Exiting on epoch {t}")
+                self.logger.info(f"CONVERGED!! (Maybe you're overfitting??) Exiting on epoch {t} with {self.number_correct_in_current_epoch} correct")
                 self.converged = True
                 break
         return self.classifier
@@ -415,8 +482,9 @@ class PerceptronTrainer():
 
     def train(self):
         for t in range( 1, self.epochs + 1 ):
-            self.logger.debug("--------------------------------------")
-            self.logger.debug(f"epoch: {t}")
+            self.logger.info("--------------------------------------")
+            self.logger.info(f"epoch: {t}")
+            self.logger.info(f"num features: {self.feat_extractor.get_num_features()}")
             self.number_correct_in_current_epoch = 0
             self.alpha = self.learning_rate_schedule.get_new_rate( t )
 
@@ -451,7 +519,7 @@ def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureE
     return PerceptronTrainer(train_exs, feat_extractor, epochs=epochs, seed=seed, alpha=alpha, shuffle=True, learning_rate_schedule=learning_rate_schedule).train()
 
 
-def train_logistic_regression(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 40, seed: int = None, alpha: float = 0.1) -> LogisticRegressionClassifier:
+def train_logistic_regression(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 80, seed: int = None, alpha: float = 0.1) -> LogisticRegressionClassifier:
     """
     Train a logistic regression model.
     :param train_exs: training set, List of SentimentExample objects
