@@ -15,7 +15,7 @@ FORMAT = "[%(filename)s:%(lineno)s - %(name)s::%(funcName)s() ] %(message)s"
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 # logging.basicConfig(level=logging.INFO)
 # Configure this logger to use DEBUG level
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 def create_logger(cls):
     """
@@ -122,7 +122,7 @@ class UnigramFeatureExtractor(FeatureExtractor):
             and we'd get a Counter with { 0:2, 1:1 }. If we call it again with "bye Javid bye Javid",
             it would index bye as 2 and we'd get { 1:2, 2,2 }.
         """
-        self.logger.info(f"sentence: {sentence}")
+        self.logger.debug(f"sentence: {sentence}")
         counter = Counter()
         for word in sentence:
             index = self.indexer.add_and_get_index( word, add=add_to_indexer )
@@ -248,14 +248,15 @@ class LogisticRegressionClassifier(SentimentClassifier):
 
         return predicted_label
 
-    def update_weights(self, prediction: int, true_label: int, alpha: float) -> bool:
-        prediction_prob = 1 / (1 + np.exp(-sum(self.weights[index] * value for index, value in self.prediction_features.items())))
-        
+    def update_weights(self, prediction: int, true_label: int, alpha: float):
+        score = sum(self.weights[index] * value for index, value in self.prediction_features.items())
+        prediction_prob = 1 / (1 + np.exp(-score))
         error = true_label - prediction_prob
+        self.logger.debug(f"error: {error}, score: {score}, prediction_prob: {prediction_prob}, alpha: {alpha}, true_label: {true_label}")
 
         for index, value in self.prediction_features.items():
             self.weights[index] += alpha * error * value
-            
+        
         return prediction != true_label
 
 
@@ -300,7 +301,7 @@ class PerceptronClassifier(SentimentClassifier):
 
         return predicted_label
 
-    def update_weights(self, prediction: int, true_label: int, alpha: float) -> bool:
+    def update_weights(self, prediction: int, true_label: int, alpha: float):
         """
         Update the weights of the Perceptron based on the prediction and true label.
         :param features: Dictionary of features extracted from the input data
@@ -318,9 +319,6 @@ class PerceptronClassifier(SentimentClassifier):
             for index, value in self.prediction_features.items():
                 # value is the word count
                 self.weights[index] += alpha * adjusted_true_label * value
-            return True
-        else:
-            return False
 
 @create_logger
 class LearningRateSchedule():
@@ -346,6 +344,52 @@ class OneOverTeeLearningRateSchedule(LearningRateSchedule):
         if ( epoch > 0 ):
             self.rate = 1 / epoch
         return self.rate
+
+@create_logger
+class LogisticRegressionTrainer():
+
+    def __init__(self, train_exs:List[SentimentExample], feat_extractor:FeatureExtractor, epochs:int=10, seed:int=None, alpha:float=0.1, shuffle:bool=True, learning_rate_schedule:LearningRateSchedule=None):
+        self.train_exs = train_exs
+        self.feat_extractor = feat_extractor
+        self.epochs = epochs
+        self.alpha = alpha
+        self.number_correct_in_current_epoch = 0
+        self.weights = np.array([])  # Initialize weights with an empty array
+        self.classifier = LogisticRegressionClassifier( self.weights, self.feat_extractor )
+        self.converged = False
+        self.shuffle = shuffle
+
+        if seed is not None:
+            set_random_seed(seed)
+
+        if learning_rate_schedule is not None:
+            self.learning_rate_schedule = learning_rate_schedule
+        else: # no schedule provided, keep it the same across epochs
+            self.learning_rate_schedule = FixedLearningRateSchedule(alpha)
+
+    def train(self):
+        for t in range( 1, self.epochs + 1 ):
+            self.logger.debug("--------------------------------------")
+            self.logger.debug(f"epoch: {t}")
+            self.number_correct_in_current_epoch = 0
+            self.alpha = self.learning_rate_schedule.get_new_rate( t )
+
+            if( self.shuffle ):
+                random.shuffle(self.train_exs)
+
+            for index, example in enumerate(self.train_exs):
+                prediction = self.classifier.predict( example.words, is_training=True )
+                self.classifier.update_weights( prediction, example.label, self.alpha )
+                is_prediction_correct = ( prediction == example.label )
+                self.logger.debug(f"Index: {index}, Example: {example.words}, Label: {example.label}, Prediction: {prediction}, Updated Weights: {self.classifier.weights}")
+                if( is_prediction_correct ):
+                    self.number_correct_in_current_epoch += 1
+
+            if ( self.number_correct_in_current_epoch == len( self.train_exs ) ):
+                self.logger.debug(f"CONVERGED!! Exiting on epoch {t}")
+                self.converged = True
+                break
+        return self.classifier
 
 @create_logger
 class PerceptronTrainer():
@@ -381,9 +425,10 @@ class PerceptronTrainer():
 
             for index, example in enumerate(self.train_exs):
                 prediction = self.classifier.predict( example.words, is_training=True )
-                is_weight_updated = self.classifier.update_weights( prediction, example.label, self.alpha )
-                self.logger.debug(f"Index: {index}, Example: {example.words}, Label: {example.label}, Prediction: {prediction}, Updated Weights: {self.classifier.weights}, is_weight_updated: {is_weight_updated}")
-                if( not is_weight_updated ):
+                self.classifier.update_weights( prediction, example.label, self.alpha )
+                is_prediction_correct = ( prediction == example.label )
+                self.logger.debug(f"Index: {index}, Example: {example.words}, Label: {example.label}, Prediction: {prediction}, Updated Weights: {self.classifier.weights}")
+                if( is_prediction_correct ):
                     self.number_correct_in_current_epoch += 1
 
             if ( self.number_correct_in_current_epoch == len( self.train_exs ) ):
@@ -392,7 +437,7 @@ class PerceptronTrainer():
                 break
         return self.classifier
 
-def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 80, seed: int = None, alpha: float = 0.1) -> PerceptronClassifier:
+def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 40, seed: int = None, alpha: float = 0.1) -> PerceptronClassifier:
     """
     Train a classifier with the perceptron.
     :param train_exs: training set, List of SentimentExample objects
@@ -406,14 +451,16 @@ def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureE
     return PerceptronTrainer(train_exs, feat_extractor, epochs=epochs, seed=seed, alpha=alpha, shuffle=True, learning_rate_schedule=learning_rate_schedule).train()
 
 
-def train_logistic_regression(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor) -> LogisticRegressionClassifier:
+def train_logistic_regression(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 40, seed: int = None, alpha: float = 0.1) -> LogisticRegressionClassifier:
     """
     Train a logistic regression model.
     :param train_exs: training set, List of SentimentExample objects
     :param feat_extractor: feature extractor to use
     :return: trained LogisticRegressionClassifier model
     """
-    raise Exception("Must be implemented")
+    learning_rate_schedule = OneOverTeeLearningRateSchedule(1)
+    #learning_rate_schedule = None
+    return LogisticRegressionTrainer(train_exs, feat_extractor, epochs=epochs, seed=seed, alpha=alpha, shuffle=True, learning_rate_schedule=learning_rate_schedule).train()
 
 
 def train_model(args, train_exs: List[SentimentExample], dev_exs: List[SentimentExample]) -> SentimentClassifier:

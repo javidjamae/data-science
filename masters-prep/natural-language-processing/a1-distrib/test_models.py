@@ -208,8 +208,60 @@ class TestLogisticRegressionClassifier(unittest.TestCase):
         self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
         self.featurizer.get_num_features.return_value = 2
         perceptron = LogisticRegressionClassifier(weights, self.featurizer)
-        predicted_label = perceptron.predict(sentence, True)
+        predicted_label = perceptron.predict(sentence, is_training=True)
         self.assertEqual(predicted_label, 1, "Predicted label should be 1 for positive sentiment")
+
+    def test_predict_negative(self):
+        sentence = ["negative", "words"]
+        weights = [-1, 0]
+        self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
+        self.featurizer.get_num_features.return_value = 2
+        perceptron = LogisticRegressionClassifier(weights, self.featurizer)
+        predicted_label = perceptron.predict(sentence, is_training=True)
+        self.assertEqual(predicted_label, 0, "Predicted label should be 0 for negative sentiment")
+
+    def test_update_weights_true_label_positive(self):
+        weights = [0, -1]
+        self.featurizer.extract_features.return_value = {0:1, 1:2}  # Define the expected feature
+        self.featurizer.get_num_features.return_value = 2
+        classifier = LogisticRegressionClassifier(weights, self.featurizer)
+
+        # given the weights, the prediction should come back as 0
+        prediction = classifier.predict([ "hi bye bye"], is_training=True)
+        self.assertEqual(prediction, 0)
+
+        # We set the true_label to 1 so that it doesn't match the prediction. Because the true label
+        # is positive, we should increase the weights.
+        true_label = 1
+        alpha = 0.1
+
+        # Update weights using the function
+        classifier.update_weights(prediction, true_label, alpha)
+
+        # Check if weights have been updated correctly
+        expected_weights = [0.08807970779778825, -0.8238405844044235]
+        self.assertEqual(classifier.weights, expected_weights)
+
+    def test_update_weights_true_label_negative(self):
+        # Create a PerceptronClassifier instance
+        weights = [1, 0]
+        self.featurizer.extract_features.return_value = {0:1, 1:2}  # Define the expected feature
+        self.featurizer.get_num_features.return_value = 2
+        classifier = LogisticRegressionClassifier(weights, self.featurizer)
+
+        # Initialize some example values
+        prediction = classifier.predict([ "hi bye bye"], is_training=True)
+        true_label = 0
+        alpha = 0.1
+
+        # Update weights using the function
+        classifier.update_weights(prediction, true_label, alpha)
+
+        # Check if weights have been updated correctly
+        updated_weights = classifier.weights
+        expected_weights = [0.9268941421369995, -0.14621171572600097]
+        self.assertEqual(updated_weights, expected_weights)
+
 
 class TestPerceptronClassifier(unittest.TestCase):
 
@@ -230,7 +282,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
         self.featurizer.get_num_features.return_value = 2
         perceptron = PerceptronClassifier(weights, self.featurizer)
-        predicted_label = perceptron.predict(sentence, True)
+        predicted_label = perceptron.predict(sentence, is_training=True)
         self.assertEqual(predicted_label, 1, "Predicted label should be 1 for positive sentiment")
 
     def test_predict_negative(self):
@@ -239,7 +291,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
         self.featurizer.get_num_features.return_value = 2
         perceptron = PerceptronClassifier(weights, self.featurizer)
-        predicted_label = perceptron.predict(sentence, True)
+        predicted_label = perceptron.predict(sentence, is_training=True)
         self.assertEqual(predicted_label, 0, "Predicted label should be 0 for negative sentiment")
 
     def test_update_weights_true_label_positive(self):
@@ -250,7 +302,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         classifier = PerceptronClassifier(weights, self.featurizer)
 
         # given the weights, the prediction should come back as 0
-        prediction = classifier.predict([ "hi bye bye"], True)
+        prediction = classifier.predict([ "hi bye bye"], is_training=True)
         self.assertEqual(prediction, 0)
 
         # We set the true_label to 1 so that it doesn't match the prediction. Because the true label
@@ -273,7 +325,6 @@ class TestPerceptronClassifier(unittest.TestCase):
         # Updated weight at index 1: -1 + 0.1 * 1 * 2 = -0.8
         expected_weights = [0.1, -0.8]
         self.assertEqual(classifier.weights, expected_weights)
-        self.assertTrue(is_weight_updated)
 
     def test_update_weights_true_label_negative(self):
         # Create a PerceptronClassifier instance
@@ -283,7 +334,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         classifier = PerceptronClassifier(weights, self.featurizer)
 
         # Initialize some example values
-        prediction = classifier.predict([ "hi bye bye"], True)
+        prediction = classifier.predict([ "hi bye bye"], is_training=True)
         true_label = 0
         alpha = 0.1
 
@@ -305,7 +356,6 @@ class TestPerceptronClassifier(unittest.TestCase):
         updated_weights = classifier.weights
         expected_weights = [0.9, -0.2]
         self.assertEqual(updated_weights, expected_weights)
-        self.assertTrue(is_weight_updated)
 
     def test_update_weights_no_update(self):
         # Create a PerceptronClassifier instance
@@ -387,6 +437,66 @@ class TestPerceptronTrainer(unittest.TestCase):
 
         self.assertTrue(trainer.converged, "the trainer did not converge")
         self.assertEqual(len(train_exs), trainer.number_correct_in_current_epoch, "every example must be correct if/when the model converges")
+
+class TestLogisticRegressionTrainer(unittest.TestCase):
+
+    def setUp(self):
+        self.indexer = Indexer()
+        self.fe_extractor = UnigramFeatureExtractor(self.indexer)
+
+        # Creating a test set of SentimentExample objects
+        self.train_exs = [
+            SentimentExample(["i", "love", "this", "movie"], 1),
+            SentimentExample(["this", "movie", "is", "terrible"], 0),
+            SentimentExample(["great", "acting", "but", "boring", "plot"], 0),
+            SentimentExample(["enjoyed", "the", "plot", "twist"], 1),
+            SentimentExample(["didn't", "like", "the", "ending"], 0),
+            SentimentExample(["amazing", "cinematography"], 1),
+        ]
+        # You might need to initialize other objects required for testing train_perceptron
+
+    def test_no_training_examples(self):
+        train_exs = []
+
+        trainer = LogisticRegressionTrainer(train_exs, self.fe_extractor)
+        perceptron_model = trainer.train()
+
+        self.assertIsInstance(perceptron_model, LogisticRegressionClassifier, "Model type is incorrect")
+
+    def test_single_training_example(self):
+        train_exs = [
+            SentimentExample(["i", "love", "this", "movie"], 1),
+        ]
+
+        trainer = LogisticRegressionTrainer(train_exs, self.fe_extractor, epochs=1, seed=42, alpha=0.1)
+        perceptron_model = trainer.train()
+
+        expected_weights = np.array([0.381103, 0.957277, 0.738557, 0.605221])
+
+        assert_allclose(perceptron_model.weights, expected_weights, rtol=1e-6, atol=1e-6)
+
+    def test_converging(self):
+        train_exs = [
+            SentimentExample(["movie", "good" ], 1),
+            SentimentExample(["movie", "bad" ], 0),
+            SentimentExample(["not", "good" ], 0),
+        ]
+
+        trainer = LogisticRegressionTrainer(train_exs, self.fe_extractor, epochs=100, seed=42, alpha=0.1, shuffle=False)
+        perceptron_model = trainer.train()
+
+        # Define the expected weights based on the known seed
+        expected_weights = np.array([-0.050396,  0.4054  , -0.258668, -0.512381])
+
+        assert_allclose(perceptron_model.weights, expected_weights, rtol=1e-6, atol=1e-6)
+
+        self.assertTrue(perceptron_model.predict(["movie", "good" ]), "after training, the prediction should be true")
+        self.assertFalse(perceptron_model.predict(["movie", "bad" ]), "after training, the prediction should be false")
+        self.assertFalse(perceptron_model.predict(["not", "good" ]), "after training, the prediction should be false")
+
+        self.assertTrue(trainer.converged, "the trainer did not converge")
+        self.assertEqual(len(train_exs), trainer.number_correct_in_current_epoch, "every example must be correct if/when the model converges")
+
 
 
 if __name__ == '__main__':
