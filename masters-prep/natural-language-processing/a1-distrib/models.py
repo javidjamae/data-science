@@ -6,17 +6,40 @@ import logging
 import numpy as np
 import random
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+#####################
+# Configure logging #
+#####################
+import logging
 logger = logging.getLogger(__name__)
+FORMAT = "[%(filename)s:%(lineno)s - %(name)s::%(funcName)s() ] %(message)s"
+logging.basicConfig(format=FORMAT, level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
+# Configure this logger to use DEBUG level
+logger.setLevel(logging.DEBUG)
 
+def create_logger(cls):
+    """
+    Create a logger for the given class.
+
+    Parameters:
+        cls (type): The class to create the logger for.
+
+    Returns:
+        type: The class with the logger added.
+    """
+    cls.logger = logging.getLogger(f"{__name__}.{cls.__name__}")
+    return cls
+
+#######################
+# Configure stopwords #
+#######################
 try:
     import nltk
     nltk.download('stopwords')
     logger.info("Downloaded stopwords from nltk...")
 except ImportError:
     logger.error("nltk not available. Couldn't download the stopword list.")
-    
+
 try:
     from nltk.corpus import stopwords
     stop_words = set(stopwords.words('english'))
@@ -40,6 +63,21 @@ class FeatureExtractor(object):
     Feature extraction base type. Takes a sentence and returns an indexed list of features.
     """
     def get_indexer(self):
+        """
+        Get the indexer for the current object.
+
+        :return: The indexer for the current object.
+        :rtype: Any
+        """
+        raise Exception("Don't call me, call my subclasses")
+    
+    def get_num_features(self) -> int:
+        """
+        Returns the total number of indexed features across all training examples that have been processed by this FeatureExtractor.
+
+        :return: An integer representing the number of features.
+        :rtype: int
+        """
         raise Exception("Don't call me, call my subclasses")
 
     def extract_features(self, sentence: List[str], add_to_indexer: bool=False) -> Counter:
@@ -55,6 +93,7 @@ class FeatureExtractor(object):
         raise Exception("Don't call me, call my subclasses")
 
 
+@create_logger
 class UnigramFeatureExtractor(FeatureExtractor):
     """
     Extracts unigram bag-of-words features from a sentence. It's up to you to decide how you want to handle counts
@@ -65,6 +104,15 @@ class UnigramFeatureExtractor(FeatureExtractor):
 
     def get_indexer(self):
         return self.indexer
+    
+    def get_num_features(self) -> int:
+        """
+        Returns the total number of indexed features (Unigrams) across all training examples that have been processed by this FeatureExtractor.
+
+        :return: An integer representing the number of features.
+        :rtype: int
+        """
+        return len(self.indexer)
 
     def extract_features(self, sentence: List[str], add_to_indexer: bool=False) -> Counter:
         """
@@ -74,17 +122,18 @@ class UnigramFeatureExtractor(FeatureExtractor):
             and we'd get a Counter with { 0:2, 1:1 }. If we call it again with "bye Javid bye Javid",
             it would index bye as 2 and we'd get { 1:2, 2,2 }.
         """
-        logger.debug(f"UnigramFeatureExtractor::extract_features -- sentence: {sentence}")
+        self.logger.info(f"sentence: {sentence}")
         counter = Counter()
         for word in sentence:
             index = self.indexer.add_and_get_index( word, add=add_to_indexer )
             if index >= 0: # Only consider words that are present in the indexer
                 counter[index] += 1
 
-        logger.debug(f"UnigramFeatureExtractor::extract_features -- counter: {counter}")
+        self.logger.debug(f"counter: {counter}")
         return counter
 
 
+@create_logger
 class BigramFeatureExtractor(FeatureExtractor):
     """
     Bigram feature extractor analogous to the unigram one.
@@ -94,6 +143,15 @@ class BigramFeatureExtractor(FeatureExtractor):
 
     def get_indexer(self):
         return self.indexer
+
+    def get_num_features(self) -> int:
+        """
+        Returns the total number of indexed features (Bigrams) across all training examples that have been processed by this FeatureExtractor.
+
+        :return: An integer representing the number of bigrams.
+        :rtype: int
+        """
+        return len(self.indexer)
     
     def extract_features(self, sentence: List[str], add_to_indexer: bool=False) -> Counter:
         """
@@ -103,18 +161,18 @@ class BigramFeatureExtractor(FeatureExtractor):
             and we'd get a Counter with { 0:2, 1:1 }. If we call it again with "bye Javid bye Javid",
             it would index bye as 2 and we'd get { 1:2, 2,2 }.
         """
-        logger.debug(f"BigramFeatureExtractor::extract_features -- sentence: {sentence}")
+        self.logger.debug(f"sentence: {sentence}")
         counter = Counter()
         for i in range(len(sentence) - 1):
             index = self.indexer.add_and_get_index( sentence[i] + " " + sentence[i+1], add=add_to_indexer )
             if index >= 0: # Only consider words that are present in the indexer
                 counter[index] += 1
 
-        logger.debug(f"BigramFeatureExtractor::extract_features -- counter: {counter}")
+        self.logger.debug(f"counter: {counter}")
         return counter
 
 
-
+@create_logger
 class BetterFeatureExtractor(FeatureExtractor):
     """
     Better feature extractor...try whatever you can think of!
@@ -123,6 +181,7 @@ class BetterFeatureExtractor(FeatureExtractor):
         raise Exception("Must be implemented")
 
 
+@create_logger
 class SentimentClassifier(object):
     """
     Sentiment classifier base type
@@ -135,6 +194,7 @@ class SentimentClassifier(object):
         raise Exception("Don't call me, call my subclasses")
 
 
+@create_logger
 class TrivialSentimentClassifier(SentimentClassifier):
     """
     Sentiment classifier that always predicts the positive class.
@@ -143,7 +203,65 @@ class TrivialSentimentClassifier(SentimentClassifier):
         return 1
 
 
+@create_logger
+class LogisticRegressionClassifier(SentimentClassifier):
+
+    """
+    Implement this class -- you should at least have init() and implement the predict method from the SentimentClassifier
+    superclass. Hint: you'll probably need this class to wrap both the weight vector and featurizer -- feel free to
+    modify the constructor to pass these in.
+    """
+    def __init__(self, weights: List[float], featurizer: FeatureExtractor):
+        self.weights = weights
+        self.featurizer = featurizer
+        self.prediction_features = None
+
+    # This is pretty much the same as the PerceptronClassifier because with logistic regression if the weights times 
+    # the features is greater than zero then the probability is greater than 0.5 and the label is positive. And, if the 
+    # weights times the features is less than zero then the probability is less than 0.5 and the label is negative. See
+    # lesson 8 (Logistic Regression) lecture notes for background.
+    def predict(self, sentence: List[str], is_training: bool = False) -> int:
+        # Extract features using the featurizer, which will return the Counter
+        self.logger.debug(f"sentence: {sentence}, seed: {RANDOM_SEED}")
+
+        # get the features for the given sentence
+        self.prediction_features = self.featurizer.extract_features(sentence, add_to_indexer=is_training)
+        self.logger.debug(f"prediction_features: {self.prediction_features}, count: {len(self.prediction_features)}")
+
+        num_features = self.featurizer.get_num_features()
+
+        # Update the size of the weights array if needed. We have to do this because we don't preset the size
+        # of the weights array in the constructor. So as more training happens, the total number of indexed features
+        # will increase, and we'll need to increase the size of the weights array to accomodate.
+        if len(self.weights) < num_features:
+            additional_weights = np.random.random(num_features - len(self.weights))
+            self.weights = np.concatenate((self.weights, additional_weights))
+
+        # Perform the prediction based on features and weights
+        score = sum(self.weights[index] * value for index, value in self.prediction_features.items())
+        if score >= 0:
+            predicted_label = 1  # Positive class
+        else:
+            predicted_label = 0  # Negative class
+
+        self.logger.debug(f"num_features: {num_features}, Weights: {self.weights}, Score: {score}, Predicted Label: {predicted_label}")
+
+        return predicted_label
+
+    def update_weights(self, prediction: int, true_label: int, alpha: float) -> bool:
+        prediction_prob = 1 / (1 + np.exp(-sum(self.weights[index] * value for index, value in self.prediction_features.items())))
+        
+        error = true_label - prediction_prob
+
+        for index, value in self.prediction_features.items():
+            self.weights[index] += alpha * error * value
+            
+        return prediction != true_label
+
+
+@create_logger
 class PerceptronClassifier(SentimentClassifier):
+
     """
     Implement this class -- you should at least have init() and implement the predict method from the SentimentClassifier
     superclass. Hint: you'll probably need this class to wrap both the weight vector and featurizer -- feel free to
@@ -156,14 +274,17 @@ class PerceptronClassifier(SentimentClassifier):
 
     def predict(self, sentence: List[str], is_training: bool = False) -> int:
         # Extract features using the featurizer, which will return the Counter
-        logger.debug(f"PerceptronClassifier::predict -- sentence: {sentence}, seed: {RANDOM_SEED}")
+        self.logger.debug(f"sentence: {sentence}, seed: {RANDOM_SEED}")
 
-        self.prediction_features = self.featurizer.extract_features(sentence, is_training)
-        logger.debug(f"PerceptronClassifier::predict -- prediction_features: {self.prediction_features}, count: {len(self.prediction_features)}")
+        # get the features for the given sentence
+        self.prediction_features = self.featurizer.extract_features(sentence, add_to_indexer=is_training)
+        self.logger.debug(f"prediction_features: {self.prediction_features}, count: {len(self.prediction_features)}")
 
-        num_features = len(self.featurizer.get_indexer())
+        num_features = self.featurizer.get_num_features()
 
-        # Update the size of the weights array if needed
+        # Update the size of the weights array if needed. We have to do this because we don't preset the size
+        # of the weights array in the constructor. So as more training happens, the total number of indexed features
+        # will increase, and we'll need to increase the size of the weights array to accomodate.
         if num_features > len(self.weights):
             additional_weights = np.random.random(num_features - len(self.weights))
             self.weights = np.concatenate((self.weights, additional_weights))
@@ -175,7 +296,7 @@ class PerceptronClassifier(SentimentClassifier):
         else:
             predicted_label = 0  # Negative class
 
-        logger.debug(f"PerceptronClassifier::predict -- num_features: {num_features}, Weights: {self.weights}, Score: {score}, Predicted Label: {predicted_label}")
+        self.logger.debug(f"num_features: {num_features}, Weights: {self.weights}, Score: {score}, Predicted Label: {predicted_label}")
 
         return predicted_label
 
@@ -188,11 +309,11 @@ class PerceptronClassifier(SentimentClassifier):
         :param alpha: Learning rate
         :return: true if the weights were updated, false if they were not
         """
-        logger.debug(f"PerceptronClassifier::update_weights - Predicted Label: {prediction}, True Label: {true_label}, Alpha: {alpha}")
+        self.logger.debug(f"Predicted Label: {prediction}, True Label: {true_label}, Alpha: {alpha}")
 
         if prediction != true_label:
             adjusted_true_label = 2 * true_label - 1  # Map 0 to -1 and 1 to +1
-            logger.debug(f"PerceptronClassifier::update_weights - Adjusted True Label: {adjusted_true_label}")
+            self.logger.debug(f"Adjusted True Label: {adjusted_true_label}")
 
             for index, value in self.prediction_features.items():
                 # value is the word count
@@ -201,27 +322,23 @@ class PerceptronClassifier(SentimentClassifier):
         else:
             return False
 
-class LogisticRegressionClassifier(SentimentClassifier):
-    """
-    Implement this class -- you should at least have init() and implement the predict method from the SentimentClassifier
-    superclass. Hint: you'll probably need this class to wrap both the weight vector and featurizer -- feel free to
-    modify the constructor to pass these in.
-    """
-    def __init__(self):
-        raise Exception("Must be implemented")
-
+@create_logger
 class LearningRateSchedule():
     def get_new_rate( epoch:int ):
         raise( "instantiate this in the subclass" )
 
+@create_logger
 class FixedLearningRateSchedule( LearningRateSchedule ):
+
     def __init__( self, initial_rate:float = 1 ):
         self.rate = initial_rate
 
     def get_new_rate( self, epoch:int ):
         return self.rate
 
+@create_logger
 class OneOverTeeLearningRateSchedule(LearningRateSchedule):
+
     def __init__( self, initial_rate:float = 1 ):
         self.rate = initial_rate
 
@@ -230,7 +347,9 @@ class OneOverTeeLearningRateSchedule(LearningRateSchedule):
             self.rate = 1 / epoch
         return self.rate
 
+@create_logger
 class PerceptronTrainer():
+
     def __init__(self, train_exs:List[SentimentExample], feat_extractor:FeatureExtractor, epochs:int=10, seed:int=None, alpha:float=0.1, shuffle:bool=True, learning_rate_schedule:LearningRateSchedule=None):
         self.train_exs = train_exs
         self.feat_extractor = feat_extractor
@@ -252,8 +371,8 @@ class PerceptronTrainer():
 
     def train(self):
         for t in range( 1, self.epochs + 1 ):
-            logger.debug("--------------------------------------")
-            logger.debug(f"PerceptronTrainer.train:: epoch: {t}")
+            self.logger.debug("--------------------------------------")
+            self.logger.debug(f"epoch: {t}")
             self.number_correct_in_current_epoch = 0
             self.alpha = self.learning_rate_schedule.get_new_rate( t )
 
@@ -261,19 +380,19 @@ class PerceptronTrainer():
                 random.shuffle(self.train_exs)
 
             for index, example in enumerate(self.train_exs):
-                prediction = self.classifier.predict( example.words, True )
+                prediction = self.classifier.predict( example.words, is_training=True )
                 is_weight_updated = self.classifier.update_weights( prediction, example.label, self.alpha )
-                logger.debug(f"PerceptronTrainer.train:: Index: {index}, Example: {example.words}, Label: {example.label}, Prediction: {prediction}, Updated Weights: {self.classifier.weights}, is_weight_updated: {is_weight_updated}")
+                self.logger.debug(f"Index: {index}, Example: {example.words}, Label: {example.label}, Prediction: {prediction}, Updated Weights: {self.classifier.weights}, is_weight_updated: {is_weight_updated}")
                 if( not is_weight_updated ):
                     self.number_correct_in_current_epoch += 1
 
             if ( self.number_correct_in_current_epoch == len( self.train_exs ) ):
-                logger.debug(f"PerceptronTrainer.train:: CONVERGED!! Exiting on epoch {t}")
+                self.logger.debug(f"CONVERGED!! Exiting on epoch {t}")
                 self.converged = True
                 break
         return self.classifier
 
-def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 40, seed: int = None, alpha: float = 0.1) -> PerceptronClassifier:
+def train_perceptron(train_exs: List[SentimentExample], feat_extractor: FeatureExtractor, epochs: int = 80, seed: int = None, alpha: float = 0.1) -> PerceptronClassifier:
     """
     Train a classifier with the perceptron.
     :param train_exs: training set, List of SentimentExample objects

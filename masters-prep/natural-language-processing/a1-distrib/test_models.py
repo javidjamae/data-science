@@ -80,8 +80,29 @@ class TestBigramFeatureExtractor(unittest.TestCase):
 
         # Check if the indexer is being used correctly
         indexer = self.fe_extractor.get_indexer()
-        love_index = indexer.index_of("love hate")
-        self.assertNotEqual(love_index, 1, "bigram 'love hate' not found in indexer")
+        love_hate_index = indexer.index_of("love hate")
+        self.assertEqual(love_hate_index, 0, "bigram 'love hate' not found in indexer")
+        love_index = indexer.index_of("love")
+        self.assertEqual(love_index, -1, "Word 'love' should not have been found in indexer")
+        hate_index = indexer.index_of("hate")
+        self.assertEqual(hate_index, -1, "Word 'hate' should not have been found in indexer")
+
+    def test_extract_features_three_words(self):
+        sentence = ["love", "hate", "apathy"]
+
+        # Extract features from the sentence using the initialized feature extractor
+        features = self.fe_extractor.extract_features(sentence, add_to_indexer=True)  # Adding to indexer
+
+        # Check if the feature extraction produced the expected output
+        expected_features = Counter({0:1, 1:1})
+        self.assertEqual(features, expected_features, "Extracted features are not as expected")
+
+        # Check if the indexer is being used correctly
+        indexer = self.fe_extractor.get_indexer()
+        love_hate_index = indexer.index_of("love hate")
+        self.assertEqual(love_hate_index, 0, "bigram 'love hate' not found in indexer")
+        hate_apathy_index = indexer.index_of("hate apathy")
+        self.assertEqual(hate_apathy_index, 1, "bigram 'hate apathy' not found in indexer")
         love_index = indexer.index_of("love")
         self.assertEqual(love_index, -1, "Word 'love' should not have been found in indexer")
         hate_index = indexer.index_of("hate")
@@ -168,14 +189,35 @@ class TestUnigramFeatureExtractor(unittest.TestCase):
         self.assertEqual(hate_index, 1, "Indexer and expected index mismatch")
 
 
+class TestLogisticRegressionClassifier(unittest.TestCase):
+
+    def setUp(self):
+        # Initialize any required resources or mock objects
+        self.featurizer = Mock()
+        self.indexer = Indexer()
+        self.featurizer.get_indexer.return_value = self.indexer
+
+    def test_init(self):
+        # Test the initialization of the LogisticRegressionClassifier
+        classifier = LogisticRegressionClassifier([], self.featurizer)
+        self.assertIsInstance(classifier, LogisticRegressionClassifier)
+
+    def test_predict_positive(self):
+        sentence = ["positive", "words"]
+        weights = [1, 0]
+        self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
+        self.featurizer.get_num_features.return_value = 2
+        perceptron = LogisticRegressionClassifier(weights, self.featurizer)
+        predicted_label = perceptron.predict(sentence, True)
+        self.assertEqual(predicted_label, 1, "Predicted label should be 1 for positive sentiment")
+
 class TestPerceptronClassifier(unittest.TestCase):
 
     def setUp(self):
         # Initialize any required resources or mock objects
-        self.featurizer = Mock()  # You can create a mock featurizer here
+        self.featurizer = Mock()
         self.indexer = Indexer()
-        self.featurizer.get_indexer.return_value = self.indexer  # Mock the behavior of get_indexer()
-
+        self.featurizer.get_indexer.return_value = self.indexer
 
     def test_init(self):
         # Test the initialization of the PerceptronClassifier
@@ -186,6 +228,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         sentence = ["positive", "words"]
         weights = [1, 0]
         self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
+        self.featurizer.get_num_features.return_value = 2
         perceptron = PerceptronClassifier(weights, self.featurizer)
         predicted_label = perceptron.predict(sentence, True)
         self.assertEqual(predicted_label, 1, "Predicted label should be 1 for positive sentiment")
@@ -194,6 +237,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         sentence = ["negative", "words"]
         weights = [-1, 0]
         self.featurizer.extract_features.return_value = {0:1, 1:1}  # Define the expected feature
+        self.featurizer.get_num_features.return_value = 2
         perceptron = PerceptronClassifier(weights, self.featurizer)
         predicted_label = perceptron.predict(sentence, True)
         self.assertEqual(predicted_label, 0, "Predicted label should be 0 for negative sentiment")
@@ -202,6 +246,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         # Create a PerceptronClassifier instance
         weights = [0, -1]
         self.featurizer.extract_features.return_value = {0:1, 1:2}  # Define the expected feature
+        self.featurizer.get_num_features.return_value = 2
         classifier = PerceptronClassifier(weights, self.featurizer)
 
         # given the weights, the prediction should come back as 0
@@ -234,6 +279,7 @@ class TestPerceptronClassifier(unittest.TestCase):
         # Create a PerceptronClassifier instance
         weights = [1, 0]
         self.featurizer.extract_features.return_value = {0:1, 1:2}  # Define the expected feature
+        self.featurizer.get_num_features.return_value = 2
         classifier = PerceptronClassifier(weights, self.featurizer)
 
         # Initialize some example values
@@ -281,13 +327,14 @@ class TestPerceptronClassifier(unittest.TestCase):
         self.assertEqual(updated_weights, expected_weights)
         self.assertFalse(is_weight_updated)
 
+
+
 class TestPerceptronTrainer(unittest.TestCase):
 
     def setUp(self):
-        # Initialize any required resources or mock objects
         self.indexer = Indexer()
         self.fe_extractor = UnigramFeatureExtractor(self.indexer)
-        #self.train_exs = [...]  # List of SentimentExample objects for training
+
         # Creating a test set of SentimentExample objects
         self.train_exs = [
             SentimentExample(["i", "love", "this", "movie"], 1),
@@ -300,14 +347,11 @@ class TestPerceptronTrainer(unittest.TestCase):
         # You might need to initialize other objects required for testing train_perceptron
 
     def test_no_training_examples(self):
-        # Test the train_perceptron function
         train_exs = []
 
-        # Call the train_perceptron function
         trainer = PerceptronTrainer(train_exs, self.fe_extractor)
         perceptron_model = trainer.train()
 
-        # Check if the returned model is of the correct type
         self.assertIsInstance(perceptron_model, PerceptronClassifier, "Model type is incorrect")
 
     def test_single_training_example(self):
@@ -323,21 +367,18 @@ class TestPerceptronTrainer(unittest.TestCase):
         assert_allclose(perceptron_model.weights, expected_weights, rtol=1e-6, atol=1e-6)
 
     def test_converging(self):
-        # Test the train_perceptron function
         train_exs = [
             SentimentExample(["movie", "good" ], 1),
             SentimentExample(["movie", "bad" ], 0),
             SentimentExample(["not", "good" ], 0),
         ]
 
-        # Call the train_perceptron function
         trainer = PerceptronTrainer(train_exs, self.fe_extractor, epochs=100, seed=42, alpha=0.1, shuffle=False)
         perceptron_model = trainer.train()
 
         # Define the expected weights based on the known seed
         expected_weights = np.array([-0.12546 ,  0.250714,  0.031994, -0.301342])
 
-        # Assert that the model's weights match the expected values
         assert_allclose(perceptron_model.weights, expected_weights, rtol=1e-6, atol=1e-6)
 
         self.assertTrue(perceptron_model.predict(["movie", "good" ]), "after training, the prediction should be true")
