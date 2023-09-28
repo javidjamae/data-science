@@ -3,17 +3,18 @@
 **Academic Honesty** 
 
 Please see the course syllabus for information about collaboration in this course.
+
 While you may discuss the assignment with other students, **all work you submit must be your own!**
 
 **Goals** 
 
 The main goal of this assignment is for you to get experience training neural networks over text.
 
-You’ll play around with feedforward neural networks in PyTorch and see the impact of different sets of word
-vectors on the sentiment classification problem from Assignment 1.
+You’ll play around with feedforward neural networks in PyTorch and see the impact of different sets of word vectors on the sentiment classification problem from Assignment 1.
 
 ## Code Setup
 **Please use Python 3.5+ and a recent version of PyTorch for this project.**
+
 **The list of installed packages in the autograder is:** `numpy`, `nltk`, `spacy`, `torch`, `scipy`, `matplotlib`, `torchvision`.
 
 ### Installing PyTorch
@@ -39,7 +40,7 @@ python optimization.py --lr 1
 
 to optimize the quadratic with a learning rate of 1. However, the code will crash, since the gradient hasn’t been implemented.
 
-**a)** Implement the gradient of the provided quadratic function in quadratic grad. sgd test quadratic will then call this function inside an SGD loop and show a visualization of the learning process. Note: you should not use PyTorch for this part!
+**a)** Implement the gradient of the provided quadratic function in `quadratic_grad`. `sgd_test_quadratic` will then call this function inside an SGD loop and show a visualization of the learning process. Note: you should not use PyTorch for this part!
 
 **b)** When initializing at the origin, what is the best step size to use? Set your step size so that it gets to a distance of within 0.1 of the optimum within as few iterations as possible. Several answers are possible. Hardcode this value into your code.
 
