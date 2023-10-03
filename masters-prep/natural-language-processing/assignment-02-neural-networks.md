@@ -78,7 +78,7 @@ You are given two sources of pretrained embeddings you can use: `data/glove.6B.5
 Note that the 300-dimensional vectors are used by default. The 50-dimensional vectors will enable your code to run much faster, particularly if you’re not using frozen embeddings, so you may find them useful for debugging.
 
 ### PyTorch example
-`ffnn example.py` (Available from Exercise 8b on edX) implements the network discussed in lecture for the synthetic XOR task. It shows a minimal example of the PyTorch network definition, training, and evaluation loop. Feel free to refer to this code extensively and to copy-paste parts of it into your solution as needed. Most of this code is self-documenting. **The most unintuitive piece is calling `zero_grad` before calling backward!** Backward computation uses in-place storage and this must be zeroed out before every gradient computation.
+`ffnn_example.py` (Available from Exercise 8b on edX) implements the network discussed in lecture for the synthetic XOR task. It shows a minimal example of the PyTorch network definition, training, and evaluation loop. Feel free to refer to this code extensively and to copy-paste parts of it into your solution as needed. Most of this code is self-documenting. **The most unintuitive piece is calling `zero_grad` before calling backward!** Backward computation uses in-place storage and this must be zeroed out before every gradient computation.
 
 ### Implementation
 Following the example, the rough steps you should take are:
@@ -91,7 +91,7 @@ Come back to this section as you tackle the assignment!
 - You should print training loss over your models’ epochs; this will give you an idea of how the learning process is proceeding.
 - You should be able to do the vast majority of your parameter tuning in small-scale experiments. Try to avoid running large experiments on the whole dataset in order to keep your development time fast.
 - If you see NaNs in your code, it’s likely due to a large step size. `log(0)` is the main way these arise.
-- For creating tensors, `torch.tensor` and `torch.from_numpy` are pretty useful. For manipulating tensors, permute lets you rearrange axes, `squeeze` can eliminate dimensions of length 1, `expand` or `repeat` can duplicate a tensor across a dimension, etc. You probably won’t need to use all of these in this project, but they’re there if you need them. PyTorch supports most basic arithmetic operations done elementwise on tensors.
+- For creating tensors, `torch.tensor` and `torch.from_numpy` are pretty useful. For manipulating tensors, `permute` lets you rearrange axes, `squeeze` can eliminate dimensions of length 1, `expand` or `repeat` can duplicate a tensor across a dimension, etc. You probably won’t need to use all of these in this project, but they’re there if you need them. PyTorch supports most basic arithmetic operations done elementwise on tensors.
 - To handle sentence input data, you typically want to treat the input as a sequence of word indices. You can use `torch.nn.Embedding` to convert these into their corresponding word embeddings. The `WordEmbeddings` class can produce this layer for you.
 - Google/Stack Overflow and the [PyTorch documentation](https://pytorch.org/docs/stable/index.html) are your friends. Although you should not seek out prepackaged solutions to the assignment itself, you should avail yourself of the resources out there to learn the tools.
 
