@@ -200,43 +200,68 @@ class BetterFeatureExtractor(FeatureExtractor):
             and we'd get a Counter with { 0:2, 1:1 }. If we call it again with "bye Javid bye Javid",
             it would index bye as 2 and we'd get { 1:2, 2,2 }.
         """
-        self.logger.debug(f"sentence: {sentence}")
+        self.logger.debug(f"sentence: {sentence} ")
         counter = Counter()
 
+        # If I had tf-idf weights available in this function (extract_features), how could I use them?
+
+        # remove stopwords and casefold up front
+        # filtered_words = [word.casefold() for word in sentence if word.casefold() not in stop_words]
+
+        # remove stopwords
+        # filtered_words = [word for word in sentence if word.casefold() not in stop_words]
+
+        # casefold
+        # filtered_words = [word.casefold() for word in sentence]
+
+        # lowercase 
+        filtered_words = [word.lower() for word in sentence]
+
         #unigrams
-        for word in sentence:
-            # skip to the next iteration if the word is contained in stop_words
-            if word in stop_words:
-                continue
-
-            if random.random() < 0.90:
-                continue
-
+        for word in filtered_words:
+            # if random.random() < 0.50:
+            #     continue
             index = self.indexer.add_and_get_index( word, add=add_to_indexer )
             if index >= 0: # Only consider words that are present in the indexer
                 counter[index] += 1
+        
+        ''' Trying out tf_idf scores
+        for word in filtered_words:
+            index = self.indexer.add_and_get_index(word, add=add_to_indexer)
+            if index >= 0: # Only consider words that are present in the indexer
+                self.logger.debug(f"word: {word}, index: {index}, tf_idf_scores: {tf_idf_scores}")
+                tf_idf_score = tf_idf_scores[word] if tf_idf_scores is not None else 1.0  # Default weight is 1.0 if word not found in tf_idf_scores
+                counter[index] += tf_idf_score
+        '''
 
+        '''
         #bigrams
-        for i in range(len(sentence) - 1):
-            if word in stop_words:
-                continue
-            if random.random() < 0.99:
-                continue
+        for i in range(len(filtered_words) - 1):
+            # if random.random() < 0.80:
+            #     continue
+
+            word = filtered_words[i]
+            word_next = filtered_words[i+1]
 
             index = self.indexer.add_and_get_index( sentence[i] + " " + sentence[i+1], add=add_to_indexer )
             if index >= 0: # Only consider words that are present in the indexer
                 counter[index] += 1
-
+        '''
+                
+        '''
         # #3-grams
-        # for i in range(len(sentence) - 2):
-        #     if word in stop_words:
-        #         continue
-        #     if random.random() < 0.99:
-        #         continue
+        for i in range(len(filtered_words) - 2):
+            # if random.random() < 0.99:
+            #     continue
+            word = sentence[i]
+            word_next = sentence[i+1]
+            word_next_next = sentence[i+2]
 
-        #     index = self.indexer.add_and_get_index( sentence[i] + " " + sentence[i+1] + " " + sentence[i+2], add=add_to_indexer )
-        #     if index >= 0: # Only consider words that are present in the indexer
-        #         counter[index] += 1
+
+            index = self.indexer.add_and_get_index( word + " " + word_next + " " + word_next_next, add=add_to_indexer )
+            if index >= 0: # Only consider words that are present in the indexer
+                counter[index] += 1
+        '''
 
         self.logger.debug(f"counter: {counter}")
         return counter
@@ -411,6 +436,38 @@ class OneOverTeeLearningRateSchedule(LearningRateSchedule):
             self.rate = 1 / epoch
         return self.rate
 
+# Calculate Term Frequency (TF)
+def calculate_tf(document):
+    tf = {}
+    total_terms = len(document)
+    for term in document:
+        lower_term = term.lower()
+        if lower_term in tf:
+            tf[lower_term] += 1 / total_terms
+        else:
+            tf[lower_term] = 1 / total_terms
+    return tf
+
+# Calculate Inverse Document Frequency (IDF)
+def calculate_idf(documents):
+    idf = {}
+    total_documents = len(documents)
+    for document in documents:
+        unique_terms = set(document)
+        # filtered_words = [word.lower() for word in sentence]
+        # how can I get the lower case term for each unique_terms as I'm iterating?
+        for term in unique_terms:
+            lower_term = term.lower()
+            if lower_term in idf:
+                idf[lower_term] += 1
+            else:
+                idf[lower_term] = 1
+
+    for term, count in idf.items():
+        idf[term] = np.log(total_documents / count)
+
+    return idf
+
 @create_logger
 class LogisticRegressionTrainer():
 
@@ -434,6 +491,17 @@ class LogisticRegressionTrainer():
             self.learning_rate_schedule = FixedLearningRateSchedule(alpha)
 
     def train(self):
+
+        documents = [example.words for example in self.train_exs]
+        '''
+        tf_idf_scores = []
+        idf = calculate_idf(documents)
+        for document in documents:
+            tf = calculate_tf(document)
+            tf_idf = {term: tf_score * idf[term] for term, tf_score in tf.items()}
+            tf_idf_scores.append(tf_idf)
+        '''
+
         for t in range( 1, self.epochs + 1 ):
             self.logger.info("--------------------------------------")
             self.logger.info(f"epoch: {t}")
@@ -445,6 +513,7 @@ class LogisticRegressionTrainer():
                 random.shuffle(self.train_exs)
 
             for index, example in enumerate(self.train_exs):
+                self.logger.debug( f"index: {index}, example: {example.words}, label: {example.label}"  )
                 prediction = self.classifier.predict( example.words, is_training=True )
                 self.classifier.update_weights( prediction, example.label, self.alpha )
                 is_prediction_correct = ( prediction == example.label )
