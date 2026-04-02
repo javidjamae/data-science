@@ -1,4 +1,4 @@
-# Optimization Basics
+# Word Embeddings
 
 These are my notes from [this lecture](https://www.youtube.com/watch?v=8EqQROdVPyM&list=PLofp2YXfp7TZZ5c7HEChs0_wfEfewLDs7&index=20) that is part of [this course](https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html).
 
