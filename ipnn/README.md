@@ -18,6 +18,7 @@ serves it.
 | [related-work.md](./related-work.md) | Prior art map: what exists, what IPNN takes or claims beyond it | As we read |
 | [journal/](./journal/README.md) | **The lab notebook of record**: one timestamped entry per iteration + the citable learnings ledger ([LEARNINGS.md](./journal/LEARNINGS.md)) | Every iteration |
 | [experiments/](./experiments/) | Numbered experiments (see below) | Continuously |
+| [disclosure-policy.md](./disclosure-policy.md) | Open-by-default policy with pre-registered safety tripwires; licensing rationale | Rarely, with journaled rationale |
 
 ## How we document (the rules)
 
@@ -44,6 +45,13 @@ serves it.
   them to a `decisions/` directory.
 - Future homes, when needed (don't create empty dirs before then): `theory/`
   if `abstract.md` outgrows itself, `glossary.md` when vocabulary stabilizes.
+
+## License
+
+Code: [Apache-2.0](./LICENSE). Documentation (all `.md` in this directory
+tree): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Scope: the
+`ipnn/` directory only, not the rest of this repository. Rationale in
+[disclosure-policy.md](./disclosure-policy.md).
 
 ## Experiments
 
