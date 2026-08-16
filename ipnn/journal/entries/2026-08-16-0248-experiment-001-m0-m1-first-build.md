@@ -4,7 +4,7 @@
 - **When:** 2026-08-16 02:48–02:58 CDT (design phase same night, 02:25–02:48)
 - **Who:** Javid + Claude (session)
 - **Experiment:** [001 — MNIST living demo](../../experiments/001-mnist-living-demo/design.md)
-- **Code state:** uncommitted at time of entry (app scaffold + engine are new files; commit hash to be added at first commit)
+- **Code state:** git `e42a500` (committed 2026-08-16 03:07 CDT; results in this entry were produced by the code as committed there)
 - **Re-run:** `cd ipnn/experiments/001-mnist-living-demo/app && npm install && npm test`
 
 ## In plain words
