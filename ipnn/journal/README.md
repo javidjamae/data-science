@@ -52,7 +52,14 @@ journal/
    what we tried, whether it worked, what we learned — readable by someone
    with no ML background. (This mirrors the plain-language digests required
    by journals like eLife and PLOS.) Written last, placed first.
-10. **Claims live in one place.** Theory belongs in `../abstract.md`, standing
+10. **Prior art & novelty, every entry.** Each entry states how the
+    iteration relates to others' prior work: what it echoes (cite
+    `../related-work.md`, adding new finds there first), what it does
+    differently, and the *smallest honest* novelty claim — marked
+    *unverified against literature* until a real search has been done, and
+    downgraded in a later entry if prior art turns up. "Nothing novel here,
+    this replicates X" is a fully respectable section.
+11. **Claims live in one place.** Theory belongs in `../abstract.md`, standing
    doubts in `../open-problems.md`, experiment designs in
    `../experiments/*/design.md`. The journal records *what happened and what
    was learned*, and links outward. When a learning changes the theory, the
@@ -82,6 +89,9 @@ field that learned it the hard way:
   Decision Records (ADRs) from software engineering.
 - **Plain-language summary first** — plain-language digests required by
   journals such as eLife and PLOS.
+- **Prior art & novelty section** — the Related Work section of a paper,
+  fused with patent practice's prior-art search and claims discipline: state
+  the smallest claim that survives what's already known.
 - **Negative results logged with full rigor** — the file-drawer problem:
   unpublished failures are how fields fool themselves.
 

@@ -179,6 +179,52 @@ plasticity) is *identical* to the consolidation mechanism we deliberately
 built in via evidence counts. They are one phenomenon with different
 valence.
 
+## Prior art & novelty
+
+*(Added retroactively at 03:23 the same night, when prior-art accounting
+became part of the entry template. Assessment reflects what we knew at time
+of writing.)*
+
+**Similar — this iteration replicates known results:**
+
+- The M1 capability itself — reward-only, real-time learning of a small
+  discrimination — is ~40 years old. Barto, Sutton & Anderson's 1983
+  actor-critic learned pole balancing in real time from a scalar reward
+  using eligibility traces; M1 is structurally that mechanism aimed at
+  3-pattern classification (related-work.md, "old online-learning
+  tradition").
+- The learning rule is REINFORCE (Williams 1992) with eligibility traces —
+  and both halves of our fix are textbook policy-gradient hygiene: baseline
+  subtraction for variance, ε-mixing for exploration.
+- L-004 (confidence kills plasticity) is a from-scratch rediscovery of
+  Grossberg's **stability–plasticity dilemma**, named in the early 1980s.
+
+**Different:**
+
+- The organism has no trial structure: no train/test split, no visible
+  episode boundaries, no labels. Trials, "spoken answers," and correctness
+  exist only in the teacher's interpretation; the organism just ticks and
+  feels reward. The 1983-era systems were built as task-scoped controllers;
+  this engine is built as an always-on organism with the task imposed
+  entirely from outside.
+- An explicit **silence action** in the output policy plus a homeostatic
+  **urge** biasing against it — "compelled but not forced to respond."
+  Related in spirit to intrinsic-motivation work in RL, but we know no
+  direct precedent for this mechanism (*unverified against literature*).
+- **Beta-evidence consolidation inside a three-factor rule** — accumulated
+  rewarded evidence gates plasticity down. Nearest neighbor is BCPNN, which
+  differs: there, probabilities *define* weights; here, evidence counts
+  *gate learning* (*unverified against literature*).
+
+**Novel (claimed, smallest honest version):** nothing in this iteration's
+*results* is novel — a 3-pattern reward-learned discrimination replicates
+40-year-old capability. The candidate novelty is architectural only: the
+silence-action + urge mechanism, and evidence-gated plasticity in a
+reward-modulated rule — both unverified against literature, and the latter
+untested even internally (threat #4: consolidation barely engaged). The
+program-level claim (always-on, multi-sense, low-power learner) is untested
+by definition at this stage.
+
 ## Learnings
 
 Added to [LEARNINGS.md](../LEARNINGS.md):

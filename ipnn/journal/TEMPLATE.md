@@ -48,6 +48,21 @@ practical. No interpretation here.
 Interpretation of the results. Which hypotheses survived? What surprised us?
 Diagnosis of failures, with the evidence chain.
 
+## Prior art & novelty
+
+How this iteration relates to what others have done. Cite
+[related-work.md](../../related-work.md) — and when the iteration surfaced
+new prior art, add it there first, then cite it here.
+
+- **Similar:** which prior systems/results this work echoes, stated plainly.
+- **Different:** what this iteration did that those did not — mechanism,
+  setting, or measurement.
+- **Novel (claimed):** the smallest honest novelty claim, if any. Mark each
+  claim *unverified against literature* until a real search has been done;
+  downgrade or retract in a later entry if prior art turns up.
+- If nothing here is novel, say so. Replication has value; pretending
+  otherwise rots the record.
+
 ## Learnings
 
 Each durable learning, added to [LEARNINGS.md](../LEARNINGS.md) with an ID:
