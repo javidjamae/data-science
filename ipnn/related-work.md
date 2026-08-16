@@ -18,6 +18,32 @@ entries short; this is a map, not a survey.
   HTM's dendritic prediction model); we should be able to say precisely what
   IPNN adds or simplifies.
 
+## The old online-learning tradition (the lineage IPNN actually belongs to)
+
+Real-time, no-training-phase learning is not a new idea — it is an old
+program that lost to batch training on capability, not on vision. IPNN's
+positioning: everybody wanted this; it remains unsolved at scale.
+
+- **Barto, Sutton & Anderson 1983 — actor-critic pole balancer.** Neuron-like
+  adaptive elements learning in real time from a scalar reward signal, with
+  eligibility traces. *Relation:* the closest structural ancestor of the M1
+  engine — reward-only, trace-based, always-on. What it never faced: many
+  tasks, many senses, retention, scale.
+- **Grossberg 1976–87 — Adaptive Resonance Theory (ART).** Continuous online
+  learning with no train/test split, built explicitly around the
+  **stability–plasticity dilemma** — Grossberg's name for exactly the
+  tension we rediscovered as L-004 (consolidation vs frozen-wrong-answer).
+  *Relation:* required reading before designing the M4 forgetting
+  experiments; ART is a candidate baseline/idea-source for
+  confidence-gated plasticity.
+- **Rosenblatt 1958 (perceptron), Widrow 1960 (ADALINE/LMS).**
+  Sample-by-sample online weight updates; LMS descendants ran in deployed
+  real-time adaptive filters. *Relation:* proof that always-learning systems
+  were normal engineering before the batch era.
+- **Samuel 1959 (checkers), Ashby 1948 (homeostat), cybernetics era.**
+  Systems that improved through interaction while operating. *Relation:* the
+  "living machine" framing predates AI as a field.
+
 ## Learning without backprop
 
 - **Three-factor learning rules / reward-modulated Hebbian plasticity
