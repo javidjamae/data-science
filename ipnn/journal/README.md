@@ -121,5 +121,6 @@ field that learned it the hard way:
 
 | Entry | Iteration | Outcome |
 |---|---|---|
+| [2026-08-20-0856 — M1 living demo UI](./entries/2026-08-20-0856-m1-living-demo-ui.md) | Infrastructure: interactive browser demo of the M1 result | 7/7 tests; stepper refactor bit-identical to recorded curves; demo published |
 | [2026-08-16-0248 — Experiment 001, M0+M1 first build](./entries/2026-08-16-0248-experiment-001-m0-m1-first-build.md) | Engine scaffold + M1 sanity gate | Gate PASSED after one collapse-and-fix cycle; L-001…L-007 |
 | [2023-07-12-2228 — Original IPNN abstract published](./entries/2023-07-12-2228-original-abstract-published.md) | Theory only; idea published to the public repo (`6ff96d3`) | Documentary (retrospective, written 2026-08-20); starts the priority record; no learnings |

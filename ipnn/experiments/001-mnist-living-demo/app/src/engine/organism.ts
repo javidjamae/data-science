@@ -207,6 +207,12 @@ export class Organism {
     }
   }
 
+  /** per-output firing probabilities from the last tick (read-only view;
+   * these are the ε-mixed policy probabilities, excluding silence) */
+  outputProbs(): Float32Array {
+    return this.outP
+  }
+
   /** fraction of pool neurons active this tick (telemetry) */
   poolActivity(): number {
     let a = 0

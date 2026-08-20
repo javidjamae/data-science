@@ -1,8 +1,10 @@
 # Experiment 001 — MNIST Living Demo
 
 **Status:** M0 + M1 complete (gate passed 2026-08-16, see journal entry
-[2026-08-16-0248](../../journal/entries/2026-08-16-0248-experiment-001-m0-m1-first-build.md))
-— M2 next
+[2026-08-16-0248](../../journal/entries/2026-08-16-0248-experiment-001-m0-m1-first-build.md));
+interactive M1 demo UI built 2026-08-20
+([entry](../../journal/entries/2026-08-20-0856-m1-living-demo-ui.md),
+`npm run dev` in `app/`) — M2 next
 **Question:** Can an IPNN organism learn digit recognition *in real time,
 through interaction and reward alone* — no training phase, no backprop, no ML
 libraries?
