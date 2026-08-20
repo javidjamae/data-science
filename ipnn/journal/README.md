@@ -59,7 +59,15 @@ journal/
     *unverified against literature* until a real search has been done, and
     downgraded in a later entry if prior art turns up. "Nothing novel here,
     this replicates X" is a fully respectable section.
-11. **Claims live in one place.** Theory belongs in `../abstract.md`, standing
+11. **Retrospective entries are allowed, and must say so.** History that
+    predates the journal (or that was never written down) may be filed as a
+    *retrospective* entry, dated to when the events happened so the index
+    reads as a timeline. It must open with a banner giving the date it was
+    actually written and separating what is verifiable from the record
+    (commits, files, output) from what is reconstructed or inferred. This
+    does not weaken rule 1: retrospective entries *add* missing history,
+    they never revise an existing entry.
+12. **Claims live in one place.** Theory belongs in `../abstract.md`, standing
    doubts in `../open-problems.md`, experiment designs in
    `../experiments/*/design.md`. The journal records *what happened and what
    was learned*, and links outward. When a learning changes the theory, the
@@ -92,6 +100,9 @@ field that learned it the hard way:
 - **Prior art & novelty section** — the Related Work section of a paper,
   fused with patent practice's prior-art search and claims discipline: state
   the smallest claim that survives what's already known.
+- **Banner-marked retrospective entries** — ELN practice for a late or
+  reconstructed entry: never backfill silently; record it, date it, and
+  state plainly that it was written after the fact.
 - **Negative results logged with full rigor** — the file-drawer problem:
   unpublished failures are how fields fool themselves.
 
@@ -111,3 +122,4 @@ field that learned it the hard way:
 | Entry | Iteration | Outcome |
 |---|---|---|
 | [2026-08-16-0248 — Experiment 001, M0+M1 first build](./entries/2026-08-16-0248-experiment-001-m0-m1-first-build.md) | Engine scaffold + M1 sanity gate | Gate PASSED after one collapse-and-fix cycle; L-001…L-007 |
+| [2023-07-12-2228 — Original IPNN abstract published](./entries/2023-07-12-2228-original-abstract-published.md) | Theory only; idea published to the public repo (`6ff96d3`) | Documentary (retrospective, written 2026-08-20); starts the priority record; no learnings |
