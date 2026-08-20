@@ -58,4 +58,4 @@ tree): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Scope: the
 
 | # | Name | Status | Question |
 |---|---|---|---|
-| [001](./experiments/001-mnist-living-demo/design.md) | MNIST living demo | M1 gate passed — reward-only learning works at toy scale | Can it learn digits in real time through reward alone — and keep performing when rewards stop? |
+| [001](./experiments/001-mnist-living-demo/design.md) | MNIST living demo | M1 gate passed — reward-only learning works at toy scale · **[live M1 demo](https://claude.ai/code/artifact/1318cf33-a77e-4c86-b699-784f0c4f3c24)** | Can it learn digits in real time through reward alone — and keep performing when rewards stop? |

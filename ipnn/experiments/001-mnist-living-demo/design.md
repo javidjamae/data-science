@@ -5,6 +5,11 @@
 interactive M1 demo UI built 2026-08-20
 ([entry](../../journal/entries/2026-08-20-0856-m1-living-demo-ui.md),
 `npm run dev` in `app/`) — M2 next
+**Live demo:**
+<https://claude.ai/code/artifact/1318cf33-a77e-4c86-b699-784f0c4f3c24> —
+the M1 organism learning the 3-pattern task in the browser: watch accuracy
+climb from chance, then toggle learning off and watch it hold (the same
+build as `app/`, single-file, no dependencies)
 **Question:** Can an IPNN organism learn digit recognition *in real time,
 through interaction and reward alone* — no training phase, no backprop, no ML
 libraries?
