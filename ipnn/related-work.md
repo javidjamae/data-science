@@ -94,6 +94,48 @@ positioning: everybody wanted this; it remains unsolved at scale.
   evidence-count* version of the same idea; the forgetting experiments should
   compare against doing nothing and against an EWC-style penalty.
 
+## Structural plasticity and pruning
+
+- **LeCun, Denker & Solla 1990 — Optimal Brain Damage; Han et al. 2015 —
+  magnitude pruning.** Trained networks are massively over-parameterized;
+  most synapses can go. Importance must be *estimated* (Hessian terms,
+  weight magnitude). *Relation:* baselines for the pruning track
+  (experiment-ideas §C). IPNN's testable angle: evidence counts are a
+  native, locally-computed importance signal these methods approximate.
+- **Frankle & Carbin 2019 — lottery ticket hypothesis.** Small
+  subnetworks suffice if well-initialized. *Relation:* existence proof for
+  "same competence, smaller body" — but the result is about
+  retrainability-from-init under SGD, which has no analogue in an
+  always-on regime; comparisons must respect the disanalogy.
+- **Bellec et al. 2018 — DEEP R.** Rewiring during training in sparse
+  (spiking) networks — connections die and are resampled online.
+  *Relation:* closest algorithmic precedent for structural plasticity in
+  IPNN's regime.
+- **Biological development: synaptic overproduction-then-pruning
+  (Huttenlocher); adult neurogenesis (dentate gyrus).** Cortex overshoots
+  synapse counts in childhood then cuts back hard; new neurons arrive
+  hyper-plastic. *Relation:* the blueprint for grow-then-prune
+  (experiment-ideas §C2–C3).
+
+## Agency and sensorimotor learning
+
+- **Skinner — operant conditioning; Rescorla 1968 — contingency vs
+  contiguity.** Learned agency has a minimal experimental definition:
+  contingent reinforcement raises response rate, and degrading the
+  contingency (same reward rate, non-contingent) lowers it. *Relation:*
+  the motor-access gates (experiment-ideas §B1) are lifted directly from
+  this playbook.
+- **Intrinsic motivation / curiosity (Schmidhuber; Oudeyer; Pathak et al.
+  2017).** Agents that generate their own exploration signal. *Relation:*
+  kin to the urge, and the frame for "play" (experiment-ideas §B3).
+- **Friston — active inference.** Perception and action as one loop
+  minimizing surprise. *Relation:* a rival account of what a closed-loop
+  IPNN would be computing; worth a precise comparison if §B1 works.
+- **Heider & Simmel 1944.** Humans attribute intent to moving geometric
+  shapes. *Relation:* the observer-bias evidence behind open-problems §8 —
+  why "it looked deliberate" is inadmissible without a pre-registered
+  criterion.
+
 ## Hardware
 
 - **Neuromorphic computing (Intel Loihi, spiking neural networks).**

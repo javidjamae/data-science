@@ -100,3 +100,29 @@ learning process. There's no standard for "learned well while interacting."
 accuracy vs stimuli-seen, retention after reward withdrawal, retention after
 task switches, robustness under perturbation, all logged and replayable.
 Define these once in experiment 001 and reuse everywhere.
+
+## 8. Recognizing intelligence when we see it
+
+**Problem.** Once the organism can act on its world
+([experiment-ideas.md §B](./experiment-ideas.md)), the temptation is to
+watch it and judge. But with a stochastic always-on system the observer is
+the weakest instrument: humans attribute agency to noise (Heider & Simmel's
+subjects saw intent in moving triangles — see related-work). "It looked
+deliberate" is pareidolia until proven otherwise, and a solo project has no
+second observer to catch it.
+
+**Working answer.** Behavior earns the word "intelligent" only against a
+criterion written down *before* watching. A ladder of pre-registered,
+measurable criteria, climbed in order: (1) operant — a contingently
+rewarded action's rate rises; (2) contingency sensitivity — the rate falls
+when the action→reward link is broken while reward rate is held constant;
+(3) instrumental use — acting on the world measurably improves task
+performance (e.g. the external-memory gate in experiment-ideas §B1);
+(4) transfer — an acquired action speeds learning of a new task. Anything
+surprising noticed ad hoc is journaled as anecdote and believed only after
+a pre-registered replication.
+
+**How we'll know.** If pre-registered criteria keep failing while observers
+keep "seeing" intelligence anyway, either the criteria are aimed at the
+wrong behaviors or the observers are fooling themselves — both findings.
+The ladder gets its first use in the §B1 motor experiments.

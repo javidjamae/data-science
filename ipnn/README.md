@@ -16,6 +16,7 @@ serves it.
 | [abstract.md](./abstract.md) | The paper-style writeup: system, mechanism, hypotheses | As theory evolves |
 | [open-problems.md](./open-problems.md) | Honest list of unsolved problems + current working answers + how we'll test them | Every time an experiment lands |
 | [related-work.md](./related-work.md) | Prior art map: what exists, what IPNN takes or claims beyond it | As we read |
+| [experiment-ideas.md](./experiment-ideas.md) | The backlog: raw ideas → shaped hypotheses → numbered experiments; ranked | As ideas arrive |
 | [journal/](./journal/README.md) | **The lab notebook of record**: one timestamped entry per iteration + the citable learnings ledger ([LEARNINGS.md](./journal/LEARNINGS.md)) | Every iteration |
 | [experiments/](./experiments/) | Numbered experiments (see below) | Continuously |
 | [disclosure-policy.md](./disclosure-policy.md) | Open-by-default policy with pre-registered safety tripwires; licensing rationale | Rarely, with journaled rationale |
