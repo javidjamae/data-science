@@ -12,13 +12,16 @@
 // Interpretation (what counts as "an answer") lives in the teacher/observer.
 
 import { mulberry32, type Rng } from './rng'
-import type { OrganismConfig } from './types'
+import type { OrganismConfig, OrganismLike } from './types'
 
 function sigmoid(x: number): number {
   return 1 / (1 + Math.exp(-x))
 }
 
-export class Organism {
+/** Experiment 001's substrate: fixed wiring, only weights change. Declared
+ * `implements OrganismLike` so the contract is enforced at compile time
+ * rather than by coincidence — experiment 002 swaps in against it. */
+export class Organism implements OrganismLike {
   readonly cfg: OrganismConfig
   private rng: Rng
 

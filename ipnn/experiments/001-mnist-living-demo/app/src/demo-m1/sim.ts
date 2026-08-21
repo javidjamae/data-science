@@ -6,6 +6,7 @@
 // gate certified.
 
 import { Organism } from '../engine/organism'
+import type { OrganismLike } from '../engine/types'
 import { AutoTeacher, TrialStepper } from '../engine/teacher'
 import { M1_PATTERNS } from '../engine/patterns'
 import { SustainedReadout } from '../engine/readout'
@@ -38,7 +39,7 @@ const BLANK = new Uint8Array(defaultConfig.senseSize)
 
 export class DemoSim {
   seed: number
-  org!: Organism
+  org!: OrganismLike
   teacher!: AutoTeacher
   stepper!: TrialStepper
 
