@@ -207,6 +207,31 @@ export class Organism {
     }
   }
 
+  /**
+   * Zero every eligibility trace. Credit is carried by traces with a
+   * ~30-tick memory (λ=0.97), so an unrewarded excursion — free-running on a
+   * held stimulus, say — would otherwise leave stale credit lying around for
+   * the next reward to land on. Weights and evidence counts are untouched:
+   * this forgets *what just happened*, not *what was learned*.
+   */
+  clearTraces(): void {
+    this.poolE.fill(0)
+    this.outE.fill(0)
+  }
+
+  /**
+   * Squared L2 norms of each weight population. Cheap, and any weight change
+   * moves them — which makes this the instrument for "did anything actually
+   * learn?" and for the reward-withdrawal drift probe (design §6, M4c).
+   */
+  weightNorms(): { pool: number; out: number } {
+    let pool = 0
+    for (let s = 0; s < this.poolW.length; s++) pool += this.poolW[s] * this.poolW[s]
+    let out = 0
+    for (let s = 0; s < this.outW.length; s++) out += this.outW[s] * this.outW[s]
+    return { pool, out }
+  }
+
   /** per-output firing probabilities from the last tick (read-only view;
    * these are the ε-mixed policy probabilities, excluding silence) */
   outputProbs(): Float32Array {
