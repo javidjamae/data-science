@@ -4,7 +4,7 @@
 - **When:** 2026-08-21 00:08–00:45 CDT
 - **Who:** Javid + Claude (session)
 - **Experiment:** [001 — MNIST living demo](../../experiments/001-mnist-living-demo/design.md) (infrastructure: UI defect fix, no science)
-- **Code state:** uncommitted at time of writing — hash of next commit: _fill in after committing_
+- **Code state:** git `f220847` (committed 2026-08-21 02:02 CDT; results in this entry were produced by the code as committed there)
 - **Re-run:** `cd ipnn/experiments/001-mnist-living-demo/app && npm test` (tests) ·
   `npm run build:single` (publishable bundle) ·
   `PLAYWRIGHT_PKG=<path to an installed playwright/index.mjs> node tools/measure-jitter.mjs dist-single/ipnn-m1-demo.html [speed 0-100] [viewport width]`

@@ -4,7 +4,7 @@
 - **When:** 2026-08-21 01:45–01:55 CDT
 - **Who:** Javid + Claude (session)
 - **Experiment:** [001 — MNIST living demo](../../experiments/001-mnist-living-demo/design.md), ablation of the M1 gate
-- **Code state:** uncommitted at time of writing — hash of next commit: _fill in after committing_
+- **Code state:** git `f220847` (committed 2026-08-21 02:02 CDT; results in this entry were produced by the code as committed there)
 - **Re-run:** `cd ipnn/experiments/001-mnist-living-demo/app && npx vite-node tools/m1b-ablation.ts`
 
 ## In plain words

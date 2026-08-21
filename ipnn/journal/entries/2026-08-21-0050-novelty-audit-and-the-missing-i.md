@@ -4,7 +4,7 @@
 - **When:** 2026-08-21 00:50–02:05 CDT
 - **Who:** Javid + Claude (session)
 - **Experiment:** theory / direction. No code changed; three docs and one new experiment design produced.
-- **Code state:** uncommitted at time of writing — hash of next commit: _fill in after committing_
+- **Code state:** no code changed; the docs described here are git `ef67886`
 - **Re-run:** n/a — documentary entry. Artifacts: [experiments/002-grown-substrate/design.md](../../experiments/002-grown-substrate/design.md), [experiment-ideas.md §F, §G](../../experiment-ideas.md), [related-work.md](../../related-work.md) additions.
 
 ## In plain words
