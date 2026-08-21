@@ -121,6 +121,10 @@ field that learned it the hard way:
 
 | Entry | Iteration | Outcome |
 |---|---|---|
+| [2026-08-21-0145 — M1b: the etaPool=0 ablation](./entries/2026-08-21-0145-m1b-etapool-ablation.md) | Ablation: is 001's hidden pool contributing? | **No** — freezing 89% of learnable synapses costs 0.004 accuracy. M1 is a readout on a fixed random projection; L-010 |
+| [2026-08-21-0050 — Novelty audit and the missing "I"](./entries/2026-08-21-0050-novelty-audit-and-the-missing-i.md) | Theory/direction: honest novelty audit + spec-vs-code audit (ran 00:50–02:05, overlapping M1b) | Nothing novel yet; the recurrence the project is *named* for is unbuilt. Experiment 002 designed; L-011, L-012 |
+| [2026-08-21-0025 — Manual mode + sustained readout](./entries/2026-08-21-0025-manual-mode-sustained-readout.md) | Infrastructure: hold a stimulus and watch the answer run free | 17/17 tests; manual mode provably cannot alter the organism; L-009; blank-sense restlessness logged as anecdote |
+| [2026-08-21-0008 — Demo layout jitter fix](./entries/2026-08-21-0008-demo-layout-jitter-fix.md) | Infrastructure: UI defect — panels sized by their own captions | Layout movement 6.2px → 0.0px measured; L-008; predicted by the prior entry's threat #1 |
 | [2026-08-20-0856 — M1 living demo UI](./entries/2026-08-20-0856-m1-living-demo-ui.md) | Infrastructure: interactive browser demo of the M1 result | 7/7 tests; stepper refactor bit-identical to recorded curves; demo published |
 | [2026-08-16-0248 — Experiment 001, M0+M1 first build](./entries/2026-08-16-0248-experiment-001-m0-m1-first-build.md) | Engine scaffold + M1 sanity gate | Gate PASSED after one collapse-and-fix cycle; L-001…L-007 |
 | [2023-07-12-2228 — Original IPNN abstract published](./entries/2023-07-12-2228-original-abstract-published.md) | Theory only; idea published to the public repo (`6ff96d3`) | Documentary (retrospective, written 2026-08-20); starts the priority record; no learnings |
