@@ -29,6 +29,18 @@ L-001). One mechanism-level fix was required: softmax saturation had made
 the dominant answer unpunishable (L-002, L-003). Variance concerns remain
 untested beyond toy scale.
 
+**Status 2026-08-21 — the M1 clearance is weaker than it looked.** The M1b
+ablation (journal
+[2026-08-21-0145](./journal/entries/2026-08-21-0145-m1b-etapool-ablation.md),
+L-010) shows the hidden pool's plasticity contributes nothing: freezing 89% of
+learnable synapses costs 0.004 accuracy. So M1 cleared this problem only in a
+regime where **there was almost no credit to assign** — one learnable layer
+feeding the outputs. The variance-with-depth failure this section is actually
+worried about was never exercised, and remains entirely open. Experiment 002
+proposes a different kind of answer (credit by diffusion geometry, where what
+degrades is diffusion distance rather than unit count) and will be the first
+setting where multi-hop credit assignment is genuinely tested.
+
 ## 2. Stability of the recurrent stochastic loop
 
 **Problem.** Output-to-input feedback with stochastic units may oscillate or

@@ -4,12 +4,17 @@
 [2026-08-16-0248](../../journal/entries/2026-08-16-0248-experiment-001-m0-m1-first-build.md));
 interactive M1 demo UI built 2026-08-20
 ([entry](../../journal/entries/2026-08-20-0856-m1-living-demo-ui.md),
-`npm run dev` in `app/`) — M2 next
+`npm run dev` in `app/`); manual stimulus mode added 2026-08-21
+([entry](../../journal/entries/2026-08-21-0025-manual-mode-sustained-readout.md))
+— a partial §1-step-6 / §5 manual mode: choose or clear the stimulus and watch
+a free-running answer readout, but **no hand-delivered reward** (that is
+experiment-ideas §A2) and no mouse drawing (still M3) — M2 next
 **Live demo:**
 <https://claude.ai/code/artifact/1318cf33-a77e-4c86-b699-784f0c4f3c24> —
 the M1 organism learning the 3-pattern task in the browser: watch accuracy
-climb from chance, then toggle learning off and watch it hold (the same
-build as `app/`, single-file, no dependencies)
+climb from chance, toggle learning off and watch it hold, then switch to
+Manual and hold a pattern in front of it (the same build as `app/`,
+single-file, no dependencies)
 **Question:** Can an IPNN organism learn digit recognition *in real time,
 through interaction and reward alone* — no training phase, no backprop, no ML
 libraries?

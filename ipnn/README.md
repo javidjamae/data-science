@@ -47,6 +47,26 @@ serves it.
 - Future homes, when needed (don't create empty dirs before then): `theory/`
   if `abstract.md` outgrows itself, `glossary.md` when vocabulary stabilizes.
 
+## Naming (what M1, M1b, 002 actually mean)
+
+- **`NNN`** — an *experiment*: a numbered directory with its own question,
+  design doc and gates. `001` is the fixed-architecture living demo; `002` is
+  the grown substrate.
+- **`M#`** — a *milestone within one experiment*, defined in that experiment's
+  `design.md` and gating the next. Always read as "experiment 001's M1",
+  never as a global number: each experiment numbers its own milestones from
+  M0. In 001: M0 scaffold, **M1 the critical learning gate**, M2 minimal
+  living demo, M3 full experience, M4 science.
+- **`M#x`** (letter suffix) — an *ablation or variant* of that milestone,
+  answering "which part of M# was load-bearing?" rather than advancing the
+  experiment. `M1b` = the `etaPool=0` ablation of 001's M1 gate.
+- **`L-###`** — a durable learning in the
+  [ledger](./journal/LEARNINGS.md), cited by ID everywhere and never deleted.
+- **Backlog letters (`§A`–`§G`)** — thematic tracks in
+  [experiment-ideas.md](./experiment-ideas.md), *not* experiments. A track
+  graduates into a numbered experiment when it gets a `design.md`; §F became
+  experiment 002.
+
 ## License
 
 Code: [Apache-2.0](./LICENSE). Documentation (all `.md` in this directory
@@ -58,4 +78,5 @@ tree): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Scope: the
 
 | # | Name | Status | Question |
 |---|---|---|---|
-| [001](./experiments/001-mnist-living-demo/design.md) | MNIST living demo | M1 gate passed — reward-only learning works at toy scale · **[live M1 demo](https://claude.ai/code/artifact/1318cf33-a77e-4c86-b699-784f0c4f3c24)** | Can it learn digits in real time through reward alone — and keep performing when rewards stop? |
+| [001](./experiments/001-mnist-living-demo/design.md) | MNIST living demo | M1 gate passed — reward-only learning works at toy scale · **M1b ablation shows the pool's plasticity earns nothing** (L-010) · **[live demo](https://claude.ai/code/artifact/1318cf33-a77e-4c86-b699-784f0c4f3c24)** | Can it learn digits in real time through reward alone — and keep performing when rewards stop? |
+| [002](./experiments/002-grown-substrate/design.md) | Grown substrate | Design only — pre-registered, nothing built | Given only the interfaces, can an organism grow its own wiring — and does reward-as-a-diffusing-field make *position* the thing that decides credit? |
