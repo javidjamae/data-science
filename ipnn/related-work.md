@@ -323,3 +323,65 @@ project is *named for* and has never built ([L-012](./journal/LEARNINGS.md)):
 iterative consideration — output→input feedback, multiple internal passes per
 stimulus, with reward-only learning and legal silence. Whether that is
 occupied has **not** been searched.
+
+## The missing "I" — iterative consideration (searched 2026-08-22)
+
+The project is named for a mechanism it has never built ([L-012](./journal/LEARNINGS.md)):
+`abstract.md` §2–§3 specify output→input feedback and multiple internal passes
+per stimulus, and both substrates are single-pass feedforward. This was
+identified on 2026-08-22 as the last place novelty might live. **It was then
+searched, and it is largely occupied too.** Recorded before any design rests on
+it.
+
+**Reward-only learning in recurrent networks — done, and it works.**
+- Miconi, [*Biologically plausible learning in recurrent neural networks
+  reproduces neural dynamics observed during cognitive tasks*](https://elifesciences.org/articles/20899)
+  (eLife 2017) — node-perturbation with reward-modulated Hebbian updates,
+  guided **solely by delayed phasic reward at the end of each trial**, learning
+  flexible associations and memory maintenance. This is essentially IPNN's
+  learning rule inside a recurrent network, nine years ago.
+- Song, Yang & Wang, [*Reward-based training of recurrent neural networks for
+  cognitive and value-based tasks*](https://elifesciences.org/articles/21492)
+  (eLife 2017).
+- [Local online learning in recurrent networks with random feedback](https://elifesciences.org/articles/43299)
+  (RFLO); [noise-based reward-modulated learning](https://arxiv.org/html/2503.23972v1).
+
+**Deciding how long to think — done.** Adaptive Computation Time (Graves
+2016), [PonderNet](https://www.alphaxiv.org/abs/2107.05407) (halting as a
+latent-variable model with a geometric prior), [probabilistic ACT](https://arxiv.org/pdf/1712.00386),
+deep equilibrium and fixed-point-iteration layers, and a large 2025–26
+test-time-compute literature.
+
+**Revising a decision mid-deliberation — done.** [*Changes of Mind in an
+Attractor Network of Decision-Making*](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1002086)
+(PLOS Comput Biol) models exactly the phenomenon the sustained readout was
+built to observe ([L-009](./journal/LEARNINGS.md)). Also
+[recurrence for hard inputs](https://arxiv.org/pdf/2106.04537) (easy-to-hard
+generalisation) and the [debate over whether iterative convergent computation
+is a useful inductive bias](https://www.biorxiv.org/content/10.1101/2023.10.13.562196.full.pdf).
+
+### What four searches did not turn up
+
+The specific **triple**: reward-only local three-factor learning **and**
+output→input iteration **and** the organism deciding for itself when to commit,
+where **silence is a legal un-punished state and the drive to answer builds
+over time** (IPNN's `urge`). Halting in the ACT/PonderNet line is learned by
+gradient; thresholds in the drift-diffusion line are fixed; Miconi's networks
+answer every trial.
+
+**This is a weak claim and should be treated as one.** Four searches is not a
+survey, all three components are individually well covered, and an unclaimed
+combination of well-covered parts is a low bar. Marked *unverified*.
+
+### Why to build it anyway, novelty aside
+
+1. **The spec demands it.** `abstract.md` has specified it since the beginning
+   and no implementation has had it (L-012). Closing a spec-versus-source gap
+   needs no novelty argument.
+2. **Miconi de-risks it.** Reward-only learning is *known* to work in recurrent
+   networks, so a failure here would be ours, not the paradigm's — and that
+   makes it a much better-posed experiment than 002 was.
+3. **The instrument already exists.** The sustained readout was built for
+   precisely this (L-009: "a commit-once readout cannot measure a mind
+   changing"), and manual mode already holds a stimulus while the answer
+   free-runs.
