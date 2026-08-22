@@ -4,7 +4,7 @@
 - **When:** 2026-08-22 01:45–02:40 CDT
 - **Who:** Javid + Claude (session)
 - **Experiment:** [002 — the grown substrate](../../experiments/002-grown-substrate/design.md), M0 and M1
-- **Code state:** uncommitted at time of writing — hash of next commit: `<fill in after committing>`
+- **Code state:** git `3cbe1f8` (the results in this entry were produced by the code as committed there)
 - **Re-run:**
   ```
   cd ipnn/experiments/001-mnist-living-demo/app
