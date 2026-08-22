@@ -625,6 +625,117 @@ So a model's standing is not a number on one task. It is a trajectory across a
 history that grows every time it competes, and a model that wins a new game by
 destroying its own past is scored as having lost ground.
 
+### Scoring — what we must not reward by accident
+
+**Added 2026-08-22 [J].** Design notes, not decisions. Nothing is being built.
+
+#### Speed is a constraint, not the score
+
+> "I want to make sure I'm not only rewarding speed. Learning and ability is not
+> all about speed. If you're fast within a certain limit, but not the fastest,
+> that might be ok, if you're more accurate."
+
+Ranking by speed alone has a specific failure: it rewards systems with small
+hypothesis spaces that snap to an answer, and it penalises systems that are
+building something more general and get there later. It also **quietly
+reintroduces the exact bias [L-020](./journal/LEARNINGS.md) warns about** — the
+project spent 2026-08-22 establishing that accuracy-at-fixed-trials punishes a
+slow learner for being slow, and a speed leaderboard punishes it again from the
+other direction. An ecosystem built to test living systems must not smuggle
+that back in on day one.
+
+Three framings that avoid it, in rough order of preference:
+
+1. **Criterion within a budget, then rank by accuracy.** Speed becomes
+   pass/fail — did you reach the standard inside N trials — and among everyone
+   who passed, standing is asymptotic accuracy. Speed matters up to a
+   threshold and not past it, which is exactly what was asked for.
+2. **Report the Pareto frontier, not a rank.** Publish (speed, accuracy) for
+   every entrant and mark who is on the frontier. Nobody is "the winner"; some
+   entrants are simply not dominated. Honest, harder to headline.
+3. **Two scores, never collapsed.** Trials-to-criterion *and* final accuracy,
+   published side by side, with the composite left to the reader. The moment
+   they are collapsed into one number, that number's weighting becomes the
+   thing everyone optimises.
+
+Open question: any budget N is arbitrary, and choosing it decides which kinds
+of learner can compete at all. It should be justified against something —
+human performance on the same game is the obvious anchor, as
+[Animal-AI](https://link.springer.com/article/10.3758/s13428-025-02616-3) did
+by testing children.
+
+#### Back-to-back learning, and sleep as a declared condition
+
+> "If you can adapt to learning new games in real time, back to back (maybe
+> with sleep)."
+
+This is the difference between **blocked** and **interleaved** practice, and it
+is a real distinction with a real literature: interleaving is harder in the
+moment and produces better retention afterwards. So "learn A, then B, then C
+with no reset" is a *different and harder* regime than "learn each in
+isolation", and both are worth running.
+
+Two things follow.
+
+- **Sleep becomes a manipulable condition rather than an implementation
+  detail.** Sleep-dependent consolidation is well established in humans and
+  animals, and experiment 002's substrate already has an offline phase where
+  all structural change happens. So *with sleep between games* versus *without*
+  is a legitimate arm, and one this project is unusually well placed to run.
+- **Order effects become a confound.** If games are entered back-to-back, the
+  order changes the result, and entrants who happened to get a friendly order
+  would rank higher for no good reason. Any serious version has to
+  counterbalance order across entrants, which multiplies the run cost.
+
+#### Generative outputs, and why the tiny world is what makes them scorable
+
+> "For things that aren't just discrete simple outputs, where the AI may have
+> to generate an output — an image, a drawing, speech — we may have to give it
+> more time to generate. One AI may quickly draw a picture but another may draw
+> a much better picture. Not sure how we'd frame that game."
+
+The difficulty is real and it is not about time: **a classification task has a
+ground truth and a generation task usually does not.** "Better picture" is a
+judgment, and the moment a judge is introduced, the judge is what everyone
+optimises against.
+
+But this is precisely where the 8×8 world stops being a limitation and starts
+being the answer. **In a 64-pixel binary world, generation is verifiable.**
+The set of valid "three vertical bars" images is finite and enumerable, so
+"draw one" has a checkable answer in a way "draw a beautiful landscape" never
+will. Some games that only work because the world is small:
+
+- **Produce a valid instance of a category.** Scored against the enumerable
+  ground-truth set — no judge required.
+- **Produce a valid instance nobody has produced before.** Validity *and*
+  novelty, both mechanically checkable. This is a genuinely hard task with no
+  subjective component.
+- **Complete a partial pattern** so that the intended category is recoverable.
+- **Produce an instance another entrant's model misclassifies** — adversarial
+  generation, scored objectively, and it makes the ecosystem's own entrants
+  into the test set.
+
+For the time problem, the same principle as above: **let the entrant declare a
+generation budget and publish (budget, quality) as a pair** rather than
+collapsing them. A model that draws slowly and well and a model that draws fast
+and adequately are different animals, and a single number would hide that.
+
+Risk to name up front: if quality is ever scored by a fixed discriminator,
+entrants will overfit the discriminator rather than the task — the standard
+adversarial-example failure. Mitigations would be rotating or ensembled judges,
+held-out judges, or sticking to the enumerable-ground-truth games above, which
+have no judge at all.
+
+#### The general principle under all three
+
+Every scoring choice here is a claim about what intelligence is, and a
+leaderboard makes that claim binding on everyone who enters. Speed-only says
+fast is smart. Accuracy-only says slow and careful is free. A single composite
+says the weighting is settled when it is not. **The safest default for an
+ecosystem that does not yet know what it is measuring is to publish the
+components and refuse to collapse them** — and to treat any collapse as a
+separate, explicitly argued decision.
+
 ### Why this is the right vehicle for this project specifically
 
 It is the same claim [vision.md](./vision.md) has made since it was written —
