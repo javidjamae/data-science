@@ -1,0 +1,5 @@
+Latent learning — substrate shallow, 400 unrewarded pre-exposure trials, criterion = rolling-100 ≥ 0.7, cap 3000
+
+arm                     | trials to criterion (per seed)      | median | final acc
+------------------------|-------------------------------------|--------|----------
+naive (no pre-exposure) |  1318   649   746 |    746 |   0.873
