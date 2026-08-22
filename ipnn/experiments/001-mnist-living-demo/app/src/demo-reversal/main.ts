@@ -98,6 +98,12 @@ input[type="number"] { font: inherit; width: 58px; padding: 4px 6px;
 .bar i { display: block; height: 100%; width: 0; border-radius: 999px;
   transition: width 0.2s; }
 .big { font-family: var(--mono); font-size: 1.5rem; font-weight: 600; margin: 2px 0 8px; }
+.score { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.78rem; }
+.score th { text-align: right; font-weight: 600; padding: 4px 8px; }
+.score th:first-child { text-align: left; }
+.score td { padding: 4px 8px; border-top: 1px solid var(--border); text-align: right;
+  font-variant-numeric: tabular-nums; }
+.score td:first-child { text-align: left; color: var(--ink-2); }
 .big small { font-size: 0.72rem; font-weight: 400; color: var(--ink-3); }
 footer { margin-top: 22px; color: var(--ink-3); font-size: 0.78rem; }
 a { color: var(--accent); }
@@ -161,10 +167,28 @@ app.innerHTML = `
     <div class="legend">
       <span><i class="swatch" style="background:${SERIES.count}"></i> count — the published rule</span>
       <span><i class="swatch" style="background:${SERIES.beta}"></i> α/β — confidence can fall</span>
-      <span>┆ rule flip</span>
+      <span>┆ rule flip (marked per arm — the x-axis is that arm's own trial count)</span>
     </div>
     <p class="cap">chance 0.33 · criterion 0.85 · the dip below chance after a flip
       is the organism confidently giving the <em>old</em> answer</p>
+  </section>
+
+  <section class="panel" style="margin-top: 14px">
+    <h2>scoreboard — the whole life</h2>
+    <table class="score">
+      <thead><tr><th></th>
+        <th style="color:${SERIES.count}">count</th>
+        <th style="color:${SERIES.beta}">α/β</th></tr></thead>
+      <tbody>
+        <tr><td>lifetime accuracy, every trial ever</td><td id="sc_acc_c">–</td><td id="sc_acc_b">–</td></tr>
+        <tr><td>share of life spent at criterion (≥0.85)</td><td id="sc_crit_c">–</td><td id="sc_crit_b">–</td></tr>
+        <tr><td>first learning (trials to criterion)</td><td id="sc_first_c">–</td><td id="sc_first_b">–</td></tr>
+        <tr><td>flips recovered from</td><td id="sc_rec_c">–</td><td id="sc_rec_b">–</td></tr>
+        <tr><td>median recovery after a flip (trials)</td><td id="sc_med_c">–</td><td id="sc_med_b">–</td></tr>
+      </tbody>
+    </table>
+    <p class="cap">recovery = trials from the flip until rolling-100 accuracy is back at ≥0.85.
+      The 100-trial window means recoveries under 100 cannot be measured; measured ones run 600–2,500.</p>
   </section>
 
   <div class="arms">
@@ -211,9 +235,14 @@ interface Arm {
   id: ArmId
   sim: DemoSim
   color: string
-  /** one entry per rule stage (acquisition + each flip); reached = learned it */
-  stages: { fromTrial: number; reached: boolean }[]
+  /** one entry per rule stage (acquisition + each flip) */
+  stages: { fromTrial: number; recoveredAt: number | null }[]
   flipTrials: number[]
+  /** incremental whole-life counters (scanning all trials per frame would
+   * be O(life) — these advance only over trials new since the last frame) */
+  seen: number
+  correctTotal: number
+  atCriterion: number
 }
 
 function makeArm(id: ArmId, seed: number): Arm {
@@ -222,8 +251,11 @@ function makeArm(id: ArmId, seed: number): Arm {
     id,
     sim: new DemoSim(seed, (s) => new Organism({ ...defaultConfig, seed: s, evidenceModel: model })),
     color: id === 'c' ? SERIES.count : SERIES.beta,
-    stages: [{ fromTrial: 0, reached: false }],
+    stages: [{ fromTrial: 0, recoveredAt: null }],
     flipTrials: [],
+    seen: 0,
+    correctTotal: 0,
+    atCriterion: 0,
   }
 }
 
@@ -241,7 +273,7 @@ function doFlip(): void {
   for (const a of arms) {
     a.sim.setLabelMap(currentMap())
     a.flipTrials.push(a.sim.trials.length)
-    a.stages.push({ fromTrial: a.sim.trials.length, reached: false })
+    a.stages.push({ fromTrial: a.sim.trials.length, recoveredAt: null })
   }
   drawRule()
 }
@@ -273,14 +305,23 @@ function frame(now: number): void {
     const n = Math.max(1, Math.round(targetTps() * dt))
     for (const a of arms) a.sim.tick(n)
 
-    // stage bookkeeping: a stage is "learned" once rolling accuracy holds the
-    // criterion with the whole window inside the stage
+    // stage bookkeeping: a stage counts as learned once rolling accuracy holds
+    // the criterion with the whole window inside the stage — and the trial
+    // index where that first happens is the recovery time
     for (const a of arms) {
       const st = a.stages[a.stages.length - 1]
-      if (!st.reached && a.sim.trials.length - st.fromTrial >= 100 &&
+      if (st.recoveredAt === null && a.sim.trials.length - st.fromTrial >= 100 &&
           a.sim.rollingAccuracy >= CRITERION) {
-        st.reached = true
+        st.recoveredAt = a.sim.trials.length
       }
+      // whole-life counters, advanced only over the trials new this frame
+      const t = a.sim.trials
+      const c = a.sim.accuracyCurve
+      for (let i = a.seen; i < t.length; i++) {
+        if (t[i].correct) a.correctTotal++
+        if (c[i] >= CRITERION) a.atCriterion++
+      }
+      a.seen = t.length
     }
 
     if (autoInput.checked) {
@@ -296,6 +337,7 @@ function frame(now: number): void {
 
   drawChart()
   for (const a of arms) drawArm(a)
+  drawScore()
   requestAnimationFrame(frame)
 }
 
@@ -318,12 +360,18 @@ function drawChart(): void {
   const start = Math.max(0, maxTrials - span)
   const x = (t: number) => ((t - start) / span) * CHART_W
 
-  // flip markers (from the count arm's trial index; the arms track closely)
-  ctx.strokeStyle = 'rgba(140,153,168,0.55)'
+  // Flip markers, PER ARM, in the arm's colour. The x-axis is trial count and
+  // trials have different durations (a confident answer ends one in ~21
+  // ticks, a hesitant one in up to 75), so at the same wall-clock flip the
+  // two arms sit at different trial numbers — one shared marker would make
+  // the other arm's response look like lag that isn't there.
   ctx.setLineDash([2, 4])
-  for (const t of arms[0].flipTrials) {
-    if (t < start) continue
-    ctx.beginPath(); ctx.moveTo(x(t), 4); ctx.lineTo(x(t), CHART_H - 4); ctx.stroke()
+  for (const a of arms) {
+    ctx.strokeStyle = a.color + '66'
+    for (const t of a.flipTrials) {
+      if (t < start) continue
+      ctx.beginPath(); ctx.moveTo(x(t), 4); ctx.lineTo(x(t), CHART_H - 4); ctx.stroke()
+    }
   }
   ctx.setLineDash([])
 
@@ -343,12 +391,33 @@ function drawChart(): void {
   }
 }
 
+function drawScore(): void {
+  const set = (id: string, v: string) => { $(id).textContent = v }
+  for (const a of arms) {
+    const k = a.id === 'c' ? 'c' : 'b'
+    const n = a.sim.trials.length
+    set(`sc_acc_${k}`, n ? (a.correctTotal / n).toFixed(3) : '–')
+    set(`sc_crit_${k}`, n ? `${((a.atCriterion / n) * 100).toFixed(0)}%` : '–')
+    const first = a.stages[0].recoveredAt
+    set(`sc_first_${k}`, first === null ? '–' : String(first))
+    const flips = a.stages.slice(1)
+    const rec = flips
+      .map((st) => (st.recoveredAt === null ? null : st.recoveredAt - st.fromTrial))
+      .filter((x): x is number => x !== null)
+    set(`sc_rec_${k}`, flips.length ? `${rec.length} / ${flips.length}` : '–')
+    if (rec.length) {
+      const sorted = [...rec].sort((x, y) => x - y)
+      set(`sc_med_${k}`, String(sorted[Math.floor(sorted.length / 2)]))
+    } else set(`sc_med_${k}`, '–')
+  }
+}
+
 function drawArm(a: Arm): void {
   const org = a.sim.org as Organism
   const acc = a.sim.rollingAccuracy
   const p = org.plasticityStats()
   const ev = org.evidenceTotals()
-  const learned = a.stages.filter((s) => s.reached).length
+  const learned = a.stages.filter((s) => s.recoveredAt !== null).length
 
   $(`${a.id}rules`).textContent = String(learned)
   $(`${a.id}total`).textContent = String(a.stages.length)
