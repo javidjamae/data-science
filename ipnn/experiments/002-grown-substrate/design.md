@@ -140,6 +140,20 @@ build, reward says what to keep.**
 
 ### Why this is the interesting part
 
+> **Prior-art correction, 2026-08-22.** This section's mechanism is **not
+> novel**, and a search should have happened before the design was written.
+> "Diffusion of Neuromodulators for Temporal Credit Assignment"
+> ([arXiv 2603.08949](https://arxiv.org/html/2603.08949), March 2026) does
+> credit assignment by "the local concentration of a modulatory particle
+> rather than by its point of origin" in recurrent spiking networks. And
+> [Liu et al., PNAS 2021](https://www.pnas.org/doi/full/10.1073/pnas.2111821118)
+> already ran **the exact ablation §4 pre-registers below as its control arm**
+> — spatially specific versus uniform modulation — finding specificity helps
+> and nonspecific still beats none. §4's null hypothesis is therefore a
+> published result. What remains untested is this mechanism combined with
+> *grown* structure; nothing else here may be claimed. See
+> [related-work.md](../../related-work.md#the-three-open-seams--all-three-checked-2026-08-22-all-three-occupied).
+
 The existing rule is `Δw = η · R_global · e`. The new rule is
 `Δw = η · R(x) · e` — the same three-factor form with the third factor read
 from a position. That one substitution means a synapse is credited **because

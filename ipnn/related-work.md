@@ -259,3 +259,67 @@ has been applied across species — which is the admissibility test (H-009).
 as the primary gates rather than as commentary on an accuracy number.
 **What it does not claim:** any novelty in them. The only unusual choice is
 the refusal to let a benchmark-style accuracy figure be the gate.
+
+## The three "open seams" — all three checked 2026-08-22, all three occupied
+
+The [2026-08-21 novelty audit](./journal/entries/2026-08-21-0050-novelty-audit-and-the-missing-i.md)
+identified three seams that looked unexamined and marked all of them
+*unverified*. They were searched on 2026-08-22. **None of them is open**, and
+the one the audit singled out as most promising is the most thoroughly closed.
+
+### 1. Credit assignment by diffusion geometry — pre-empted, and recently
+
+The audit called this "the one worth pursuing, because it is a different *kind*
+of answer to open-problems §1". It is experiment 002's design §4: reward as a
+substance emitted from a locus, read locally at each synapse, so `Δw = η·R(x)·e`
+rather than `η·R_global·e`.
+
+- **"Diffusion of Neuromodulators for Temporal Credit Assignment"**
+  ([arXiv 2603.08949](https://arxiv.org/html/2603.08949), March 2026) —
+  credit assignment "determined by the local concentration of a modulatory
+  particle rather than by its point of origin," in recurrent spiking networks
+  on temporal tasks. This is 002 §4's central idea, published five months
+  before 002 was designed.
+- **Cell-type-specific neuromodulation guides synaptic credit assignment in a
+  spiking neural network** (Liu et al., [PNAS 2021](https://www.pnas.org/doi/full/10.1073/pnas.2111821118))
+  — and it already ran **the ablation 002 pre-registered as its control arm**:
+  performance degrades when spatial specificity is removed so modulatory
+  signals reach all cells without attenuation, though nonspecific modulation
+  still beats none. That is 002's `rewardField: 'uniform'` versus `'diffuse'`
+  comparison, already reported.
+
+**Consequence for this project:** 002's headline mechanism is not novel, and
+its M2 gate would be re-running a published ablation. This does not make 002
+worthless — the combination with *grown* structure is still untested, and 002
+failed at M1 for unrelated reasons — but no novelty claim can rest on §4.
+
+### 2. Metabolic rent, and death as failure to pay — well established
+
+Energy-constrained structural plasticity is a developed literature: overgrowth
+followed by pruning maximises memory performance under metabolic constraints
+([synaptic pruning and synapse efficiency](https://arxiv.org/pdf/cond-mat/0207545);
+[Concurrence of form and function in developing networks](https://www.nature.com/articles/s41467-018-04537-6)),
+alongside [energy-efficient synaptic plasticity](https://ncbi.nlm.nih.gov/pmc/articles/PMC7082127),
+[competitive plasticity to reduce the energetic costs of learning](https://www.biorxiv.org/content/10.1101/2023.04.04.535544v1.full.pdf),
+and [the write-cost bottleneck](https://link.springer.com/article/10.1007/s11571-026-10508-1)
+on energy limits for continual learning. 002's rent-and-death is a
+straightforward instance.
+
+### 3. Latency as a plastic, use-tuned per-edge parameter — occupied
+
+The audit's remaining seam, and never built in 002 either (latency is set from
+span and then frozen). Delay learning in spiking networks is an active area:
+[co-learning delays, weights and adaptation](https://www.frontiersin.org/journals/neuroscience/articles/10.3389/fnins.2024.1360300/full),
+[learnable axonal delay](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10665570/),
+[DelRec](https://arxiv.org/html/2509.24852),
+[delays via dilated convolutions with learnable spacings](https://arxiv.org/pdf/2306.17670),
+and delay-domain extensions of STDP including three-factor rules for online
+adaptation. Also relevant: [delay selection by STDP](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3567188/).
+
+### What this leaves
+
+No mechanism in this project is novel. What remains unexamined is the thing the
+project is *named for* and has never built ([L-012](./journal/LEARNINGS.md)):
+iterative consideration — output→input feedback, multiple internal passes per
+stimulus, with reward-only learning and legal silence. Whether that is
+occupied has **not** been searched.
