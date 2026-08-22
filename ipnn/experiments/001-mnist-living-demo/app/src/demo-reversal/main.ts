@@ -18,6 +18,7 @@
 import { DemoSim } from '../demo-m1/sim'
 import { Organism } from '../engine/organism'
 import { defaultConfig } from '../engine/types'
+import { mulberry32, type Rng } from '../engine/rng'
 
 const SERIES = { count: '#C08A18', beta: '#3E8EDE' }
 const SCREEN_BG = '#0E1116'
@@ -68,6 +69,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 input[type="range"] { width: 120px; accent-color: var(--accent); }
 input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); }
 input[type="number"] { font: inherit; width: 58px; padding: 4px 6px;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--border);
+  border-radius: 6px; }
+select { font: inherit; font-family: var(--mono); padding: 4px 6px;
   background: var(--bg); color: var(--ink); border: 1px solid var(--border);
   border-radius: 6px; }
 .rulebar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
@@ -151,6 +155,10 @@ app.innerHTML = `
     <button id="flip">Flip the rule</button>
     <label><input id="auto" type="checkbox" checked> auto-flip every
       <input id="every" type="number" value="2500" min="150" step="50"> trials</label>
+    <label>next rule <select id="mode">
+      <option value="alternate">alternates A↔B</option>
+      <option value="shuffle">never looks back</option>
+    </select></label>
     <label>seed <input id="seed" type="number" value="1" min="1" step="1"></label>
     <button id="reset">Reset</button>
   </div>
@@ -183,12 +191,20 @@ app.innerHTML = `
         <tr><td>lifetime accuracy, every trial ever</td><td id="sc_acc_c">–</td><td id="sc_acc_b">–</td></tr>
         <tr><td>share of life spent at criterion (≥0.85)</td><td id="sc_crit_c">–</td><td id="sc_crit_b">–</td></tr>
         <tr><td>first learning (trials to criterion)</td><td id="sc_first_c">–</td><td id="sc_first_b">–</td></tr>
-        <tr><td>flips recovered from</td><td id="sc_rec_c">–</td><td id="sc_rec_b">–</td></tr>
-        <tr><td>median recovery after a flip (trials)</td><td id="sc_med_c">–</td><td id="sc_med_b">–</td></tr>
+        <tr><td>flips it came back from</td><td id="sc_rec_c">–</td><td id="sc_rec_b">–</td></tr>
+        <tr><td>&nbsp;&nbsp;· already aligned — no learning (≤110 trials)</td><td id="sc_inst_c">–</td><td id="sc_inst_b">–</td></tr>
+        <tr><td>&nbsp;&nbsp;· genuinely relearned</td><td id="sc_rel_c">–</td><td id="sc_rel_b">–</td></tr>
+        <tr><td>median trials, genuine relearning only</td><td id="sc_med_c">–</td><td id="sc_med_b">–</td></tr>
       </tbody>
     </table>
     <p class="cap">recovery = trials from the flip until rolling-100 accuracy is back at ≥0.85.
-      The 100-trial window means recoveries under 100 cannot be measured; measured ones run 600–2,500.</p>
+      A recovery at ≈100–110 trials is the measurement floor: the arm was at criterion the
+      moment the window filled — it <em>already knew this rule</em> and learned nothing. A frozen
+      organism farms those whenever the rule swings back to its frozen mapping ("alternates A↔B"),
+      which is why the split matters — and why "never looks back" exists. Measured honestly:
+      in the never-returning world BOTH arms mostly fail at this stage budget — α/β keeps its
+      synapses movable (0% frozen) but relearning still costs 600–2,500 trials per rule.
+      Flexible synapses are not yet flexible behaviour.</p>
   </section>
 
   <div class="arms">
@@ -260,18 +276,33 @@ function makeArm(id: ArmId, seed: number): Arm {
 }
 
 let arms: Arm[] = [makeArm('c', 1), makeArm('b', 1)]
-let flipped = false
+let map: number[] = [0, 1, 2]
+let ruleRng: Rng = mulberry32(1 * 31 + 7)
 let running = false
 let last = 0
 
-function currentMap(): number[] {
-  return flipped ? FLIPPED : [0, 1, 2]
-}
+/** all six mappings of three stimuli onto three answers */
+const PERMS = [
+  [0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0],
+]
 
 function doFlip(): void {
-  flipped = !flipped
+  const mode = (document.getElementById('mode') as HTMLSelectElement).value
+  if (mode === 'shuffle') {
+    // a rule that never returns rewards only genuine relearning — a frozen
+    // organism can no longer score by standing still until the world swings
+    // back to it. Drawn from the seeded rng so a life is reproducible.
+    let next = map
+    while (next.join() === map.join()) {
+      next = PERMS[Math.floor(ruleRng() * PERMS.length)]
+    }
+    map = next
+  } else {
+    // the recorded experiment's regime: A ↔ B
+    map = map.join() === '0,1,2' ? FLIPPED : [0, 1, 2]
+  }
   for (const a of arms) {
-    a.sim.setLabelMap(currentMap())
+    a.sim.setLabelMap(map)
     a.flipTrials.push(a.sim.trials.length)
     a.stages.push({ fromTrial: a.sim.trials.length, recoveredAt: null })
   }
@@ -279,7 +310,6 @@ function doFlip(): void {
 }
 
 function drawRule(): void {
-  const map = currentMap()
   ruleEl.innerHTML = STIM.map((s, i) => `${s}→<b>${STIM[map[i]]}</b>`).join(' · ')
   const flips = arms[0].flipTrials.length
   flipCountEl.textContent = `${flips} flip${flips === 1 ? '' : 's'} so far`
@@ -288,7 +318,8 @@ function drawRule(): void {
 function rebuild(): void {
   const seed = Math.max(1, Math.round(Number(seedInput.value) || 1))
   arms = [makeArm('c', seed), makeArm('b', seed)]
-  flipped = false
+  map = [0, 1, 2]
+  ruleRng = mulberry32(seed * 31 + 7)
   drawRule()
 }
 
@@ -405,8 +436,16 @@ function drawScore(): void {
       .map((st) => (st.recoveredAt === null ? null : st.recoveredAt - st.fromTrial))
       .filter((x): x is number => x !== null)
     set(`sc_rec_${k}`, flips.length ? `${rec.length} / ${flips.length}` : '–')
-    if (rec.length) {
-      const sorted = [...rec].sort((x, y) => x - y)
+    // ≤110 is the measurement floor: at criterion the moment the rolling
+    // window filled, i.e. the arm already knew this rule and learned nothing.
+    // A frozen organism farms these whenever the rule swings back to it —
+    // the stopped-clock effect Javid caught in his own run.
+    const instant = rec.filter((r) => r <= 110)
+    const relearned = rec.filter((r) => r > 110)
+    set(`sc_inst_${k}`, flips.length ? String(instant.length) : '–')
+    set(`sc_rel_${k}`, flips.length ? String(relearned.length) : '–')
+    if (relearned.length) {
+      const sorted = [...relearned].sort((x, y) => x - y)
       set(`sc_med_${k}`, String(sorted[Math.floor(sorted.length / 2)]))
     } else set(`sc_med_${k}`, '–')
   }

@@ -797,6 +797,11 @@ is an ecosystem gap rather than a scientific one.
   was to design a fresh set each year, which is expensive.
 - **Does the composite score have a degenerate optimum** — e.g. a model that
   learns nothing new but forgets nothing?
+- **Hard requirement #3 (added 2026-08-22, from L-038/L-039):** flexibility
+  scoring must use task sequences that never revisit a prior state (or score
+  revisits separately), and must never credit recoveries at the measurement
+  floor — a rigid entrant otherwise farms the leaderboard by standing still
+  while a periodic world swings back to it.
 - **This is a platform, not an experiment.** It would be a large build, and it
   competes for time with experiment 003, which tests the same hypothesis
   privately and could run this week.
