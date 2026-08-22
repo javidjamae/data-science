@@ -389,7 +389,122 @@ this") and the UI needs no structural change.
    evening. Staging it behind the §2 interface means 001 keeps working
    throughout and the two can be compared in the same UI.
 
-## 11. Out of scope
+## 11. Every knob, in one table
+
+Design §10 risk 2 names free parameters as the main threat to this
+experiment's credibility. The defence starts with being able to *see* them.
+Everything below is a constant for the whole of a run: nothing here adapts,
+and nothing here is under selection (see "what is actually random", after the
+table). All of it lives in `src/engine/grown/config.ts`.
+
+**Geometry** — the sheet and where the three cortices sit. Fixed for M1;
+`outputX` is the one L-013 turned out to hinge on.
+
+| Knob | M1 value | What it does | Why it could change the outcome |
+|---|---|---|---|
+| `width` × `height` | 32 × 32 | lattice size, = `poolSize` | sets how far input is from output in hops |
+| `inputOrigin` | (2, 12) | top-left of the 8×8 input block | with `outputX`, sets the gap a path must cross |
+| `outputX` | 29 | column of the output cortex | **the M1/shallow difference: 0.157 vs 0.883** |
+| `outputYs` | 13, 16, 19 | rows of the three answer neurons | spacing controls how much they compete for the same inputs |
+| `rewardCortex` | (16, 4) | centre of the reward locus | M2's variable; must stay off the input→output axis |
+| `rewardRadius` | 1 | size of the locus | how sharp the reward field's source is |
+
+**The unit** — deliberately close to 001's neuron (§6), so outcome
+differences are attributable to plumbing rather than to a new unit model.
+
+| Knob | M1 value | What it does | Why it could change the outcome |
+|---|---|---|---|
+| `gain` | 2.0 | sigmoid slope | with `birthWeight`, sets how much one arriving spike moves a node's firing probability — **the per-hop signal-to-noise ratio, i.e. L-013 itself** |
+| `bias` | −1.0 | resting excitability | where the unit sits on the sigmoid before any input |
+| `targetSparsity` | 0.15 | activity the homeostat holds | sparser = less noise but fewer carriers |
+| `inhibitionRate` | 0.02 | homeostat adaptation speed | also an activity *source* from silence (L-016) |
+| `pSpont` | 0.02 | spontaneous firing rate | the intended cold-start bootstrap |
+| `lateralInhibition` | 2.0 | output-cortex competition | replaces 001's softmax; too low → two answers at once |
+| `urgeRate` / `urgeMax` | 0.05 / 3.0 | pressure to answer during silence | too low → never speaks; too high → speaks at random |
+| `readoutWindow` | 20 | window for `outputProbs()` | display only |
+
+**The learning rule** — identical in form to 001's, with `R` read locally.
+
+| Knob | M1 value | What it does | Why it could change the outcome |
+|---|---|---|---|
+| `traceDecay` λ | 0.97 | eligibility horizon (~33 ticks) | must exceed the deepest path delay or credit never arrives (§5) |
+| `eta` | 0.08 | learning rate | must outrun rent, or nothing is ever selected for |
+| `wMax` | 3.0 | weight clamp | ceiling on how strong one connection can get |
+| `consolidation` | true | whether plasticity decays with evidence | off scores *worse* (0.829 vs 0.869): load-bearing |
+| `consolidationN0` | 1000 | evidence at which plasticity halves | how fast a synapse freezes — L-004's tension |
+
+**Metabolism** — the selection pressure. Death is failure to pay rent.
+
+| Knob | M1 value | What it does | Why it could change the outcome |
+|---|---|---|---|
+| `rent` ρ | 9e−5 | weight decay per edge per tick | ρ=0 collapses the system (0.444, runaway to 32k edges) |
+| `birthWeight` | 0.15 | weight a new edge is born with | with `gain`, the per-hop SNR; also sets how long an edge lives unearned |
+| `deathThreshold` θ | 0.02 | \|w\| below which an edge is removed | with rent and `sleepEvery`, the lifetime of an unearning edge |
+
+**Growth** — how it builds. Undirected among candidates, which is L-014.
+
+| Knob | M1 value | What it does | Why it could change the outcome |
+|---|---|---|---|
+| `growthAttempts` | 2 | attempts per node per sleep | how fast structure turns over |
+| `rMax` | 8 | longest span a new edge may have | sets hops-per-distance; capped by the off-axis constraint |
+| `lambdaG` λ_g | 4 | distance penalty `exp(−span/λ_g)` | how rare long jumps are |
+| `sleepEvery` | 20 | trials between structural changes | freezing structure early scores worse (0.803) |
+| `maxOutDegree` | 32 | cap on outgoing edges per node | bounds edge count; binding must be reported (§10 risk 3) |
+
+**The two fields** — §4's core.
+
+| Knob | M1 value | What it does | Why it could change the outcome |
+|---|---|---|---|
+| `activityD` | 0.045 | activity diffusion constant | with decay, sets how far "nearby" reaches for growth |
+| `activityDecay` | 0.005 | activity decay per tick | length scale √(D/decay) = 3; time constant 1/decay = 200 ticks |
+| `rewardField` | `uniform` | `uniform` = 001's broadcast, `diffuse` = R(x) | **the M2 variable; `uniform` is the control arm** |
+| `rewardLambda` | 8 | reward-field length scale | how sharply credit falls off with distance |
+| `latency` | `uniform` | `span` charges time of flight | **the M3 variable; `uniform` is the control arm** |
+| `conductionSpeed` v | 3 | lattice units per tick | makes long edges the fast path |
+
+**The teacher** — not the substrate's, but they shape what it can learn.
+Unchanged from 001 so the comparison holds: `maxTicks 60, blankTicks 15,
+spokenWindow 20, spokenThreshold 6, schedule 'ignore', rewardMagnitude 1.0,
+correctionMagnitude 0.2, baselineRate 0.05`. `spokenThreshold`/`spokenWindow`
+are quietly important — they decide what counts as an answer at all, and a
+silent trial scores as wrong.
+
+### What is actually random, and what only looks it
+
+Four things are sampled at run time, every one from a **fixed** distribution:
+
+1. **Firing** — Bernoulli per node per tick, `p = σ(gain·(drive − inhibition) + bias)`, then a spontaneous floor.
+2. **Growth targets** — one candidate within `rMax`, sampled with probability ∝ `A(target)·exp(−span/λ_g)`.
+3. **Whether a node grows at all** — Bernoulli at `min(1, fireRate/targetSparsity)`.
+4. **A new edge's sign** — a coin flip; and the order the three outputs are evaluated in, shuffled each tick.
+
+So the *draws* are stochastic but the *distributions* are hardcoded: the
+sigmoid, the exponential distance penalty, the linear activity gate and the
+fair coin are all fixed functional forms, and every parameter above is a
+constant shared by every node and every edge.
+
+The consequence is worth stating plainly, because it bounds what this
+experiment can discover. **Structure is under selection; the rules that
+generate structure are not.** An edge can be selected for by earning its rent,
+but `rent` itself, `growthAttempts`, `lambdaG` and the rest cannot — they are
+identical everywhere and never vary, so there is no heritable variation for
+selection to act on. The organism evolves its wiring inside a fixed physics it
+cannot touch. Making any of these per-node or per-edge and heritable (a new
+edge inheriting its source node's growth parameters, with mutation) would put
+the physics under selection too, and is registered as a follow-up rather than
+done here.
+
+### Searching this space
+
+`tools/exp002-sweep.ts` samples it and `tools/exp002-sweep-report.ts` reads it
+back. Two rules, neither optional, both because §10 risk 2 is a real hazard
+and not a ritual: configurations are **scored on search seeds and validated on
+seeds never used during the search**, and **every draw is written to JSONL
+with its full config and the git commit**, so winners and discards are equally
+auditable. With this many knobs a random search will always produce a
+leaderboard; only the held-out numbers mean anything.
+
+## 12. Out of scope
 
 Multi-sense and multimodal fusion (moves to 003+); neurogenesis (nodes are
 fixed sites here — only *edges* are born and die); dendritic branch targeting
@@ -397,7 +512,7 @@ fixed sites here — only *edges* are born and die); dendritic branch targeting
 replay during sleep; the α/β confidence fix; MNIST (the task stays the three
 M1 patterns on purpose).
 
-## 12. Relationship to the rest of the project
+## 13. Relationship to the rest of the project
 
 - **Experiment 001 is not superseded.** It becomes the fixed-architecture
   baseline arm, and its published demo stays as-is.
