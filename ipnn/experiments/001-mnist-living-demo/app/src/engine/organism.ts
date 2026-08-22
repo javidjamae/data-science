@@ -233,6 +233,25 @@ export class Organism implements OrganismLike {
   }
 
   /**
+   * Readout-layer plasticity, summarised — telemetry only, nothing reads it
+   * back into behaviour. `mean` is the average consolidation factor
+   * 1/(1+|α−β|/n₀) over the 480 pool→output synapses ("plasticity
+   * remaining"), and `frozenFraction` is the share below 1/6 (|α−β| > 5n₀) —
+   * the aging gauge L-034's demo drains in real time.
+   */
+  plasticityStats(): { mean: number; frozenFraction: number } {
+    const n0 = this.cfg.consolidationN0
+    let sum = 0
+    let frozen = 0
+    for (let s = 0; s < this.outN.length; s++) {
+      const p = 1 / (1 + Math.abs(this.outN[s] - this.outBeta[s]) / n0)
+      sum += p
+      if (p < 1 / 6) frozen++
+    }
+    return { mean: sum / this.outN.length, frozenFraction: frozen / this.outN.length }
+  }
+
+  /**
    * Summed evidence per population — the instrument for watching β climb
    * during a reversal, and for verifying that under `'count'` it never moves.
    */

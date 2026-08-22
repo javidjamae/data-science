@@ -3,6 +3,8 @@
 **Status:** pre-registration. Written before the harness was run.
 **Substrate:** experiment 001, unchanged. **Does not depend on 002**, which is
 blocked at its own M1.
+**Live demo:** <https://claude.ai/code/artifact/4751e69e-739c-459f-814c-2669a3229349> — count vs α/β racing through rule flips;
+watch one age out of learning while the other keeps changing its mind.
 **Origin:** [L-020](../../journal/LEARNINGS.md) — the project has defined
 intelligence as transfer-plus-retention since `vision.md` was written and has
 never once tested it.

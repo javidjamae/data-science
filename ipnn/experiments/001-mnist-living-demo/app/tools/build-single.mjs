@@ -32,6 +32,11 @@ const TARGETS = {
     out: 'ipnn-002-grown-demo',
     title: 'IPNN — experiment 002, the grown substrate',
   },
+  reversal: {
+    entry: 'src/demo-reversal/main.ts',
+    out: 'ipnn-003-reversal-demo',
+    title: 'IPNN — experiment 003, the rule flip',
+  },
 }
 
 const requested = process.argv.slice(2).filter((a) => !a.startsWith('-'))

@@ -67,6 +67,10 @@ export class DemoSim {
 
   /** auto = teacher-driven lessons; manual = you hold a stimulus and watch */
   mode: SimMode = 'auto'
+  /** rewarded label for stimulus i — identity unless a rule flip is active.
+   * This is experiment 003's reversal: the same stimuli, reassigned answers.
+   * Identity by default, so every recorded demo and test is bit-identical. */
+  labelMap: number[] = [0, 1, 2]
   /** in manual mode: which pattern is on the sense, or null for cleared */
   manualLabel: number | null = null
   /** free-running answer readout — only advanced in manual mode */
@@ -108,6 +112,7 @@ export class DemoSim {
     this.correctInWindow = 0
     this.mode = 'auto'
     this.manualLabel = null
+    this.labelMap = [0, 1, 2]
     this.readout = new SustainedReadout({
       outputSize: this.org.cfg.outputSize,
       window: this.teacher.cfg.spokenWindow,
@@ -145,6 +150,14 @@ export class DemoSim {
     this.manualLabel = label
     this.org.sense.set(label === null ? BLANK : M1_PATTERNS[label])
     this.readout.reset()
+  }
+
+  /** Reassign the rewarded answers (the rule flip). Traces are cleared for
+   * the same reason mode switches clear them: credit earned under the old
+   * rule must not be paid out by the new rule's first reward. */
+  setLabelMap(map: number[]): void {
+    this.labelMap = [...map]
+    this.org.clearTraces()
   }
 
   get learning(): boolean {
@@ -251,6 +264,10 @@ export class DemoSim {
       this.block = shuffleInPlace([0, 1, 2], this.order)
     }
     const label = this.block.pop()!
-    this.stepper = this.teacher.beginTrial(this.org, M1_PATTERNS[label], label)
+    this.stepper = this.teacher.beginTrial(
+      this.org,
+      M1_PATTERNS[label],
+      this.labelMap[label]
+    )
   }
 }
