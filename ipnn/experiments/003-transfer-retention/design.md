@@ -26,6 +26,18 @@ and this is the first use of the doctrine adopted on 2026-08-22.
 
 ## 2. Method
 
+> **Correction, 2026-08-22, after running.** The claim below that same-outputs
+> is "maximum interference" is **false**, and the experiment as designed did not
+> test retention. Task B's glyphs are *different stimuli*, so output 1 learns to
+> fire for A₁ **and** B₁ — the two demands are compatible and nothing ever
+> contradicts A. All three gates passed and measured readout *capacity*. The
+> protocol that does contradict prior learning is **reversal**: task A's stimuli
+> with permuted labels, under which retention collapses to 0.069 against a 0.333
+> chance line. Reversal is now the primary protocol and the arm below is
+> retained as the capacity control it turned out to be. See
+> [2026-08-22-1530](../../journal/entries/2026-08-22-1530-transfer-retention.md)
+> and [L-029](../../journal/LEARNINGS.md).
+
 **Task A** — the three M1 glyphs (vertical bars, horizontal bars, diagonal X).
 **Task B** — three new glyphs (plus, ring, diagonal band) on **the same three
 output neurons**. Same outputs is the deliberate choice: it is maximum
