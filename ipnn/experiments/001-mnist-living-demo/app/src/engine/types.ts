@@ -85,6 +85,27 @@ export interface OrganismConfig extends SubstrateConfig {
   /** Beta-confidence consolidation: plasticity scales as 1/(1 + n/n0) */
   consolidation: boolean
   consolidationN0: number
+
+  /**
+   * How evidence accumulates under consolidation.
+   *
+   * `'count'` — the original rule and the default: `n` grows on positive
+   * reward and never shrinks, so plasticity decays monotonically over the
+   * organism's whole life. Kept as the default because the published M1 demo
+   * and every recorded result are a record of this rule; changing it silently
+   * would invalidate them (the M1b entry's decision 3).
+   *
+   * `'beta'` — the α/β fix, promoted from "registered follow-up" (002 design
+   * §7) after serial reversal showed the count model causes *cumulative
+   * learning death*: 7/32 reversals learnable against 22/32 without
+   * consolidation (L-034). Confirming and contradicting evidence are tracked
+   * separately — the α and β the "Beta-confidence" name promised — and
+   * plasticity scales as 1/(1 + |α−β|/n0), so a synapse whose evidence turns
+   * mixed becomes *less* certain and plastic again. With β ≡ 0 the two models
+   * are arithmetically identical, which is what makes this a one-parameter
+   * control arm rather than a fork.
+   */
+  evidenceModel: 'count' | 'beta'
 }
 
 export const defaultConfig: OrganismConfig = {
@@ -112,6 +133,7 @@ export const defaultConfig: OrganismConfig = {
 
   consolidation: true,
   consolidationN0: 1000,
+  evidenceModel: 'count',
 }
 
 export type TeacherSchedule = 'ignore' | 'correction'

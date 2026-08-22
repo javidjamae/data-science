@@ -29,11 +29,15 @@ export class Organism implements OrganismLike {
   readonly sense: Uint8Array
 
   // sense→pool synapses: for pool neuron j, poolPre[j*fanIn..] are sense
-  // indices and poolW the matching weights
+  // indices and poolW the matching weights.
+  // poolN is α (confirming evidence) and poolBeta is β (contradicting
+  // evidence). Under the 'count' model β is never written and stays zero, so
+  // the arithmetic below reduces exactly to the original rule.
   private poolPre: Int32Array
   private poolW: Float32Array
   private poolE: Float32Array
   private poolN: Float32Array
+  private poolBeta: Float32Array
 
   /** pool firing state this tick (binary) */
   readonly poolFired: Uint8Array
@@ -45,6 +49,7 @@ export class Organism implements OrganismLike {
   private outW: Float32Array
   private outE: Float32Array
   private outN: Float32Array
+  private outBeta: Float32Array
   private outP: Float32Array
 
   /** output neuron that fired this tick, or -1 (silence) */
@@ -67,6 +72,7 @@ export class Organism implements OrganismLike {
     this.poolW = new Float32Array(nPoolSyn)
     this.poolE = new Float32Array(nPoolSyn)
     this.poolN = new Float32Array(nPoolSyn)
+    this.poolBeta = new Float32Array(nPoolSyn)
     for (let s = 0; s < nPoolSyn; s++) {
       this.poolPre[s] = Math.floor(this.rng() * cfg.senseSize)
       this.poolW[s] = (this.rng() * 2 - 1) * 0.5
@@ -76,6 +82,7 @@ export class Organism implements OrganismLike {
     this.outW = new Float32Array(nOutSyn)
     this.outE = new Float32Array(nOutSyn)
     this.outN = new Float32Array(nOutSyn)
+    this.outBeta = new Float32Array(nOutSyn)
     this.outP = new Float32Array(cfg.outputSize)
     for (let s = 0; s < nOutSyn; s++) {
       this.outW[s] = (this.rng() * 2 - 1) * 0.1
@@ -181,32 +188,65 @@ export class Organism implements OrganismLike {
   /**
    * Broadcast a reward (typically an advantage, R − baseline) to every
    * synapse. This is the only learning signal the organism ever receives.
+   *
+   * Consolidation reads the *net* evidence |α − β|, where α (`outN`/`poolN`)
+   * accumulates on positive reward and β on negative — so a synapse whose
+   * evidence turns mixed becomes plastic again. Under the `'count'` model β is
+   * never incremented, |α − 0| = α, and this is bit-for-bit the original rule.
+   * Under `'beta'` it is the α/β fix: serial reversal showed the count model
+   * causes cumulative learning death — plasticity decays monotonically over
+   * the organism's life until no rule, new or old, can be learned (L-034).
    */
   applyReward(r: number): void {
     if (r === 0) return
     const { cfg } = this
     const n0 = cfg.consolidationN0
+    const beta = cfg.evidenceModel === 'beta'
 
     for (let s = 0; s < this.outW.length; s++) {
       const e = this.outE[s]
       if (e === 0) continue
-      const plasticity = cfg.consolidation ? 1 / (1 + this.outN[s] / n0) : 1
+      const plasticity = cfg.consolidation
+        ? 1 / (1 + Math.abs(this.outN[s] - this.outBeta[s]) / n0)
+        : 1
       let w = this.outW[s] + cfg.etaOut * r * e * plasticity
       if (w > cfg.wMax) w = cfg.wMax
       else if (w < -cfg.wMax) w = -cfg.wMax
       this.outW[s] = w
       if (r > 0) this.outN[s] += Math.abs(e)
+      else if (beta) this.outBeta[s] += Math.abs(e)
     }
 
     for (let s = 0; s < this.poolW.length; s++) {
       const e = this.poolE[s]
       if (e === 0) continue
-      const plasticity = cfg.consolidation ? 1 / (1 + this.poolN[s] / n0) : 1
+      const plasticity = cfg.consolidation
+        ? 1 / (1 + Math.abs(this.poolN[s] - this.poolBeta[s]) / n0)
+        : 1
       let w = this.poolW[s] + cfg.etaPool * r * e * plasticity
       if (w > cfg.wMax) w = cfg.wMax
       else if (w < -cfg.wMax) w = -cfg.wMax
       this.poolW[s] = w
       if (r > 0) this.poolN[s] += Math.abs(e)
+      else if (beta) this.poolBeta[s] += Math.abs(e)
+    }
+  }
+
+  /**
+   * Summed evidence per population — the instrument for watching β climb
+   * during a reversal, and for verifying that under `'count'` it never moves.
+   */
+  evidenceTotals(): { poolAlpha: number; poolBeta: number; outAlpha: number; outBeta: number } {
+    const sum = (a: Float32Array) => {
+      let t = 0
+      for (let i = 0; i < a.length; i++) t += a[i]
+      return t
+    }
+    return {
+      poolAlpha: sum(this.poolN),
+      poolBeta: sum(this.poolBeta),
+      outAlpha: sum(this.outN),
+      outBeta: sum(this.outBeta),
     }
   }
 
