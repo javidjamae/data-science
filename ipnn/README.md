@@ -6,7 +6,9 @@ split. Built from scratch — no ML training frameworks — in the spirit of
 Jeff Hawkins' Thousand Brains program.
 
 Start with [vision.md](./vision.md). It's the north star; everything else
-serves it.
+serves it. If you hit a label you don't recognise — `002`, `001-M1b`, `L-013`,
+`H-004`, `§F`, `[J→C]` — every one of them is defined in
+[Naming](#naming--every-label-used-in-this-project) below.
 
 ## Map
 
@@ -47,32 +49,60 @@ serves it.
 - Future homes, when needed (don't create empty dirs before then): `theory/`
   if `abstract.md` outgrows itself, `glossary.md` when vocabulary stabilizes.
 
-## Naming (what M1, M1b, 002 actually mean)
+## Naming — every label used in this project
 
-- **`NNN`** — an *experiment*: a numbered directory with its own question,
-  design doc and gates. `001` is the fixed-architecture living demo; `002` is
-  the grown substrate.
-- **`M#`** — a *milestone within one experiment*, defined in that experiment's
-  `design.md` and gating the next. Always read as "experiment 001's M1",
-  never as a global number: each experiment numbers its own milestones from
-  M0. In 001: M0 scaffold, **M1 the critical learning gate**, M2 minimal
-  living demo, M3 full experience, M4 science.
-- **`M#x`** (letter suffix) — an *ablation or variant* of that milestone,
-  answering "which part of M# was load-bearing?" rather than advancing the
-  experiment. `M1b` = the `etaPool=0` ablation of 001's M1 gate.
-- **`L-###`** — a durable learning in the
-  [ledger](./journal/LEARNINGS.md), cited by ID everywhere and never deleted.
-- **`H-###`** — an open hypothesis in the
-  [hypotheses ledger](./journal/HYPOTHESES.md): what we believe or intend to
-  test, as opposed to what we have established.
-- **`[J]` / `[C]` / `[J→C]`** — attribution marks recording whether an idea
-  came from Javid, from Claude, or was seeded by one and developed by the
-  other. Recorded live, never reconstructed
-  ([convention](./journal/README.md#attribution-who-thought-of-it)).
-- **Backlog letters (`§A`–`§G`)** — thematic tracks in
-  [experiment-ideas.md](./experiment-ideas.md), *not* experiments. A track
-  graduates into a numbered experiment when it gets a `design.md`; §F became
-  experiment 002.
+Four families of label, answering four different questions. If a label is not
+in this table, it is not a label.
+
+### Where work lives
+
+| Label | Means | Examples |
+|---|---|---|
+| `NNN` | An **experiment**: its own directory, question, `design.md` and gates | `001` fixed-architecture living demo · `002` grown substrate |
+| `§A`–`§G` | A **backlog track** in [experiment-ideas.md](./experiment-ideas.md) — a *theme*, not an experiment. Graduates to a number when it earns a `design.md` | `§F` became experiment 002 |
+
+> **`§E` is not an ID.** The backlog letters are section headings in one file.
+> They have nothing to do with `L-###` or `H-###`, and there is no `E-###`.
+
+### Steps inside one experiment
+
+| Label | Means |
+|---|---|
+| `M#` | A **milestone**, defined in that experiment's `design.md`, gating the next |
+| `NNN-M#x` | An **ablation** of that milestone — "which part was load-bearing?" — not progress toward the next one |
+
+> **⚠️ `M#` is per-experiment, never global.** 001's M1 and 002's M1 are
+> different gates with different outcomes: **001's M1 passed** (0.98), **002's
+> M1 failed** (0.157). Always write and read it as "001's M1".
+>
+> Ablations therefore carry their experiment: **`001-M1b`** (the `etaPool=0`
+> ablation), **`001-M1c`** (no-pool control), **`002-M1d`** (depth ladder),
+> **`002-M1e`** (starved readout). Bare `M1c` is ambiguous and should not be
+> used — an earlier draft did, and the two experiments' suffixes read as one
+> alphabetical sequence when they are not.
+
+### What we think
+
+| Label | Means | Ledger |
+|---|---|---|
+| `L-###` | A **learning** — established, with evidence behind it | [LEARNINGS.md](./journal/LEARNINGS.md) |
+| `H-###` | A **hypothesis** — believed or intended, not yet established | [HYPOTHESES.md](./journal/HYPOTHESES.md) |
+
+`L` is what we know; `H` is what we suspect. A hypothesis that survives
+testing becomes a learning; one that dies is marked refuted and stays in the
+ledger. Neither is ever deleted.
+
+### Who thought of it
+
+| Mark | Means |
+|---|---|
+| `[J]` | Javid's, in substance |
+| `[C]` | Claude's, in substance |
+| `[J→C]` | Javid seeded it, Claude developed it |
+| `[C→J]` | Claude proposed it, Javid selected or redirected it |
+
+Recorded live, never reconstructed. Full convention in
+[journal/README.md](./journal/README.md#attribution-who-thought-of-it).
 
 ## License
 

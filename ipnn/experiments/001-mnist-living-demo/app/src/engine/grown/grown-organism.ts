@@ -475,6 +475,7 @@ export class GrownOrganism implements OrganismLike {
           e: 0,
           n: 0,
           d: latencyForSpan(span, cfg.conductionSpeed, cfg.latency),
+          born: this.stats_.sleeps,
         })
         present.add(i * lat.size + j)
         outDeg[i]++
@@ -519,6 +520,21 @@ export class GrownOrganism implements OrganismLike {
       else pool += w2
     }
     return { pool, out }
+  }
+
+  /**
+   * Age of every live edge, in sleeps survived. The question this exists to
+   * answer: is the substrate churning a random fraction of a stationary
+   * population, or is a stable core accumulating underneath the churn? The
+   * aggregate survival fraction cannot tell those apart — a geometric age
+   * distribution means pure churn, a heavy old tail means crystallisation.
+   */
+  edgeAges(): Int32Array {
+    const ages = new Int32Array(this.edges.count)
+    for (let s = 0; s < this.edges.count; s++) {
+      ages[s] = this.stats_.sleeps - this.edges.born[s]
+    }
+    return ages
   }
 
   stats(): GrownStats {

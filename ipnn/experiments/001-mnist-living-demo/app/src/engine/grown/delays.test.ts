@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { EdgeSet, latencyForSpan, type Edge } from './edges'
 
 function edge(pre: number, post: number, d: number, w = 1): Edge {
-  return { pre, post, w, e: 0, n: 0, d }
+  return { pre, post, w, e: 0, n: 0, d, born: 0 }
 }
 
 describe('time of flight', () => {

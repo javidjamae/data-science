@@ -38,6 +38,12 @@ export interface Edge {
   e: number
   n: number
   d: number
+  /** index of the sleep at which this edge was grown. Age in sleeps is
+   * `currentSleep − born`, and it is the only way to tell a substrate that
+   * churns a random fraction every generation from one that is crystallising
+   * a stable core — the aggregate survival fraction looks identical either
+   * way. */
+  born: number
 }
 
 export class EdgeSet {
@@ -52,6 +58,7 @@ export class EdgeSet {
   w = new Float32Array(0)
   e = new Float32Array(0)
   n = new Float32Array(0)
+  born = new Int32Array(0)
 
   /** per-edge: did a presynaptic spike arrive on *this* tick. The only
    * co-activity signal any caller is allowed to see. */
@@ -88,6 +95,7 @@ export class EdgeSet {
     this.w = new Float32Array(c)
     this.e = new Float32Array(c)
     this.n = new Float32Array(c)
+    this.born = new Int32Array(c)
     this.arrived = new Uint8Array(c)
     this.ring = new Uint8Array(c * this.delaySlots)
 
@@ -105,6 +113,7 @@ export class EdgeSet {
       this.w[i] = ed.w
       this.e[i] = ed.e
       this.n[i] = ed.n
+      this.born[i] = ed.born
     }
 
     this.outStart.fill(0)
@@ -125,6 +134,7 @@ export class EdgeSet {
         e: this.e[i],
         n: this.n[i],
         d: this.delay[i],
+        born: this.born[i],
       }
     }
     return out
