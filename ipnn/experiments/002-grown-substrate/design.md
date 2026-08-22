@@ -4,6 +4,8 @@
 blocked — see the status note in §8 and the amendment at the head of §10.
 Everything below §8's status note is the original pre-registration, left
 unedited except where an amendment is marked as such.
+**Live demo:** <https://claude.ai/code/artifact/122d168d-179c-4004-96b2-102377504da6> — watch it wire itself from zero edges, and
+switch arms to see the one change that makes the identical rule learn.
 **Depends on:** experiment 001's engine, which becomes this experiment's
 **baseline arm** rather than being replaced.
 **Backlog origin:** [experiment-ideas.md §F](../../experiment-ideas.md)

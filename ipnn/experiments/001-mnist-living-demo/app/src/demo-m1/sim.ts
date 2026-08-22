@@ -37,8 +37,23 @@ export type SimMode = 'auto' | 'manual'
 /** blank sense, used when the manual stimulus is cleared */
 const BLANK = new Uint8Array(defaultConfig.senseSize)
 
+/**
+ * How a substrate is built for a given seed.
+ *
+ * The default is experiment 001's fixed-architecture organism, which is what
+ * the published M1 demo runs and what every existing test exercises. Passing a
+ * different factory — experiment 002's grown substrate, say — swaps the
+ * substrate without changing one line of the controller below, which is the
+ * whole point of the OrganismLike contract (002 design §2 and §9).
+ */
+export type SubstrateFactory = (seed: number) => OrganismLike
+
+const defaultSubstrate: SubstrateFactory = (seed) =>
+  new Organism({ ...defaultConfig, seed })
+
 export class DemoSim {
   seed: number
+  private makeOrganism: SubstrateFactory
   org!: OrganismLike
   teacher!: AutoTeacher
   stepper!: TrialStepper
@@ -69,14 +84,16 @@ export class DemoSim {
   private block: number[] = []
   private correctInWindow = 0
 
-  constructor(seed: number) {
+  constructor(seed: number, makeOrganism: SubstrateFactory = defaultSubstrate) {
     this.seed = seed
+    // assigned before reset(), which uses it
+    this.makeOrganism = makeOrganism
     this.reset(seed)
   }
 
   reset(seed: number): void {
     this.seed = seed
-    this.org = new Organism({ ...defaultConfig, seed })
+    this.org = this.makeOrganism(seed)
     this.teacher = new AutoTeacher({ ...defaultTeacherConfig })
     // schedule identical to the M1 gate harness (m1-sanity.test.ts)
     this.order = mulberry32(seed * 7919 + 1)
