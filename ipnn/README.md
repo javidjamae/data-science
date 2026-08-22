@@ -17,7 +17,7 @@ serves it.
 | [open-problems.md](./open-problems.md) | Honest list of unsolved problems + current working answers + how we'll test them | Every time an experiment lands |
 | [related-work.md](./related-work.md) | Prior art map: what exists, what IPNN takes or claims beyond it | As we read |
 | [experiment-ideas.md](./experiment-ideas.md) | The backlog: raw ideas → shaped hypotheses → numbered experiments; ranked | As ideas arrive |
-| [journal/](./journal/README.md) | **The lab notebook of record**: one timestamped entry per iteration + the citable learnings ledger ([LEARNINGS.md](./journal/LEARNINGS.md)) | Every iteration |
+| [journal/](./journal/README.md) | **The lab notebook of record**: one timestamped entry per iteration, the learnings ledger ([LEARNINGS.md](./journal/LEARNINGS.md), what we know) and the hypotheses ledger ([HYPOTHESES.md](./journal/HYPOTHESES.md), what we believe and intend to test) | Every iteration, and whenever a realisation lands |
 | [experiments/](./experiments/) | Numbered experiments (see below) | Continuously |
 | [disclosure-policy.md](./disclosure-policy.md) | Open-by-default policy with pre-registered safety tripwires; licensing rationale | Rarely, with journaled rationale |
 
@@ -62,6 +62,13 @@ serves it.
   experiment. `M1b` = the `etaPool=0` ablation of 001's M1 gate.
 - **`L-###`** — a durable learning in the
   [ledger](./journal/LEARNINGS.md), cited by ID everywhere and never deleted.
+- **`H-###`** — an open hypothesis in the
+  [hypotheses ledger](./journal/HYPOTHESES.md): what we believe or intend to
+  test, as opposed to what we have established.
+- **`[J]` / `[C]` / `[J→C]`** — attribution marks recording whether an idea
+  came from Javid, from Claude, or was seeded by one and developed by the
+  other. Recorded live, never reconstructed
+  ([convention](./journal/README.md#attribution-who-thought-of-it)).
 - **Backlog letters (`§A`–`§G`)** — thematic tracks in
   [experiment-ideas.md](./experiment-ideas.md), *not* experiments. A track
   graduates into a numbered experiment when it gets a `design.md`; §F became

@@ -1,3 +1,7 @@
 sweep v1 shard 3/8 — 250 configs × 2 seeds × 1200 trials → /Users/javidjamae/code/data-science/ipnn/experiments/001-mnist-living-demo/app/sweeps/exp002-sweep-v1-shard3.jsonl
   [3] run 0: new best worst-seed tail 0.000 (edges 5228, within-2-hops 0)
   [3] run 2: new best worst-seed tail 0.300 (edges 5117, within-2-hops 0)
+  [3] run 5: new best worst-seed tail 0.320 (edges 8342, within-2-hops 0)
+  [3] run 20: new best worst-seed tail 0.330 (edges 5856, within-2-hops 0)
+  [3] run 23: new best worst-seed tail 0.340 (edges 971, within-2-hops 0)
+  [3] 25/250 done, best 0.340

@@ -10,7 +10,8 @@ here. If a result isn't in the journal, it didn't happen.
 journal/
   README.md      ← this file: the rules
   TEMPLATE.md    ← copy this to start a new entry
-  LEARNINGS.md   ← the learnings ledger: every learning, numbered and citable
+  LEARNINGS.md   ← the learnings ledger: what we have established (L-###)
+  HYPOTHESES.md  ← the hypotheses ledger: what we believe or intend to test (H-###)
   entries/       ← one file per iteration: YYYY-MM-DD-HHMM-slug.md
   artifacts/     ← (when needed) raw data dumps per entry: artifacts/<entry-slug>/
 ```
@@ -35,31 +36,44 @@ journal/
 5. **Negative results are mandatory content.** A failed attempt is logged
    with the same rigor as a success — usually more, since diagnosis is where
    learnings come from.
-6. **Learnings are first-class.** Every durable learning gets an `L-###` ID
+6. **Thoughts are first-class, not just iterations.** A realisation, a change
+   of direction, a new hypothesis or a reframing of what we are even trying to
+   measure is worth recording *the day it happens*, whether or not any code
+   ran. File it as a `theory` entry, and register any new hypothesis in
+   [HYPOTHESES.md](./HYPOTHESES.md) with an `H-###`. The reason is plain: the
+   ideas that change a project's direction are almost never the ones that
+   arrive attached to a result, and if they only ever live in a conversation
+   they will be re-derived from scratch in three months, usually worse.
+
+7. **Attribution: who thought of it.** See the section below. Every hypothesis,
+   and every idea in an entry that materially changed the direction, carries a
+   `[J]` / `[C]` / `[J→C]` / `[C→J]` mark.
+
+8. **Learnings are first-class.** Every durable learning gets an `L-###` ID
    in [LEARNINGS.md](./LEARNINGS.md) with a one-line statement, status, and a
    link to the entry holding the evidence. Later entries cite learnings by ID
    instead of restating them. Learnings are never deleted — they are marked
    `superseded by L-###` or `refuted (entry link)`.
-7. **Reproducibility block.** Every entry records: the exact configuration
+9. **Reproducibility block.** Every entry records: the exact configuration
    values used (a snapshot, not a reference to a file that may change), RNG
    seeds, the git commit hash of the code that produced the results (commit
    at iteration boundaries so the hash exists; note "uncommitted" honestly if
    so), and the command to re-run.
-8. **Threats to validity.** Every entry with a positive result must state
+10. **Threats to validity.** Every entry with a positive result must state
    what could make its conclusions wrong. If you can't think of one, you
    haven't thought.
-9. **Plain words first.** Every entry opens with a non-technical summary —
+11. **Plain words first.** Every entry opens with a non-technical summary —
    what we tried, whether it worked, what we learned — readable by someone
    with no ML background. (This mirrors the plain-language digests required
    by journals like eLife and PLOS.) Written last, placed first.
-10. **Prior art & novelty, every entry.** Each entry states how the
+12. **Prior art & novelty, every entry.** Each entry states how the
     iteration relates to others' prior work: what it echoes (cite
     `../related-work.md`, adding new finds there first), what it does
     differently, and the *smallest honest* novelty claim — marked
     *unverified against literature* until a real search has been done, and
     downgraded in a later entry if prior art turns up. "Nothing novel here,
     this replicates X" is a fully respectable section.
-11. **Retrospective entries are allowed, and must say so.** History that
+13. **Retrospective entries are allowed, and must say so.** History that
     predates the journal (or that was never written down) may be filed as a
     *retrospective* entry, dated to when the events happened so the index
     reads as a timeline. It must open with a banner giving the date it was
@@ -67,11 +81,43 @@ journal/
     (commits, files, output) from what is reconstructed or inferred. This
     does not weaken rule 1: retrospective entries *add* missing history,
     they never revise an existing entry.
-12. **Claims live in one place.** Theory belongs in `../abstract.md`, standing
+14. **Claims live in one place.** Theory belongs in `../abstract.md`, standing
    doubts in `../open-problems.md`, experiment designs in
    `../experiments/*/design.md`. The journal records *what happened and what
    was learned*, and links outward. When a learning changes the theory, the
    entry's *Decisions* section says which doc was updated.
+
+
+## Attribution: who thought of it
+
+This project is run by a person and a model working together, over long
+sessions, at speed. Six months from now it will be impossible to reconstruct
+which of them an idea came from — and that is worth knowing, both for honesty
+about the record and because the two have noticeably different failure modes.
+So it gets marked at the time, never afterwards.
+
+| Mark | Meaning |
+|---|---|
+| **[J]** | Javid's, in substance. He stated it; it was not prompted or suggested by the model. |
+| **[C]** | Claude's, in substance. The model originated it. |
+| **[J→C]** | Javid seeded it; Claude developed, formalised or operationalised it. |
+| **[C→J]** | Claude proposed it; Javid selected it, redirected it, or decided on it. |
+
+Rules that keep this from becoming decorative:
+
+- **Recorded live, never reconstructed.** An attribution added weeks later is
+  a guess wearing a costume. If it was not marked at the time, leave it
+  unmarked rather than inventing one.
+- **When genuinely unclear, it is `[J→C]`.** Most good ideas here arrive in
+  conversation and neither party can honestly claim them alone. The ambiguous
+  case is the common case, and it has its own mark for that reason.
+- **It attaches to ideas and decisions, not to typing.** Claude writes almost
+  all of the prose and nearly all of the code; that is not authorship of the
+  idea. Conversely a one-line instruction that redirects the whole experiment
+  is `[J]`, however short it was.
+- **Marks go on hypotheses, on direction-changing ideas in entries, and on
+  backlog items.** Not on routine work — there is no value in attributing a
+  bug fix.
 
 ## Where these rules come from
 
@@ -114,13 +160,15 @@ field that learned it the hard way:
 3. Fill *Method / Results* as you go; *Analysis / Learnings / Decisions /
    Threats / Next* at the end.
 4. Add new learnings to `LEARNINGS.md`; update statuses of any superseded
-   ones.
+   ones. Register new hypotheses in `HYPOTHESES.md` with their attribution,
+   and update the status of any the entry bears on.
 5. Update the index below.
 
 ## Index (newest first)
 
 | Entry | Iteration | Outcome |
 |---|---|---|
+| [2026-08-22-1030 — What counts as learning](./entries/2026-08-22-1030-what-counts-as-learning.md) | Theory/direction: answering "how do you know it will never learn?" and replacing accuracy as the primary gate | Adopted the **ladder of evidence** (7 rungs, each with a null) in vision.md; added the hypotheses ledger (H-001…H-008) and the `[J]`/`[C]` attribution convention. Key argument: **slow learning requires a slow variable**, and 002 has none — persistence flat at 5–6%. Experiment 003 (transfer/retention) promoted, and it runs on 001; L-018, L-019, L-020 |
 | [2026-08-22-0208 — exp002 M0 built; M1 fails on depth](./entries/2026-08-22-0208-exp002-m0-built-m1-fails-on-depth.md) | Experiment 002: build the grown substrate, run the M1 critical gate | M0 **met** (001 bit-identical, 88 tests). M1 **FAILED** — flat at chance, 3 seeds × 2,000 trials. Cause localised: stimulus information survives exactly one hop (7.7σ → 1.7σ = the 3/√π noise floor), and no sense pixel is within 5 hops of an answer. An arm with 19 of 64 pixels inside 2 hops scores 0.883, same rule. Also: the homeostat regenerates activity from silence, invalidating a pre-registered control; L-013 … L-017 |
 | [2026-08-21-0145 — M1b: the etaPool=0 ablation](./entries/2026-08-21-0145-m1b-etapool-ablation.md) | Ablation: is 001's hidden pool contributing? | **No** — freezing 89% of learnable synapses costs 0.004 accuracy. M1 is a readout on a fixed random projection; L-010 |
 | [2026-08-21-0050 — Novelty audit and the missing "I"](./entries/2026-08-21-0050-novelty-audit-and-the-missing-i.md) | Theory/direction: honest novelty audit + spec-vs-code audit (ran 00:50–02:05, overlapping M1b) | Nothing novel yet; the recurrence the project is *named* for is unbuilt. Experiment 002 designed; L-011, L-012 |

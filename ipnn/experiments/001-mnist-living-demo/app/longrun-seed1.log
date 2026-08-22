@@ -1,0 +1,13 @@
+NULL for the per-node statistic (range of 3 standard normals)
+  closed form E[range] = 3/√π = 1.6926   Monte Carlo = 1.6913
+  P(range > 3σ) under the null = 8.5%  ← what fraction of nodes "look significant" with no signal at all
+  population decoding chance = 0.333
+
+32000 trials, seed 1, checkpoints 250, 500, 1000, 2000, 4000, 8000, 16000, 32000
+
+  M1      @   250 trials: acc 0.190  hop2 σ 1.84  hop2 decode 0.367  edges 6046  persist n/a
+  M1      @   500 trials: acc 0.170  hop2 σ 1.72  hop2 decode 0.400  edges 5945  persist 5%
+  M1      @  1000 trials: acc 0.195  hop2 σ 1.82  hop2 decode 0.356  edges 4797  persist 5%
+  M1      @  2000 trials: acc 0.205  hop2 σ 1.77  hop2 decode 0.356  edges 6406  persist 6%
+  M1      @  4000 trials: acc 0.200  hop2 σ 1.73  hop2 decode 0.400  edges 5211  persist 5%
+  M1      @  8000 trials: acc 0.170  hop2 σ 1.66  hop2 decode 0.322  edges 5593  persist 5%
