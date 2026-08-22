@@ -1,6 +1,9 @@
 # Experiment 002 — The Grown Substrate
 
-**Status:** design only, nothing built. Pre-registration document.
+**Status:** M0 built and gated; **M1 run and FAILED** (2026-08-22). M2–M4
+blocked — see the status note in §8 and the amendment at the head of §10.
+Everything below §8's status note is the original pre-registration, left
+unedited except where an amendment is marked as such.
 **Depends on:** experiment 001's engine, which becomes this experiment's
 **baseline arm** rather than being replaced.
 **Backlog origin:** [experiment-ideas.md §F](../../experiment-ideas.md)
@@ -246,6 +249,16 @@ Milestone numbering is per-experiment (see the naming section in
 [README.md](../../README.md)); these are experiment 002's M0–M4, and they are
 unrelated to experiment 001's.
 
+> **Status 2026-08-22.** **M0 — met** (001 bit-identical, 88 tests, `tsc` and
+> build clean). **M1 — FAILED**: flat at chance across 3 seeds × 2,000 trials,
+> despite growing structure that connects input to output in 4–6 hops and
+> earning reward within 200 ticks. The gate's own clause applies —
+> "if M1 fails, everything below is moot" — so **M2, M3 and M4 are blocked**
+> until depth is fixed or explicitly abandoned. Diagnosis, the shallow control
+> arm (0.883, which is *not* a substitute gate), and the M1c/M1d/M1e
+> follow-ups are in journal
+> [2026-08-22-0208](../../journal/entries/2026-08-22-0208-exp002-m0-built-m1-fails-on-depth.md).
+
 **M0 — scaffold.** Extract the `OrganismLike` interface (§2) from experiment
 001 without changing its behavior — all 17 existing tests must pass unchanged
 — then build the substrate, fields, ring-buffer delays, growth and rent, with
@@ -307,6 +320,42 @@ windowed firing rate; the bars keep their meaning ("how strongly is it saying
 this") and the UI needs no structural change.
 
 ## 10. Risks and honest expectations
+
+> **Amended 2026-08-22, after M1 ran** (journal
+> [2026-08-22-0208](../../journal/entries/2026-08-22-0208-exp002-m0-built-m1-fails-on-depth.md)).
+> **This ranking was wrong, and the original order is left below rather than
+> rewritten so the miss stays visible.** Risk 1 (cold start) never happened:
+> spontaneous firing and urge bootstrapped from zero edges on every seed, with
+> the first reward inside 200 ticks, and not one rung of its mitigation ladder
+> was needed for its stated purpose. Risk 5 (credit may not reach far
+> synapses) was fatal, and for a reason risk 5 does not actually name — the
+> problem is not that *credit* fails to reach distant synapses, it is that
+> *information* fails to reach them. Stimulus dependence survives exactly one
+> hop (7.7σ → 1.7σ), so the distal synapses have nothing worth crediting in
+> the first place. Risk 3 (performance) was comfortably clear: 6,900–8,500
+> ticks/s against a ≥1,000 target. Risk 4 (output collapse without the
+> softmax) did not occur: lateral inhibition held ambiguous ticks to 2.3–2.6%.
+> Risk 2 (free parameters) stands, undiminished.
+>
+> The corrected ranking, for anyone reading this before the next attempt:
+> **1. information does not survive a hop. 2. free parameters.
+> 3. the readout is geometrically starved** (new, L-014: a 3-site output
+> cortex received 19 of 5,258 edges, because growth has no target-attractiveness
+> term). Everything else is noise by comparison.
+>
+> **Two corrections to this document's own machinery, both load-bearing.**
+> (a) §6 credits spontaneous firing as "the bootstrap that makes growth
+> possible at t=0". It is not the main one — the homeostat is, and it will
+> revive a substrate from total silence on its own (L-016). The
+> **no-spontaneous-activity control arm in §8 is therefore invalid as
+> written**: removing `pSpont` alone leaves the organism wiring up normally.
+> It must also disable the homeostat (`inhibitionRate: 0`) and bury the
+> resting bias, and with those it fails outright exactly as §8 predicted.
+> (b) §8's standing measurement "input→output path length distribution" means
+> the distribution **over every input site**, not the shortest path over the
+> cortex. The two disagree badly — an arm with a 1-hop shortest path had a
+> median sense pixel 3 hops out — and reading the minimum as the depth
+> produced a wrong claim once already (L-017).
 
 1. **Cold start is the likely failure mode.** Zero edges → no activity → no
    output → no reward → forever. Spontaneous firing is the designed answer,
