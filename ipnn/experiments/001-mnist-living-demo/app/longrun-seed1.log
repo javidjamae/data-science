@@ -11,3 +11,12 @@ NULL for the per-node statistic (range of 3 standard normals)
   M1      @  2000 trials: acc 0.205  hop2 σ 1.77  hop2 decode 0.356  edges 6406  persist 6%
   M1      @  4000 trials: acc 0.200  hop2 σ 1.73  hop2 decode 0.400  edges 5211  persist 5%
   M1      @  8000 trials: acc 0.170  hop2 σ 1.66  hop2 decode 0.322  edges 5593  persist 5%
+  M1      @ 16000 trials: acc 0.185  hop2 σ 1.80  hop2 decode 0.356  edges 4756  persist 5%
+  M1      @ 32000 trials: acc 0.230  hop2 σ 1.75  hop2 decode 0.372  edges 5414  persist 5%
+  shallow @   250 trials: acc 0.300  hop2 σ 1.95  hop2 decode 0.439  edges 6701  persist n/a
+  shallow @   500 trials: acc 0.470  hop2 σ 1.85  hop2 decode 0.450  edges 7208  persist 9%
+  shallow @  1000 trials: acc 0.590  hop2 σ 2.08  hop2 decode 0.650  edges 8513  persist 8%
+  shallow @  2000 trials: acc 0.890  hop2 σ 1.76  hop2 decode 0.361  edges 6280  persist 6%
+  shallow @  4000 trials: acc 0.795  hop2 σ 1.86  hop2 decode 0.517  edges 7865  persist 7%
+  shallow @  8000 trials: acc 0.800  hop2 σ 2.05  hop2 decode 0.478  edges 7083  persist 7%
+  shallow @ 16000 trials: acc 0.850  hop2 σ 1.82  hop2 decode 0.361  edges 7748  persist 7%

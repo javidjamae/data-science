@@ -217,3 +217,45 @@ treated here as computational variables rather than implementation details.
   plasticity rules. *Relation:* the existence proof for IPNN's low-power
   pillar — and a constraint worth honoring in the design (local state only,
   no global passes), so a future hardware port stays plausible.
+
+## Measuring learning without assuming a machine (added 2026-08-22)
+
+Added before any claim rests on it, per journal rule 12. These are the sources
+behind [vision.md](./vision.md#how-we-judge-whether-it-is-learning)'s ladder
+and comparative battery. Every one predates machine learning, and every one
+has been applied across species — which is the admissibility test (H-009).
+
+- **Ebbinghaus (1885), *Über das Gedächtnis*** — the savings method: measure
+  retention by how much *faster* something is relearned, not by whether it can
+  be recalled. The original demonstration that behaviour and stored knowledge
+  are separable. Rung 4.
+- **Pavlov (1927), *Conditioned Reflexes*** — extinction and **spontaneous
+  recovery**: a response that has been extinguished returns after a rest with
+  no further training, so extinction suppresses rather than erases. A direct
+  probe for a trace behaviour is not expressing.
+- **Tolman & Honzik (1930), "Introduction and removal of reward and maze
+  performance in rats"** — **latent learning**. Unrewarded rats looked like
+  non-learners for ten days, then matched the rewarded group almost
+  immediately once food was introduced. The canonical answer to "how would you
+  know if it were learning invisibly?", and the model for H-010.
+- **Harlow (1949), "The formation of learning sets"** — learning-to-learn:
+  performance on the *n*-th novel discrimination improves with *n*, until
+  rhesus monkeys solve new problems in one trial. Rung 7, and the strongest
+  claim this project could eventually support.
+- **Comparative reversal-learning literature** (bees, fish, rodents, primates)
+  — cognitive flexibility as trials-to-recover after a contingency swap.
+- **Guttman & Kalish (1956), generalisation gradients in pigeons** — orderly
+  interpolation to stimuli never trained on, which a lookup table does not
+  produce.
+- **Kandel and colleagues on *Aplysia*** — habituation, sensitisation and
+  their synaptic substrates in an animal with ~20,000 neurons; the existence
+  proof that these measures do not require a big brain, or a brain we
+  designed.
+- **In-vivo synaptic turnover imaging** (spine formation/elimination in mouse
+  cortex under learning) — the biological version of rungs 2 and 3, and the
+  reason "structural persistence" is a measurement rather than a metaphor.
+
+**What this project takes:** the measures themselves, essentially unmodified,
+as the primary gates rather than as commentary on an accuracy number.
+**What it does not claim:** any novelty in them. The only unusual choice is
+the refusal to let a benchmark-style accuracy figure be the gate.

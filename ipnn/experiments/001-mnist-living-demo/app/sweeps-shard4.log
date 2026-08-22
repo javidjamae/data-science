@@ -2,3 +2,4 @@ sweep v1 shard 4/8 — 250 configs × 2 seeds × 1200 trials → /Users/javidjam
   [4] run 0: new best worst-seed tail 0.010 (edges 16975, within-2-hops 0)
   [4] run 1: new best worst-seed tail 0.280 (edges 7869, within-2-hops 0)
   [4] run 2: new best worst-seed tail 0.360 (edges 7519, within-2-hops 0)
+  [4] 25/250 done, best 0.360
