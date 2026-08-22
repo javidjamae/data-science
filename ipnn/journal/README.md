@@ -11,7 +11,7 @@ journal/
   README.md      ← this file: the rules
   TEMPLATE.md    ← copy this to start a new entry
   LEARNINGS.md   ← the learnings ledger: what we have established (L-###)
-  HYPOTHESES.md  ← the hypotheses ledger: what we believe or intend to test (H-###)
+  HYPOTHESES.md  ← hypotheses (refutable claims) AND ideas (considerations we carry), H-###
   entries/       ← one file per iteration: YYYY-MM-DD-HHMM-slug.md
   artifacts/     ← (when needed) raw data dumps per entry: artifacts/<entry-slug>/
 ```

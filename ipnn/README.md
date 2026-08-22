@@ -18,7 +18,7 @@ serves it. If you hit a label you don't recognise — `002`, `001-M1b`, `L-013`,
 | [abstract.md](./abstract.md) | The paper-style writeup: system, mechanism, hypotheses | As theory evolves |
 | [open-problems.md](./open-problems.md) | Honest list of unsolved problems + current working answers + how we'll test them | Every time an experiment lands |
 | [related-work.md](./related-work.md) | Prior art map: what exists, what IPNN takes or claims beyond it | As we read |
-| [experiment-ideas.md](./experiment-ideas.md) | The backlog: raw ideas → shaped hypotheses → numbered experiments; ranked | As ideas arrive |
+| [experiment-ideas.md](./experiment-ideas.md) | The backlog: raw ideas → shaped hypotheses → numbered experiments; ranked. Lettered tracks `§A`–`§H` | As ideas arrive |
 | [journal/](./journal/README.md) | **The lab notebook of record**: one timestamped entry per iteration, the learnings ledger ([LEARNINGS.md](./journal/LEARNINGS.md), what we know) and the hypotheses ledger ([HYPOTHESES.md](./journal/HYPOTHESES.md), what we believe and intend to test) | Every iteration, and whenever a realisation lands |
 | [experiments/](./experiments/) | Numbered experiments (see below) | Continuously |
 | [disclosure-policy.md](./disclosure-policy.md) | Open-by-default policy with pre-registered safety tripwires; licensing rationale | Rarely, with journaled rationale |
@@ -86,11 +86,14 @@ in this table, it is not a label.
 | Label | Means | Ledger |
 |---|---|---|
 | `L-###` | A **learning** — established, with evidence behind it | [LEARNINGS.md](./journal/LEARNINGS.md) |
-| `H-###` | A **hypothesis** — believed or intended, not yet established | [HYPOTHESES.md](./journal/HYPOTHESES.md) |
+| `H-###` | A **hypothesis** (a claim that could be shown wrong) or an **idea** (a design consideration we're carrying). The ledger's `Kind` column says which | [HYPOTHESES.md](./journal/HYPOTHESES.md) |
 
-`L` is what we know; `H` is what we suspect. A hypothesis that survives
-testing becomes a learning; one that dies is marked refuted and stays in the
-ledger. Neither is ever deleted.
+`L` is what we know; `H` is what we don't yet. Within `H`, a **hypothesis**
+names a result that would refute it and an **idea** does not — *an idea becomes
+a hypothesis the moment someone states what would refute it.* A hypothesis that
+survives testing becomes a learning; one that dies is marked refuted and stays.
+Neither is ever deleted. Whole programmes, rather than single considerations,
+go in [experiment-ideas.md](./experiment-ideas.md) as lettered tracks (`§A`–`§H`).
 
 ### Who thought of it
 

@@ -594,6 +594,109 @@ perception. To be added to [related-work.md](./related-work.md) when this
 track is shaped further; listed here so the section is not written in
 ignorance.
 
+## H. The Games — an evaluation ecosystem, not another benchmark
+
+**Origin:** Javid, 2026-08-22 **[J]**. Raw idea; nothing built.
+
+> "Something like the AI Hunger Games, where we put a bunch of different models
+> to the test. Anybody could create a model and plug it into the games and run
+> it against the challenges, competing with other people's models. It's all
+> open source, open weight, and you have to show the full history of how you
+> trained it."
+
+### The shape
+
+A growing suite of tiny games in one fixed world — 8×8 binary pixels, the same
+world experiment 001 already uses:
+
+- identify vertical lines · identify horizontal lines · identify blank
+- which image has the most white squares
+- which has the most *connected* white squares
+- find the longest vertical line · more-vs-fewer comparisons · and onward
+
+An entrant meets each game **never having been trained on it**. Two things are
+scored, and the second is the whole point:
+
+1. **Acquisition** — how fast and how accurately it learns the new game.
+2. **Retention** — how well it still performs on *every game it has already
+   entered*, now that it has been through another learning phase.
+
+So a model's standing is not a number on one task. It is a trajectory across a
+history that grows every time it competes, and a model that wins a new game by
+destroying its own past is scored as having lost ground.
+
+### Why this is the right vehicle for this project specifically
+
+It is the same claim [vision.md](./vision.md) has made since it was written —
+"teach it a second task, return to the first, and it has not forgotten" — with
+the scoring function made public and adversarial. And it operationalises
+[H-001](./journal/HYPOTHESES.md) (intelligence is transfer and retention),
+[H-011](./journal/HYPOTHESES.md) (trials-to-criterion as the currency) and
+[H-017](./journal/HYPOTHESES.md) (test on games it was never trained on) in one
+artefact.
+
+### Prior art — searched 2026-08-22, and most of this exists
+
+Recorded honestly, because three of these are close and one is very close.
+
+| What | How close | Where it differs |
+|---|---|---|
+| **ARC-AGI / ARC Prize** (Chollet, *On the Measure of Intelligence*, 2019) | **Very.** Defines intelligence as *skill-acquisition efficiency on unknown tasks* — the same definition. ARC-AGI-3 (2026, $2M) is interactive: explore novel environments, acquire goals on the fly, learn continuously | Scores **first-exposure efficiency**. A search found no evidence it tests retention on environments already solved — the trajectory-across-your-own-history part is absent |
+| **GVGAI** (General Video Game AI) | Close. Agents are submitted without knowing the games and evaluated on unseen ones, explicitly to stop overfitting. Has a learning-agents track | Per-competition novel game sets; no persistent per-entrant history, no retention score |
+| **General Game Playing** (Stanford/AAAI) | Close in spirit — rules handed to the agent at runtime | Symbolic board games; no learning-curve or retention measurement |
+| **Animal-AI Olympics / Environment** | **Strikingly aligned with [H-009](./journal/HYPOTHESES.md).** 900 configurations drawn from comparative cognition — trap-tube, string-pulling, Y-mazes, Thorndike escape boxes — run against crows, chimpanzees, octopuses and children | Someone already built "measures you could apply to an animal" as a testbed. Spatial/physical cognition in 3D, one-shot competition, no retention scoring |
+| **Continual-learning benchmarks** (permuted/split MNIST, CIFAR100, TRACE, CITB, CL-VISTA, Continual Learning Bench 2026) | The retention half is **standard**: Backward Transfer and Forgetting Measure are established metrics | Offline dataset sequences, not a live open ecosystem. No public entry, no provenance requirement, and the task sequence is fixed by the benchmark author rather than grown |
+| **Open-weight leaderboards** | The open-weight norm exists | They rank models on fixed benchmarks. "Open weight rarely means fully open source: most models publish weights, not training data" — the provenance requirement is the unusual part |
+
+### The smallest honest claim
+
+Every component exists. What a search did not turn up is the **combination**:
+
+> a public, open-entry ecosystem whose *ranking function* is acquisition speed
+> **×** retention over the entrant's own growing history, with open weights and
+> **full training provenance** required to enter.
+
+Marked *unverified against literature* — one afternoon of searching is not a
+survey, and the continual-learning literature is large enough that a closer
+analogue very likely exists.
+
+### The differentiator that actually matters, and it is not novelty
+
+**An 8×8 binary world is sized for a hand-built organism.** ARC uses grids up
+to 30×30 of visual reasoning; GVGAI is real-time video games; Animal-AI is 3D
+physical cognition. All three are, in practice, arenas for large pretrained
+systems. A from-scratch substrate with 1,024 stochastic binary units cannot
+enter any of them and do anything but lose.
+
+A 64-pixel world is small enough that a grown substrate, a hand-coded rule
+system, a tiny RL agent and a frontier model can all compete on the same board
+— which makes it a place to ask *what kind of thing learns efficiently*, rather
+than *which large model is best*. That is the gap worth building into, and it
+is an ecosystem gap rather than a scientific one.
+
+### Open questions before any of this is worth building
+
+- **Provenance is hard to enforce.** "Show the full history of how you trained
+  it" is checkable for a small from-scratch system and close to unfalsifiable
+  for a fine-tuned frontier model. Does the rule mean anything without
+  re-execution?
+- **Retention scoring needs a decay policy.** Is a model re-tested on all past
+  games after every new one? That cost grows quadratically.
+- **Who writes new games, and how are they kept unseeable?** GVGAI's answer
+  was to design a fresh set each year, which is expensive.
+- **Does the composite score have a degenerate optimum** — e.g. a model that
+  learns nothing new but forgets nothing?
+- **This is a platform, not an experiment.** It would be a large build, and it
+  competes for time with experiment 003, which tests the same hypothesis
+  privately and could run this week.
+
+### Status
+
+Backlog only. Not scheduled, not designed, no `design.md`. **Experiment 003
+(transfer and retention) is the same question at 1% of the cost and should run
+first** — if 001 cannot transfer between two tasks in private, there is nothing
+to enter into a public arena.
+
 ## E. Already registered (index only — claims live in their own docs)
 
 - **M1b — etaPool=0 ablation:** is the pool contributing anything yet?
