@@ -42,6 +42,17 @@ serves it. If you hit a label you don't recognise — `002`, `001-M1b`, `L-013`,
   `open-problems.md`, evidence in journal entries and
   `experiments/*/results.md`. Don't restate theory inside experiment docs —
   link to it.
+- **Old experiments keep working at HEAD.** New mechanisms enter behind config
+  flags whose *default is the recorded behavior* (`rewardField: 'uniform'`,
+  `evidenceModel: 'count'`), so a recorded experiment's default invocation
+  reproduces its recorded results on current code — and this is *asserted*,
+  not trusted: the test suite pins the exact recorded M1 curves and frozen
+  retention, so a one-hundredth drift on one block fails CI. The archival
+  guarantee is separate and absolute: every journal entry records the git
+  hash and full config snapshot that produced its results (journal rule 9),
+  so any entry is reproducible from its recorded commit regardless of what
+  HEAD does. Defaults of recorded experiments are never flipped; new
+  experiments opt into new mechanisms explicitly in their own configs.
 - **Decisions get recorded where they bind:** experiment-scoped decisions in
   that experiment's `design.md`/`log.md`; project-wide ones in the relevant
   top-level doc. If we accumulate enough cross-cutting decisions, promote
