@@ -3,3 +3,8 @@ Latent learning — substrate shallow, 400 unrewarded pre-exposure trials, crite
 arm                     | trials to criterion (per seed)      | median | final acc
 ------------------------|-------------------------------------|--------|----------
 naive (no pre-exposure) |  1318   649   746 |    746 |   0.873
+pre-exposed, unrewarded |   659   740   289 |    659 |   0.917
+scrambled control       |   735   535   374 |    535 |   0.903
+
+Pre-exposure changed trials-to-criterion by −342 trials on average (faster on 2/3 seeds).
+Not consistent across seeds — no latent-learning effect at this pre-exposure length.
