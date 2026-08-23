@@ -13,7 +13,7 @@
 // off the chance line. Same rule, same rent, same seed.
 
 import { DemoSim } from '../demo-m1/sim'
-import { grownSim, grownOrganism, GROWN_ARMS, type GrownArm } from './sim'
+import { grownSim, grownOrganism, grownConfig, GROWN_ARMS, type GrownArm } from './sim'
 import type { GrownOrganism, GrownStats } from '../engine/grown/grown-organism'
 import { ROLE_INPUT, ROLE_OUTPUT } from '../engine/grown/lattice'
 import { M1_PATTERNS } from '../engine/patterns'
@@ -126,6 +126,17 @@ select { font: inherit; font-family: var(--mono); padding: 4px 6px;
   border-radius: 3px; overflow: hidden; }
 .depthbar i { display: block; height: 100%; width: 0; }
 .note { color: var(--ink-3); font-size: 0.78rem; margin: 9px 0 0; }
+.knobs { font-family: var(--mono); font-size: 0.74rem; }
+.knobgroup { margin: 10px 0 4px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; font-size: 0.66rem; color: var(--ink-3); }
+.knobrow { display: grid; grid-template-columns: 11rem 7rem 1fr; gap: 10px;
+  padding: 3px 6px; border-radius: 4px; align-items: baseline; }
+.knobrow:nth-child(even) { background: color-mix(in srgb, var(--border) 30%, transparent); }
+.knobhot { outline: 1px solid var(--accent); }
+.knobname { color: var(--ink); }
+.knobval { color: var(--accent); text-align: right; font-variant-numeric: tabular-nums; }
+.knobdef { color: var(--ink-2); font-family: var(--sans); font-size: 0.8rem; }
+@media (max-width: 700px) { .knobrow { grid-template-columns: 8rem 5rem 1fr; } }
 a { color: var(--accent); }
 footer { margin-top: 22px; color: var(--ink-3); font-size: 0.78rem; }
 `
@@ -216,6 +227,13 @@ app.innerHTML = `
     </div>
   </div>
 
+  <section class="panel" style="margin-top: 14px">
+    <h2>every knob, in plain words <span class="badge" id="knobbadge"></span></h2>
+    <div class="knobs" id="knobs"></div>
+    <p class="note">Highlighted rows are what the selected arm changes from the recorded
+      M1 configuration. Same seed + same knobs = the same life, tick for tick.</p>
+  </section>
+
   <footer>
     Substrate, gates and the full negative result:
     <a href="${REPO}/experiments/002-grown-substrate/design.md">design</a> ·
@@ -262,6 +280,77 @@ function setupCanvas(c: HTMLCanvasElement, w: number, h: number): CanvasRenderin
 }
 
 // ------------------------------------------------------------------- state
+
+// Every knob, in plain words — rendered into the page so the configuration
+// is never a mystery. [J: "the knobs and their values listed out on the
+// webpage, with a definition for each and every one, in layman's terms"]
+const KNOBS: { k: string; group: string; def: string }[] = [
+  { k: 'seed', group: 'run', def: 'the dice roll — same seed, same life, every time' },
+  { k: 'width', group: 'the sheet', def: 'how wide the brain-sheet is (spots where neurons live)' },
+  { k: 'height', group: 'the sheet', def: 'how tall the sheet is' },
+  { k: 'poolSize', group: 'the sheet', def: 'total neuron spots (width × height)' },
+  { k: 'outputSize', group: 'the sheet', def: 'how many answer neurons there are' },
+  { k: 'inputOrigin', group: 'the sheet', def: 'where the 8×8 eye patch sits' },
+  { k: 'outputX', group: 'the sheet', def: 'which column the answer neurons live in' },
+  { k: 'outputYs', group: 'the sheet', def: 'which rows the three answer neurons live in' },
+  { k: 'rewardCortex', group: 'the sheet', def: 'the spot where the reward chemical is released' },
+  { k: 'rewardRadius', group: 'the sheet', def: 'how big that reward spot is' },
+  { k: 'gain', group: 'neurons', def: 'how touchy a neuron is — how sharply input pushes it to fire' },
+  { k: 'bias', group: 'neurons', def: "a neuron's resting mood; negative = quiet unless pushed" },
+  { k: 'targetSparsity', group: 'neurons', def: 'what share of neurons should be firing at any moment' },
+  { k: 'inhibitionRate', group: 'neurons', def: 'how fast the global damper adjusts to hold that share' },
+  { k: 'pSpont', group: 'neurons', def: 'chance a neuron fires for no reason — background chatter' },
+  { k: 'lateralInhibition', group: 'neurons', def: 'how hard answer neurons shush each other so one answer wins' },
+  { k: 'urgeRate', group: 'neurons', def: 'pressure to say something, building during silence' },
+  { k: 'urgeMax', group: 'neurons', def: 'the cap on that pressure' },
+  { k: 'readoutWindow', group: 'neurons', def: 'how many ticks the answer display averages over' },
+  { k: 'rewardField', group: 'chemicals', def: "how reward is heard: 'uniform' = everywhere at once; 'diffuse' = spreads from the spot" },
+  { k: 'rewardLambda', group: 'chemicals', def: 'how far the reward chemical spreads' },
+  { k: 'activityD', group: 'chemicals', def: 'how far the "we are busy here" scent spreads (growth follows it)' },
+  { k: 'activityDecay', group: 'chemicals', def: 'how quickly that scent fades' },
+  { k: 'latency', group: 'wires', def: "whether long wires take longer to deliver ('span') or not ('uniform')" },
+  { k: 'conductionSpeed', group: 'wires', def: 'signal speed along a wire, in sheet-units per tick' },
+  { k: 'traceDecay', group: 'learning', def: 'the memory of who-just-did-what used to hand out credit (~33 ticks)' },
+  { k: 'eta', group: 'learning', def: 'how big each learning step is' },
+  { k: 'wMax', group: 'learning', def: 'the strongest any single connection is allowed to get' },
+  { k: 'consolidation', group: 'learning', def: 'whether proven connections become harder to change' },
+  { k: 'consolidationN0', group: 'learning', def: "how much proof halves a connection's willingness to change" },
+  { k: 'rent', group: 'the economy', def: 'upkeep every connection pays each tick; cannot pay = it dies' },
+  { k: 'birthWeight', group: 'the economy', def: 'the strength a brand-new connection is born with' },
+  { k: 'deathThreshold', group: 'the economy', def: 'weaker than this at cleanup time = removed' },
+  { k: 'rentN0', group: 'the economy', def: 'earned durability: the more a connection proves out, the cheaper its rent (0 = off)' },
+  { k: 'graceSleeps', group: 'the economy', def: 'rent-free youth protection (0 = off; tried, made things worse)' },
+  { k: 'growthAttempts', group: 'growth', def: 'new connections each neuron tries at every sleep' },
+  { k: 'rMax', group: 'growth', def: 'the farthest a growing connection can reach' },
+  { k: 'lambdaG', group: 'growth', def: 'how strongly growth prefers near targets over far ones' },
+  { k: 'sleepEvery', group: 'growth', def: 'trials between rewiring sessions (all growth and death happen asleep)' },
+  { k: 'maxOutDegree', group: 'growth', def: 'the cap on outgoing connections per neuron' },
+  { k: 'seedEdges', group: 'birth', def: 'random connections present at birth — the innate scaffold (0 = born bare)' },
+  { k: 'seedSpanMax', group: 'birth', def: 'how long innate birth-wires may be (unlike growth, they can cross the whole sheet)' },
+]
+
+function renderKnobs(): void {
+  const cfg = grownConfig(
+    arm,
+    Math.max(1, Math.round(Number(seedInput.value) || 1))
+  ) as unknown as Record<string, unknown>
+  const armKeys = new Set(Object.keys(GROWN_ARMS[arm].cfg))
+  let group = ''
+  let html = ''
+  for (const kn of KNOBS) {
+    if (!(kn.k in cfg)) continue
+    if (kn.group !== group) {
+      group = kn.group
+      html += `<div class="knobgroup">${group}</div>`
+    }
+    const v = cfg[kn.k]
+    const vs = typeof v === 'object' ? JSON.stringify(v) : String(v)
+    const hot = armKeys.has(kn.k) ? ' knobhot' : ''
+    html += `<div class="knobrow${hot}"><span class="knobname">${kn.k}</span>` +
+      `<span class="knobval">${vs}</span><span class="knobdef">${kn.def}</span></div>`
+  }
+  document.getElementById('knobs')!.innerHTML = html
+}
 
 let arm: GrownArm = 'm1'
 let sim: DemoSim = grownSim(1, arm)
@@ -602,6 +691,7 @@ function rebuild(): void {
   lastSleeps = 0
   outEdges = 0
   armNote.textContent = GROWN_ARMS[arm].note
+  renderKnobs()
 }
 
 function setArm(next: GrownArm): void {
@@ -630,4 +720,5 @@ seedInput.onchange = rebuild
 
 speedInput.oninput(new Event('input'))
 armNote.textContent = GROWN_ARMS[arm].note
+renderKnobs()
 requestAnimationFrame(frame)
