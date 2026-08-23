@@ -214,6 +214,14 @@ cannot come back negative is not a measure.
 
 ## What this is not
 
+- **Not experiment 001.** A hand-designed, fixed architecture — even one that
+  learns its weights from reward alone — is not an IPNN. It is a control arm
+  and a test harness. The organism's defining property is that **the neurons
+  themselves learn to connect to other neurons and create neural pathways**:
+  structure is grown, not given. Every claim about *the organism*, every new
+  experiment, and every demo of "it" must be demonstrated on a grown
+  substrate; 001 appears only as an explicitly-labelled baseline. **[J,
+  2026-08-22, stated as binding.]**
 - Not an attempt to beat state-of-the-art benchmark accuracy.
 - Not built on existing ML training frameworks — the neuron model, learning
   rule, and simulation loop are built from scratch, because the point is a
