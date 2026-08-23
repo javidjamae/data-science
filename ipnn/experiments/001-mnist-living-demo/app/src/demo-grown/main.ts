@@ -167,6 +167,7 @@ app.innerHTML = `
       <button id="armshallow" aria-pressed="false">Shallow</button>
       <button id="arminnate" aria-pressed="false">Innate</button>
       <button id="armdurable" aria-pressed="false">Durable</button>
+      <button id="armslow" aria-pressed="false">Slow</button>
     </span>
     <label><input id="learning" type="checkbox" checked> reward on</label>
     <label>overlay <select id="overlay">
@@ -252,6 +253,7 @@ const armM1 = $<HTMLButtonElement>('armm1')
 const armShallow = $<HTMLButtonElement>('armshallow')
 const armInnate = $<HTMLButtonElement>('arminnate')
 const armDurable = $<HTMLButtonElement>('armdurable')
+const armSlow = $<HTMLButtonElement>('armslow')
 const armNote = $('armnote')
 const learningInput = $<HTMLInputElement>('learning')
 const overlaySel = $<HTMLSelectElement>('overlay')
@@ -673,7 +675,7 @@ function frame(now: number): void {
   sheetCap.textContent =
     `${stats.edges.toLocaleString()} connections · ` +
     `input cortex left, answer neurons ${arm === 'shallow' ? 'centre' : 'far right'}` +
-    (arm === 'innate' || arm === 'durable'
+    (arm === 'innate' || arm === 'durable' || arm === 'slow'
       ? ' · born with 12,000 (long tracts included)'
       : '')
 
@@ -700,6 +702,7 @@ function setArm(next: GrownArm): void {
   armShallow.setAttribute('aria-pressed', String(next === 'shallow'))
   armInnate.setAttribute('aria-pressed', String(next === 'innate'))
   armDurable.setAttribute('aria-pressed', String(next === 'durable'))
+  armSlow.setAttribute('aria-pressed', String(next === 'slow'))
   rebuild()
 }
 
@@ -714,6 +717,7 @@ armM1.onclick = () => setArm('m1')
 armShallow.onclick = () => setArm('shallow')
 armInnate.onclick = () => setArm('innate')
 armDurable.onclick = () => setArm('durable')
+armSlow.onclick = () => setArm('slow')
 learningInput.onchange = () => sim.setLearning(learningInput.checked)
 resetBtn.onclick = rebuild
 seedInput.onchange = rebuild

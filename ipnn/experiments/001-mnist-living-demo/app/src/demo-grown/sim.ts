@@ -64,6 +64,19 @@ export const GROWN_ARMS = {
       '002-M1g). Not yet the 0.80 gate. Try seeds 2 or 3.',
     cfg: { seedEdges: 12000, seedSpanMax: 44, rentN0: 25 },
   },
+  slow: {
+    label: 'Slow · the confirmed champion',
+    note:
+      'The full stack: innate scaffold + earned durability + GROW SLOWER — ' +
+      'rewiring every 80 trials instead of 20, so the construction site ' +
+      'stops shaking the proven routes (002-M1h, held-out confirmed). ' +
+      'Seeds 1, 2, 5 and 6 reach ~0.97–1.00; seeds 3 and 4 can stall near ' +
+      '0.66 — exactly two of three shapes mastered, because the random ' +
+      'birth wiring dealt no usable route for the third (the coverage ' +
+      'lottery, L-046). That variance is what scaffold selection attacks ' +
+      'next. Give it a few thousand trials at high speed.',
+    cfg: { seedEdges: 12000, seedSpanMax: 44, rentN0: 25, sleepEvery: 80 },
+  },
 } satisfies Record<string, GrownArmSpec>
 
 export type GrownArm = keyof typeof GROWN_ARMS
