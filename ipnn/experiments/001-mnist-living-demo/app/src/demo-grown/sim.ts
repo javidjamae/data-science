@@ -40,6 +40,18 @@ export const GROWN_ARMS = {
       'now learns: 0.883. Depth is the whole difference.',
     cfg: { outputX: 14 },
   },
+  innate: {
+    label: 'Innate · born with a scaffold',
+    note:
+      'Born with 12,000 random connections including long tracts — the ' +
+      'scaffold idea. Eye→answer routes exist at birth (watch the 1–2 hop ' +
+      'bars), and on this hard geometry it learns from the first minutes — ' +
+      'the only thing that ever has. Then watch the economy eat the ' +
+      'inheritance: rent gives every edge a ~24-trial audition, growth can ' +
+      'never rebuild a long edge, so the hop bars drain and the learning ' +
+      'fades with them. Works on contact; taxed to death (L-041, L-042).',
+    cfg: { seedEdges: 12000, seedSpanMax: 44 },
+  },
 } satisfies Record<string, GrownArmSpec>
 
 export type GrownArm = keyof typeof GROWN_ARMS

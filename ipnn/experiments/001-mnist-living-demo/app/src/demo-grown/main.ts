@@ -154,6 +154,7 @@ app.innerHTML = `
     <span class="segmented" role="group" aria-label="arm">
       <button id="armm1" aria-pressed="true">M1</button>
       <button id="armshallow" aria-pressed="false">Shallow</button>
+      <button id="arminnate" aria-pressed="false">Innate</button>
     </span>
     <label><input id="learning" type="checkbox" checked> reward on</label>
     <label>overlay <select id="overlay">
@@ -230,6 +231,7 @@ const speedInput = $<HTMLInputElement>('speed')
 const speedLbl = $('speedlbl')
 const armM1 = $<HTMLButtonElement>('armm1')
 const armShallow = $<HTMLButtonElement>('armshallow')
+const armInnate = $<HTMLButtonElement>('arminnate')
 const armNote = $('armnote')
 const learningInput = $<HTMLInputElement>('learning')
 const overlaySel = $<HTMLSelectElement>('overlay')
@@ -579,7 +581,8 @@ function frame(now: number): void {
   stimBadge.textContent = label === null ? 'blank' : PATTERN_NAMES[label]
   sheetCap.textContent =
     `${stats.edges.toLocaleString()} connections · ` +
-    `input cortex left, answer neurons ${arm === 'm1' ? 'far right' : 'centre'}`
+    `input cortex left, answer neurons ${arm === 'shallow' ? 'centre' : 'far right'}` +
+    (arm === 'innate' ? ' · born with 12,000 (long tracts included)' : '')
 
   requestAnimationFrame(frame)
 }
@@ -601,6 +604,7 @@ function setArm(next: GrownArm): void {
   arm = next
   armM1.setAttribute('aria-pressed', String(next === 'm1'))
   armShallow.setAttribute('aria-pressed', String(next === 'shallow'))
+  armInnate.setAttribute('aria-pressed', String(next === 'innate'))
   rebuild()
 }
 
@@ -613,6 +617,7 @@ speedInput.oninput = () => {
 }
 armM1.onclick = () => setArm('m1')
 armShallow.onclick = () => setArm('shallow')
+armInnate.onclick = () => setArm('innate')
 learningInput.onchange = () => sim.setLearning(learningInput.checked)
 resetBtn.onclick = rebuild
 seedInput.onchange = rebuild
