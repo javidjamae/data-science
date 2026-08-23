@@ -385,3 +385,62 @@ combination of well-covered parts is a low bar. Marked *unverified*.
    precisely this (L-009: "a commit-once readout cannot measure a mind
    changing"), and manual mode already holds a stimulus while the answer
    free-runs.
+
+## How real brains wire themselves (searched 2026-08-22, for the convergence program)
+
+Added when Javid redirected the 002 convergence work to biology **[J]**: how do
+actual nervous systems emerge and grow, and what does that imply for a
+substrate that must grow its own connections?
+
+**The developmental sequence, neocortex:**
+
+1. **Neurogenesis and radial migration** — neurons are born in the ventricular
+   zone and migrate along radial glia into *layers*, inside-out (deep layers
+   first). The laminar skeleton exists before learning does.
+   ([Molecular pathways of projection-neuron production and migration](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4682034/))
+2. **A protomap, then molecular routing.** Transcription-factor gradients
+   pattern the cortical primordium before activity matters
+   ([the protomap propagates through an Eomes-dependent intermediate map](https://www.pnas.org/doi/10.1073/pnas.1209076110)),
+   and growth cones are steered to their approximate **target region** by
+   graded guidance molecules — ephrins, netrins, semaphorins, slits
+   ([Eph/ephrin in cortical development](https://esmed.org/MRA/mra/article/view/1694),
+   [netrin-4 and thalamocortical branching](https://www.pnas.org/doi/10.1073/pnas.1402095111)).
+   Sperry's chemoaffinity hypothesis, vindicated in gradient form. **Coarse
+   topology is inherited; activity never routes it.**
+3. **Structured spontaneous activity.** Before the eyes open, the retina
+   generates *waves* — spatially correlated, travelling fronts, not white
+   noise. Neighbouring cells co-fire, so the correlations themselves carry
+   topographic information, and disrupting the wave *pattern* (not the
+   activity level) breaks map refinement — the waves are **instructive**
+   ([retinal waves likely instruct eye-specific projections](https://link.springer.com/article/10.1186/1749-8104-4-24),
+   [waves can generate long-range horizontal connectivity in V1](https://www.jneurosci.org/content/40/34/6584),
+   [waves simulate future optic flow](https://www.science.org/doi/10.1126/science.abd0830)).
+4. **Overproduction, then activity-dependent pruning.** Exuberant synapse
+   production followed by large-scale elimination, Hebbian refinement deciding
+   what survives ([ephrin-A2 and experience-dependent pruning](https://pmc.ncbi.nlm.nih.gov/articles/PMC3792401/);
+   the two-component summary — **graded guidance cues + activity-dependent
+   refinement** — in [Cang et al., superior colliculus maps](https://pubmed.ncbi.nlm.nih.gov/18945909/)).
+   Huttenlocher's classic counts (textbook) put peak synapse density far above
+   adult levels.
+5. **Critical periods.** Plasticity is deliberately high early and then gated
+   down (inhibitory maturation, perineuronal nets — Hensch, textbook).
+   Closure is *regulated and reopenable*, unlike L-034's accidental terminal
+   freeze.
+
+**Simpler animals bracket the axis.** *C. elegans* (302 neurons) is essentially
+genetically wired — the locked-at-birth end. Insects are largely genetic with
+activity refinement. The neocortex sits far toward grown-under-guidance —
+but **no animal occupies "no inherited routing, unstructured noise, purely
+local growth."** That point in design space is uninhabited, and it is exactly
+where 002 stands.
+
+**Model lineage for the refinement half:** Willshaw & von der Malsburg's
+self-organizing maps from correlated activity; Linsker; Miller's
+correlation-based development of ocular dominance and orientation (all
+textbook); Katz & Shatz's synthesis of activity in circuit construction.
+
+**What this project takes:** the *sequence* — inherited coarse scaffold →
+structured spontaneous activity → correlation refinement → overproduce/prune
+→ staged plasticity. **What it does not claim:** any novelty; this is the
+most-trodden ground in developmental neuroscience, which is precisely its
+value here.
