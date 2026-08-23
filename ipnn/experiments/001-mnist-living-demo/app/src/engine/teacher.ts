@@ -11,8 +11,7 @@
 // at a time — what a live UI uses). runTrial delegates to the stepper, so
 // there is exactly one implementation of trial mechanics.
 
-import type { Organism } from './organism'
-import type { TrialResult } from './types'
+import type { OrganismLike, TrialResult } from './types'
 import type { TeacherConfig } from './types'
 
 export type TrialPhase = 'stimulus' | 'blank' | 'done'
@@ -38,14 +37,14 @@ export class TrialStepper {
   result: TrialResult | null = null
 
   private readonly teacher: AutoTeacher
-  private readonly org: Organism
+  private readonly org: OrganismLike
   private readonly win: Int8Array
   private t = 0
   private blankT = 0
 
   constructor(
     teacher: AutoTeacher,
-    org: Organism,
+    org: OrganismLike,
     pattern: Uint8Array,
     label: number
   ) {
@@ -138,12 +137,12 @@ export class AutoTeacher {
   }
 
   /** Start a trial to be driven one tick at a time (live UIs). */
-  beginTrial(org: Organism, pattern: Uint8Array, label: number): TrialStepper {
+  beginTrial(org: OrganismLike, pattern: Uint8Array, label: number): TrialStepper {
     return new TrialStepper(this, org, pattern, label)
   }
 
   /** Present one stimulus, wait for an answer, deliver reward, blank. */
-  runTrial(org: Organism, pattern: Uint8Array, label: number): TrialResult {
+  runTrial(org: OrganismLike, pattern: Uint8Array, label: number): TrialResult {
     const stepper = this.beginTrial(org, pattern, label)
     while (!stepper.step()) {
       /* run to completion */

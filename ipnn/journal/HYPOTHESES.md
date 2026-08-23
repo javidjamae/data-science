@@ -1,0 +1,72 @@
+# Hypotheses & Ideas Ledger
+
+Open questions and claims-not-yet-tested, numbered and citable — the
+forward-looking twin of [LEARNINGS.md](./LEARNINGS.md), which records what we
+have already established.
+
+A learning is something we know. This file holds the things we don't yet — and
+they are not all the same kind of thing, so the **Kind** column says which:
+
+- **hypothesis** — a claim that could be shown wrong. It names, or can name, a
+  result that would refute it. H-002 and H-010 are already marked refuted, which
+  is the column doing its job.
+- **idea** — a design consideration, a principle, or a proposed method we are
+  carrying as we go. Not a claim, not falsifiable as stated, and not pretending
+  to be. Most of these are good ideas that simply are not predictions.
+
+**An idea becomes a hypothesis the moment someone states what result would
+refute it.** That is the only promotion criterion, and it is the same discipline
+H-008 asks for everywhere else.
+
+Both get an ID, because an idea that only exists in a conversation is one that
+will be re-derived from scratch in three months, usually worse. Bigger ideas —
+whole programmes rather than single considerations — live in
+[experiment-ideas.md](../experiment-ideas.md) as lettered tracks instead.
+
+**Statuses:** **open** (stated, untested) · **testing** (an experiment is
+running against it) · **supported** (evidence for, cite the entry) ·
+**refuted** (evidence against, cite the entry) · **superseded by H-###**.
+
+Refuted hypotheses are never deleted. Being wrong in a specific, recorded way
+is worth more than being vaguely right.
+
+## Attribution
+
+Every hypothesis carries its origin, because on a project run by a person and
+a model together, *who thought of it* is part of the record and cannot be
+reconstructed afterwards. See the attribution rule in
+[README.md](./README.md#attribution-who-thought-of-it).
+
+| Mark | Meaning |
+|---|---|
+| **[J]** | Javid's, in substance. Stated by him, not prompted by the model. |
+| **[C]** | Claude's, in substance. Originated by the model. |
+| **[J→C]** | Javid seeded it; Claude developed, formalised or operationalised it. |
+| **[C→J]** | Claude proposed it; Javid selected, redirected or decided on it. |
+
+Ideas that arose in conversation between Javid and someone else are recorded as
+**[J]** with the source conversation cited, rather than given a third mark —
+his call, and the honest one when a transcript is not diarised and turns cannot
+be recovered.
+
+## Ledger
+
+| ID | Origin | Kind | Claim | Status | Test / next step |
+|---|---|---|---|---|---|
+| H-001 | **[J]** | **idea** | **Intelligence is transfer and retention, not task accuracy.** A system that learns task A, then learns task B, and still performs A, is intelligent in a way that a system with higher accuracy on A alone is not. Accuracy on a single fixed task is a benchmark measure, and benchmarks are what this project explicitly is not for. | open | experiment 003 (transfer/retention), design owed |
+| H-002 | **[J]** | **hypothesis** | **A living system may learn on timescales far longer than we have been observing.** A flat learning curve over N trials is not evidence of no learning; it may be evidence of an observation window chosen for convenience. A system that took a month of wall-clock to become competent, and then generalised, would be more interesting than one that converges in 800 trials. | **refuted for 002's M1 arm** (scope: this substrate, 128× the original window — every measure flat, persistence 5% throughout); open as a general principle | [2026-08-22-1215](./entries/2026-08-22-1215-longrun-and-a-correction.md) |
+| H-003 | **[C]** | **hypothesis** | **Slow learning requires a slow variable.** A system in which every state variable has a short time constant cannot learn slowly — it reaches steady state and then stays there, and further time buys only more steady state. So H-002 is not a claim about patience; it is a claim about mechanism, and it is checkable by asking what the longest-lived quantity in the system is. | open | measure the timescale of every state variable in 002; compare against observed persistence |
+| H-004 | **[C]** | **hypothesis** | **002's only genuinely accumulating variable is stored on its most ephemeral object.** The evidence count `n` only ever increases (design §7), which makes it the one monotone quantity in the substrate — and it lives on edges, ~94% of which die every generation. The slow variable is destroyed along with its carrier, so nothing accumulates across sleeps. Moving it to the *site* — a per-location trace that outlives the edges that created it and biases where regrowth goes — would give the substrate its first long-term memory. | open | a site-trace variant of 002, measured by structural persistence |
+| H-005 | **[J→C]** | **hypothesis** | **Savings detects learning that behaviour cannot show.** A substrate may hold a latent trace it does not express. Re-teaching a previously-taught task should then be faster than teaching it to a naive control, *even if accuracy during the first exposure never left chance*. This is Ebbinghaus's method, not an ML method, and it is the right instrument for H-002: it can find learning inside a flat curve. | open — **first attempt void**: 003 measured savings with a floor at the rolling-window length, so `T_A2`=100 on 5/5 seeds is a censored value, not a duration (L-032). Needs a re-run without the floor | savings protocol on 001 and 002, with a never-taught control arm |
+| H-006 | **[C]** | **hypothesis** | **Growth is activity-seeking but not correlation-seeking.** A node grows toward wherever there is activity, regardless of whether that activity has anything to do with its own. So each interior node accumulates ~5 mutually unrelated inputs and averages them into noise, which is a mechanism for L-013's one-hop wall. Growth that preferred *correlated* targets would build coherent receptive fields instead of random mixtures. | open | a correlation-seeking growth rule, measured by hop-2 decodability |
+| H-007 | **[J→C]** | **idea** | **Detection of learning should be a ladder, not a threshold.** Behaviour is the last thing to change, so a single behavioural gate cannot distinguish "no machinery" from "machinery that has not yet reached behaviour". Evidence should be sought at every level from structure upward, with each level having its own null. | open | the ladder in [vision.md](../vision.md#how-we-judge-whether-it-is-learning) |
+| H-008 | **[C]** | **idea** | **Unfalsifiability is this project's real occupational hazard.** "It is learning, just slowly and invisibly" is unanswerable unless every new instrument ships with a null and a pre-registered decision rule. H-002 and H-005 are worth pursuing *and* are exactly the shape of belief that quietly turns a research project into a faith. The defence is that no instrument enters the record without stating what result would count as no-learning. | open | applies to every entry; enforced by journal rule 3 |
+| H-009 | **[J]** | **idea** | **A measure of learning is admissible only if it is substrate-independent.** If it could be applied to an ant, an ape, a human and a machine, it is measuring learning; if it only makes sense for a system with a loss function, a train/test split and epochs, it is measuring a *training procedure* and may not transfer to a living model. Borrowed measures are fine — most of comparative psychology qualifies, most of the ML evaluation battery does not. | open | applied as an admission test to every rung in [vision.md](../vision.md#what-makes-a-measure-admissible) |
+| H-010 | **[J→C]** | **hypothesis** | **Latent learning is the decisive test for H-002.** Expose the organism with reward switched off, then switch reward on, and compare trials-to-criterion against a naive control. If pre-exposure helps, it was acquiring structure the whole time while behaviour showed nothing — which is exactly the claim "it might be learning invisibly" makes. Tolman's 1930 rats did precisely this. It converts an unfalsifiable worry into a controlled experiment with a control group. | **refuted** — no pattern-specific latent learning on either substrate; the scrambled control matched or beat the pre-exposed arm, so the speed-up is warm-up (L-024) | [2026-08-22-1240](./entries/2026-08-22-1240-latent-learning.md) |
+| H-011 | **[C]** | **idea** | **Trials-to-criterion is the right currency, not accuracy.** "How many exposures to reach a fixed standard" is comparable across systems with different asymptotes and speeds; "accuracy at trial 2,000" is comparable to nothing, and silently penalises a slow learner for being slow rather than for failing. Every gate from 003 onward should be written in trials-to-criterion. | open | rewrite the 003 gates in this currency and check it reproduces 001's and 002's known results |
+| H-012 | **[J→C]** | **hypothesis** | **Scaffolded growth: crystallisation needs positive feedback from what has already formed to what forms next.** 002 builds a strong, well-evidenced core and it never grows, because the growth rule cannot see it (L-028). Make growth's target weighting depend on consolidated structure — `A(target)·exp(−span/λ_g)·(1 + κ·evidence near target)` — so a core that forms becomes a frame later growth follows. Javid's clause "when it gets strong enough, faster things can grow around it" has no mechanism in the current design. | open | pre-registered measure: **the core must grow across checkpoints**, which it demonstrably does not today |
+| H-013 | **[J]** | **idea** | **Infinite reward, limited punishment — and punishment is death.** Positive reinforcement should be unbounded; negative reinforcement accumulates against a threshold, and crossing it **kills the instance** rather than adjusting a weight. 002 already does exactly this one level down — rent is a bounded running cost and failure to pay is death — so the proposal is to lift a mechanism that already works at the synapse up to the organism. | open | organism-level death on accumulated punishment, measured against the current symmetric advantage rule · [source]([2026-08-22-1340](./entries/2026-08-22-1340-kian-conversation.md)) |
+| H-014 | **[J]** | **hypothesis** | **Inheritance is the accumulator: the ultimate reward is passing on what was learned.** A successful instance seeds the next with part of what it acquired. This attacks [L-028](./LEARNINGS.md)'s gap from the opposite side to H-012 — where that adds within-lifetime scaffolding, this adds across-lifetime transmission, and a population under selection also puts the *rules* under selection, which today's [knob table](../experiments/002-grown-substrate/design.md) notes they currently are not. | open | a population of instances with partial inheritance; measure whether generation N reaches criterion faster than generation 1 · [source]([2026-08-22-1340](./entries/2026-08-22-1340-kian-conversation.md)) |
+| H-015 | **[J]** | **idea** | **How much is pre-programmed is a dial, not a binary.** A spider spins a web untaught; humans look unprogrammed but have balance, breathing and blinking built in. 001 is fully given, 002 is fully grown, and the interesting region is between them. This also answers the standing worry about whether defining what a system should learn is cheating: **an organism's parameters are built in too — having a genome is not cheating.** | open | a series of substrates varying the given/grown ratio, measured on the same battery · [source]([2026-08-22-1340](./entries/2026-08-22-1340-kian-conversation.md)) |
+| H-016 | **[J]** | **idea** | **Structure-versus-noise is the first test of pattern learning, and it is not a classification task.** Show 100 images of which 80 are random dots and 20 have real structure, and ask whether it can separate them *without being told what the structure is*. A system that cannot tell signal from noise has not begun; one that can has done something no label taught it. | open | 80 noise / 20 structured images on 001 and 002; chance is the base rate · [source]([2026-08-22-1340](./entries/2026-08-22-1340-kian-conversation.md)) |
+| H-017 | **[J]** | **idea** | **Learning and measurement are separate phases: test with games it was never trained on.** Train on one thing, then run a battery of *novel* games — horizontal versus vertical, which image has more lines, find the longest line — and measure how fast it adapts to each. Stated independently of, and converging with, H-011 (trials-to-criterion) and ladder rung 7 (Harlow's learning set): "you've learned a bunch of stuff in school but at the end I'm going to throw you into a whole set of challenges." | open | the game battery, scored in trials-to-criterion per novel game · [source]([2026-08-22-1340](./entries/2026-08-22-1340-kian-conversation.md)) |

@@ -72,6 +72,23 @@ button:focus-visible, input:focus-visible {
   outline: 2px solid var(--accent); outline-offset: 2px;
 }
 #run { min-width: 84px; }
+/* the readout widens as the number grows ("≈60" → "≈24.0k"); reserving the
+   width stops it shoving the controls to its right around */
+#speedlbl { display: inline-block; min-width: 12ch; }
+.segmented { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; }
+.segmented button { border: 0; background: none; padding: 5px 12px; }
+.segmented button + button { border-left: 1px solid var(--border); }
+.segmented button[aria-pressed="true"] {
+  background: var(--accent); color: #FFFFFF; border-radius: 5px;
+}
+.segmented button[aria-pressed="true"] + button { border-left-color: transparent; }
+#stimbar[hidden] { display: none; }
+#stimbar { margin-top: -6px; }
+#stimnote { color: var(--ink-3); }
+.stim { display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px; }
+.stim canvas { display: block; }
+.stim[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+label.disabled { opacity: 0.45; }
 input[type="range"] { width: 130px; accent-color: var(--accent); }
 input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); }
 input[type="number"] {
@@ -83,9 +100,14 @@ input[type="number"] {
   border: 1px solid var(--accent); color: var(--accent); font-size: 0.72rem;
 }
 .is-frozen .frozen-badge { display: inline-block; }
+/* The two screen panels are locked to the width of the canvas they hold
+   (--panel-w, measured once in JS), NOT to their content. With auto tracks
+   the widest thing in the column was the caption — which changes text every
+   phase ("showing: horizontal bars" → "blank (between stimuli)") — so the
+   grid re-laid out on almost every tick and the page visibly shook. */
 .panels {
-  display: grid; grid-template-columns: auto auto 1fr; gap: 14px;
-  align-items: stretch;
+  display: grid; grid-template-columns: var(--panel-w) var(--panel-w) 1fr;
+  gap: 14px; align-items: stretch;
 }
 @media (max-width: 860px) { .panels { grid-template-columns: 1fr; } }
 .panel {
@@ -104,7 +126,14 @@ input[type="number"] {
 .panel .cap {
   margin: 8px 0 0; font-family: var(--mono); font-size: 0.74rem;
   color: var(--ink-2); font-variant-numeric: tabular-nums;
+  /* two lines are always reserved: captions change text as the trial phase
+     changes, and a 1↔2 line wrap would shake the row vertically the same way
+     content-sized tracks shook it horizontally */
+  min-height: 2.9em;
 }
+/* the break is placed deliberately (label / value) rather than left to
+   whatever the text happens to wrap at */
+.panel .cap span { display: block; }
 .outrows { display: flex; flex-direction: column; gap: 8px; background: var(--screen);
   border: 1px solid var(--screen-border); border-radius: 6px; padding: 12px; }
 .outrow { display: grid; grid-template-columns: 26px 118px 1fr 76px 16px;
@@ -136,7 +165,14 @@ input[type="number"] {
   font-family: var(--mono); font-size: 0.78rem; color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
-.stats b { color: var(--ink); font-weight: 600; }
+/* every value here changes as it runs, and a digit gained (trials 999 → 1000)
+   shifts each stat after it — so values are fixed-width boxes, right-aligned
+   against the label like a gauge */
+.stats span { white-space: nowrap; }
+.stats b {
+  color: var(--ink); font-weight: 600;
+  display: inline-block; text-align: right; min-width: var(--w, auto);
+}
 footer { margin-top: 22px; color: var(--ink-2); font-size: 0.85rem;
   border-top: 1px solid var(--border); padding-top: 14px; }
 footer a { color: var(--accent); }
@@ -159,24 +195,37 @@ app.innerHTML = `
   </header>
 
   <div class="controls">
+    <span class="segmented" role="group" aria-label="teaching mode">
+      <button id="modeauto" aria-pressed="true">Auto</button
+      ><button id="modemanual" aria-pressed="false">Manual</button>
+    </span>
     <button id="run" aria-pressed="true">Pause</button>
     <label>speed <input id="speed" type="range" min="0" max="100" value="57">
       <span id="speedlbl"></span></label>
-    <label><input id="learning" type="checkbox" checked> learning</label>
+    <label id="learninglbl"><input id="learning" type="checkbox" checked> learning</label>
     <label>seed <input id="seed" type="number" value="1" min="1" step="1"></label>
     <button id="reset">Reset</button>
+  </div>
+
+  <div class="controls" id="stimbar" hidden>
+    <span>show it:</span>
+    <button class="stim" id="stim0" aria-pressed="false"></button>
+    <button class="stim" id="stim1" aria-pressed="false"></button>
+    <button class="stim" id="stim2" aria-pressed="false"></button>
+    <button class="stim" id="stimclear" aria-pressed="true">nothing (clear)</button>
+    <span id="stimnote">no teacher, no reward — it can't learn here, only respond</span>
   </div>
 
   <div class="panels">
     <section class="panel">
       <h2>Sense · 8×8</h2>
       <canvas id="sense" class="screen" role="img" aria-label="the organism's 8 by 8 visual sense"></canvas>
-      <p class="cap" id="sensecap"></p>
+      <p class="cap"><span id="sensecap1"></span><span id="sensecap2"></span></p>
     </section>
     <section class="panel">
       <h2>Pool · 160 neurons</h2>
       <canvas id="pool" class="screen" role="img" aria-label="live firing raster of the 160 pool neurons"></canvas>
-      <p class="cap" id="poolcap"></p>
+      <p class="cap"><span id="poolcap1"></span><span id="poolcap2"></span></p>
     </section>
     <section class="panel">
       <h2>Output register</h2>
@@ -189,7 +238,7 @@ app.innerHTML = `
 
   <div class="chartwrap">
     <section class="panel">
-      <h2>Rolling accuracy · last 100 trials</h2>
+      <h2 id="charttitle">Rolling accuracy · last 100 trials</h2>
       <canvas id="chart" height="230"></canvas>
     </section>
     <div class="tooltip" id="tooltip"></div>
@@ -201,7 +250,11 @@ app.innerHTML = `
     This is the experiment the journal recorded on 2026-08-16: seeds 1–3
     reproduce the logged curves exactly (chance ≈ 0.33 → ~0.98 within 800
     trials). Toggle <em>learning</em> off once it's competent — accuracy
-    holding without reward is the living-model claim.
+    holding without reward is the living-model claim. Then switch to
+    <em>Manual</em> and hold a pattern in front of it: a learned one it sits
+    on steadily, but show it <em>nothing</em> and it babbles, cycling answers
+    every few ticks — that restlessness is the urge that solves the
+    cold-start problem, with nothing to settle on.
     <a href="${REPO}/journal/entries/2026-08-16-0248-experiment-001-m0-m1-first-build.md">journal entry</a> ·
     <a href="${REPO}/experiments/001-mnist-living-demo/design.md">design</a> ·
     <a href="${REPO}/vision.md">vision</a>
@@ -220,8 +273,16 @@ const speedLbl = $('speedlbl')
 const learningInput = $<HTMLInputElement>('learning')
 const seedInput = $<HTMLInputElement>('seed')
 const resetBtn = $<HTMLButtonElement>('reset')
-const senseCap = $('sensecap')
-const poolCap = $('poolcap')
+const senseCap1 = $('sensecap1')
+const senseCap2 = $('sensecap2')
+const poolCap1 = $('poolcap1')
+const poolCap2 = $('poolcap2')
+const modeAutoBtn = $<HTMLButtonElement>('modeauto')
+const modeManualBtn = $<HTMLButtonElement>('modemanual')
+const stimBar = $('stimbar')
+const learningLbl = $('learninglbl')
+const lampLbl = $('lamplbl')
+const chartTitle = $('charttitle')
 const lamp = $('lamp')
 const statsEl = $('stats')
 const tooltip = $('tooltip')
@@ -270,18 +331,24 @@ const senseCtx = setupCanvas($<HTMLCanvasElement>('sense'), CELL * 8, CELL * 8)
 function drawSense(): void {
   senseCtx.fillStyle = SCREEN_BG
   senseCtx.fillRect(0, 0, CELL * 8, CELL * 8)
-  const on = sim.stepper.phase === 'stimulus'
-  senseCtx.fillStyle = on ? '#E7EDF4' : '#1A212B'
+  const label = sim.currentLabel
+  senseCtx.fillStyle = label !== null ? '#E7EDF4' : '#1A212B'
   const s = sim.org.sense
   for (let i = 0; i < 64; i++) {
     if (s[i]) {
       senseCtx.fillRect((i % 8) * CELL + 1, ((i / 8) | 0) * CELL + 1, CELL - 2, CELL - 2)
     }
   }
-  senseCap.textContent = on
-    ? `showing: ${PATTERN_NAMES[sim.currentLabel]}`
-    : 'blank (between stimuli)'
-  senseCap.style.color = on ? SERIES[sim.currentLabel] : ''
+  const manual = sim.mode === 'manual'
+  senseCap1.textContent =
+    label !== null ? (manual ? 'you are showing' : 'showing') : 'blank'
+  senseCap2.textContent =
+    label !== null
+      ? PATTERN_NAMES[label]
+      : manual
+        ? '(nothing shown)'
+        : '(between stimuli)'
+  senseCap2.style.color = label !== null ? SERIES[label] : ''
 }
 
 // ---------------------------------------------------------------- pool
@@ -294,6 +361,27 @@ const poolCtx = setupCanvas(
   PCOLS * PCELL,
   PROWS * PCELL
 )
+
+/**
+ * Pin the two screen-panel grid tracks to the width of the canvas they hold.
+ * The panel chrome is measured from the live DOM rather than hardcoded, so
+ * this can never drift from the padding/border declared in STYLE.
+ */
+function lockPanelWidth(): void {
+  const panel = $<HTMLCanvasElement>('sense').parentElement as HTMLElement
+  const cs = getComputedStyle(panel)
+  const chrome =
+    parseFloat(cs.paddingLeft) +
+    parseFloat(cs.paddingRight) +
+    parseFloat(cs.borderLeftWidth) +
+    parseFloat(cs.borderRightWidth)
+  const screenW = Math.max(CELL * 8, PCOLS * PCELL)
+  document.documentElement.style.setProperty(
+    '--panel-w',
+    `${Math.ceil(screenW + chrome)}px`
+  )
+}
+lockPanelWidth()
 
 function drawPool(): void {
   poolCtx.fillStyle = SCREEN_BG
@@ -311,7 +399,11 @@ function drawPool(): void {
       PCELL - 2
     )
   }
-  poolCap.textContent = `sparsity ${(sim.org.poolActivity() * 100).toFixed(0)}% · urge ${sim.org.urge.toFixed(2)}`
+  // padded so 9% and 15% occupy the same space (tabular-nums equalizes digit
+  // widths, not digit counts)
+  const sparse = (sim.org.poolActivity() * 100).toFixed(0).padStart(2, ' ')
+  poolCap1.textContent = `sparsity ${sparse}%`
+  poolCap2.textContent = `urge ${sim.org.urge.toFixed(2)}`
 }
 
 // ---------------------------------------------------------------- outputs
@@ -366,11 +458,12 @@ const outRows: OutRow[] = []
 function drawOutputs(): void {
   const p = sim.org.outputProbs()
   let sum = 0
-  const spoken = sim.stepper.spoken
+  const spoken = sim.spoken
+  const counts = sim.spokenCounts
   for (let k = 0; k < 3; k++) {
     sum += p[k]
     outRows[k].bar.style.width = `${(p[k] * 100).toFixed(1)}%`
-    const c = Math.min(6, sim.stepper.counts[k])
+    const c = Math.min(6, counts[k])
     outRows[k].pips.forEach((pip, i) => {
       pip.style.background = i < c ? SERIES[k] : '#1A212B'
     })
@@ -535,6 +628,30 @@ chartCanvas.addEventListener('mouseleave', () => (hoverX = null))
 // ---------------------------------------------------------------- stats
 
 function drawStats(): void {
+  if (sim.mode === 'manual') {
+    const r = sim.readout
+    const shown = sim.currentLabel
+    const said = r.answer
+    // "agreement" only means something when there is something to agree with
+    const agree =
+      shown === null ? '—' : `${(r.shares()[shown] * 100).toFixed(0)}%`
+    statsEl.innerHTML = `
+      <span title="the answer it is holding right now; silence is legal">saying <b style="--w:16ch">${
+        said === null ? '(nothing)' : PATTERN_NAMES[said]
+      }</b></span>
+      <span>for <b style="--w:9ch">${r.dwell} tick${
+        r.dwell === 1 ? '' : 's'
+      }</b></span>
+      <span title="times one spoken answer replaced a different one during this exposure">changed its mind <b style="--w:5ch">${r.revisions}×</b></span>
+      <span title="share of this exposure spent saying the pattern you are showing">agreement <b style="--w:5ch">${agree}</b></span>
+      <span title="share of this exposure spent saying nothing at all">silent <b style="--w:4ch">${(
+        r.shares()[3] * 100
+      ).toFixed(0)}%</b></span>
+      <span>speed <b style="--w:13ch">${(measuredTps / 1000).toFixed(
+        1
+      )}k ticks/s</b></span>`
+    return
+  }
   const recent = sim.trials.slice(-20)
   const lat = recent.length
     ? recent.reduce((a, t) => a + t.latency, 0) / recent.length
@@ -542,16 +659,90 @@ function drawStats(): void {
   const silent = recent.length
     ? recent.filter((t) => t.spoken === null).length / recent.length
     : 0
+  // --w reserves each value's widest form so a digit gained never shifts the
+  // stats to its right
   statsEl.innerHTML = `
-    <span>trials <b>${sim.trials.length}</b></span>
-    <span>accuracy (last 100) <b>${sim.rollingAccuracy.toFixed(2)}</b></span>
-    <span>reward baseline <b>${sim.teacher.baseline.toFixed(2)}</b></span>
-    <span>answer latency <b>${lat.toFixed(0)} ticks</b></span>
-    <span>silent <b>${(silent * 100).toFixed(0)}%</b></span>
-    <span>speed <b>${(measuredTps / 1000).toFixed(1)}k ticks/s</b></span>`
+    <span>trials <b style="--w:5ch">${sim.trials.length}</b></span>
+    <span>accuracy (last 100) <b style="--w:4ch">${sim.rollingAccuracy.toFixed(2)}</b></span>
+    <span>reward baseline <b style="--w:5ch">${sim.teacher.baseline.toFixed(2)}</b></span>
+    <span>answer latency <b style="--w:9ch">${lat.toFixed(0)} ticks</b></span>
+    <span>silent <b style="--w:4ch">${(silent * 100).toFixed(0)}%</b></span>
+    <span>speed <b style="--w:13ch">${(measuredTps / 1000).toFixed(1)}k ticks/s</b></span>`
 }
 
 // ---------------------------------------------------------------- controls
+
+// ---- manual mode: stimulus picker -------------------------------------
+// Each button carries the pattern it shows, drawn in that pattern's series
+// color, so the choice is the thing itself rather than a name for it.
+const stimButtons: HTMLButtonElement[] = []
+for (let k = 0; k < 3; k++) {
+  const btn = $<HTMLButtonElement>(`stim${k}`)
+  const c = document.createElement('canvas')
+  c.width = 20 * dpr
+  c.height = 20 * dpr
+  c.style.width = '20px'
+  c.style.height = '20px'
+  const g = c.getContext('2d')!
+  g.scale(dpr, dpr)
+  g.fillStyle = SERIES[k]
+  const pat = M1_PATTERNS[k]
+  for (let i = 0; i < 64; i++) {
+    if (pat[i]) g.fillRect((i % 8) * 2.5, ((i / 8) | 0) * 2.5, 2.5, 2.5)
+  }
+  btn.appendChild(c)
+  btn.appendChild(document.createTextNode(PATTERN_NAMES[k]))
+  btn.addEventListener('click', () => selectStimulus(k))
+  stimButtons.push(btn)
+}
+const stimClearBtn = $<HTMLButtonElement>('stimclear')
+stimClearBtn.addEventListener('click', () => selectStimulus(null))
+
+function selectStimulus(label: number | null): void {
+  sim.setManualStimulus(label)
+  stimButtons.forEach((b, i) =>
+    b.setAttribute('aria-pressed', String(i === label))
+  )
+  stimClearBtn.setAttribute('aria-pressed', String(label === null))
+}
+
+/** Ticks/sec you can actually watch an answer form at (~1 tick ≈ 10ms). */
+const WATCHABLE_TPS = 120
+let leftAutoSpeed: string | null = null
+
+function setMode(mode: 'auto' | 'manual'): void {
+  if (mode === sim.mode) return
+  sim.setMode(mode)
+  modeAutoBtn.setAttribute('aria-pressed', String(mode === 'auto'))
+  modeManualBtn.setAttribute('aria-pressed', String(mode === 'manual'))
+  stimBar.hidden = mode !== 'manual'
+  // learning is inert without a teacher to deliver reward — say so rather
+  // than leaving a live-looking control that does nothing
+  learningInput.disabled = mode === 'manual'
+  learningLbl.classList.toggle('disabled', mode === 'manual')
+  lampLbl.textContent = mode === 'manual' ? 'reward (none in manual)' : 'reward'
+  chartTitle.textContent =
+    mode === 'manual'
+      ? 'Rolling accuracy · paused (no trials in manual)'
+      : 'Rolling accuracy · last 100 trials'
+
+  if (mode === 'manual') {
+    // at 5k ticks/s an answer forms and is gone between two frames; drop to a
+    // rate a person can follow, and put the old speed back on the way out
+    leftAutoSpeed = speedInput.value
+    speedInput.value = String(
+      Math.round((Math.log(WATCHABLE_TPS / 60) / Math.log(400)) * 100)
+    )
+    selectStimulus(null)
+  } else if (leftAutoSpeed !== null) {
+    speedInput.value = leftAutoSpeed
+    leftAutoSpeed = null
+  }
+  speedLabel()
+}
+
+modeAutoBtn.addEventListener('click', () => setMode('auto'))
+modeManualBtn.addEventListener('click', () => setMode('manual'))
 
 runBtn.addEventListener('click', () => {
   running = !running
@@ -564,7 +755,13 @@ learningInput.addEventListener('change', () => {
   root.classList.toggle('is-frozen', !learningInput.checked)
 })
 resetBtn.addEventListener('click', () => {
+  // sim.reset() returns to auto mode; the chrome has to follow it back
+  const wasManual = sim.mode === 'manual'
   sim.reset(Math.max(1, Number(seedInput.value) | 0))
+  if (wasManual) {
+    sim.setMode('manual')
+    setMode('auto')
+  }
   learningInput.checked = true
   root.classList.remove('is-frozen')
   uiPulse = 0
@@ -579,7 +776,14 @@ speedLabel()
 window.addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLInputElement) return
   if (e.key === ' ') { e.preventDefault(); runBtn.click() }
-  if (e.key === 'l') learningInput.click()
+  if (e.key === 'l' && !learningInput.disabled) learningInput.click()
+  if (e.key === 'm') setMode(sim.mode === 'manual' ? 'auto' : 'manual')
+  if (sim.mode === 'manual') {
+    if (e.key === '1' || e.key === '2' || e.key === '3') {
+      selectStimulus(Number(e.key) - 1)
+    }
+    if (e.key === '0') selectStimulus(null)
+  }
 })
 if (!running) runBtn.textContent = 'Run'
 

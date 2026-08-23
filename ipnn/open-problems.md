@@ -29,6 +29,52 @@ L-001). One mechanism-level fix was required: softmax saturation had made
 the dominant answer unpunishable (L-002, L-003). Variance concerns remain
 untested beyond toy scale.
 
+**Status 2026-08-21 — the M1 clearance is weaker than it looked.** The M1b
+ablation (journal
+[2026-08-21-0145](./journal/entries/2026-08-21-0145-m1b-etapool-ablation.md),
+L-010) shows the hidden pool's plasticity contributes nothing: freezing 89% of
+learnable synapses costs 0.004 accuracy. So M1 cleared this problem only in a
+regime where **there was almost no credit to assign** — one learnable layer
+feeding the outputs. The variance-with-depth failure this section is actually
+worried about was never exercised, and remains entirely open. Experiment 002
+proposes a different kind of answer (credit by diffusion geometry, where what
+degrades is diffusion distance rather than unit count) and will be the first
+setting where multi-hop credit assignment is genuinely tested.
+
+**Status 2026-08-22 — multi-hop credit assignment was tested, and it failed.**
+Experiment 002's M1 gate (journal
+[2026-08-22-0208](./journal/entries/2026-08-22-0208-exp002-m0-built-m1-fails-on-depth.md),
+L-013) put four to six grown layers between stimulus and reward and ran flat at
+chance for 2,000 trials on three seeds. The failure has a measured location:
+task information in the substrate survives **exactly one hop** — 7.7σ mean
+discriminability at hop 1, 1.7σ (the noise floor) at hop 2 and every hop
+beyond. Reward then modulates traces that encode nothing about the stimulus,
+and weights random-walk until rent kills them (94% of every generation of
+edges dies).
+
+The mechanism is not what failed: an arm that brings 19 of the 64 sense pixels
+within two hops of an answer, changing nothing else, reaches 0.883. So the
+working answer above is confirmed *within the one-hop horizon* and refuted
+beyond it.
+
+**And the name of this section is now slightly wrong for what broke.** The
+failure is not that credit could not be assigned; it is that the distal
+substrate had nothing worth assigning credit to. Information does not travel
+*forward* across a hop, so the backward problem never got a chance to be the
+bottleneck. The variance concern this section has carried since the beginning
+remains untested at depth — it is still waiting behind a more basic
+transmission problem.
+
+Note what this does to the section's own proposed fix. "Credit by diffusion
+geometry" addresses **which** synapses get credited; it does nothing about
+whether the presynaptic activity carries information worth crediting. Diffusion
+geometry cannot be tested until something carries signal across a hop, which is
+why experiment 002's M2–M4 are blocked. The next question is not a credit
+question at all: it is *what mechanism preserves stimulus information across a
+layer of sparse stochastic units*. Variance mitigations listed above
+(baselines, sparser activity, curricula, population readouts) all address the
+estimator; none of them address a signal that is already gone.
+
 ## 2. Stability of the recurrent stochastic loop
 
 **Problem.** Output-to-input feedback with stochastic units may oscillate or

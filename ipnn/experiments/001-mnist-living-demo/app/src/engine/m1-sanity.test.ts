@@ -15,6 +15,23 @@ const TRIALS = 800
 const TAIL = 100
 const GATE = 0.8
 
+// ── The recorded record, asserted ─────────────────────────────────────────
+// These are the exact curves journal entry 2026-08-16-0248 recorded and that
+// every later entry compares against. Asserting them (not just the ≥0.80
+// gate) is what makes "old experiments keep working at HEAD" an enforced
+// invariant instead of a habit: any change that nudges the default
+// organism's behaviour by one hundredth on one block fails the suite.
+//
+// If this ever fails with NO code diff — e.g. right after a Node/V8 upgrade —
+// the cause is floating-point drift in the engine (Math.exp is not
+// spec-pinned), not a regression. Record it in the journal and re-pin.
+const RECORDED_CURVES: Record<number, string> = {
+  1: '0.53 0.80 0.91 0.98 0.94 0.95 0.97 0.98',
+  2: '0.54 0.80 0.87 0.94 0.96 0.95 0.97 0.98',
+  3: '0.42 0.74 0.85 0.89 0.95 0.96 0.98 0.99',
+}
+const RECORDED_FROZEN = 0.97
+
 function runSeed(seed: number): { tailAccuracy: number; curve: number[] } {
   const org = new Organism({ ...defaultConfig, seed })
   const teacher = new AutoTeacher({ ...defaultTeacherConfig })
@@ -49,6 +66,8 @@ describe('M1 sanity gate: 3 patterns, reward-only learning', () => {
           .join(' → ')}`
       )
       expect(tailAccuracy).toBeGreaterThanOrEqual(GATE)
+      // bit-identical to the record, not merely above the gate
+      expect(curve.map((a) => a.toFixed(2)).join(' ')).toBe(RECORDED_CURVES[seed])
     })
   }
 
@@ -73,6 +92,6 @@ describe('M1 sanity gate: 3 patterns, reward-only learning', () => {
       if (teacher.runTrial(org, M1_PATTERNS[label], label).correct) correct++
     }
     console.log(`frozen accuracy over 100 unrewarded trials: ${correct / 100}`)
-    expect(correct / 100).toBeGreaterThanOrEqual(GATE)
+    expect(correct / 100).toBe(RECORDED_FROZEN)
   })
 }, 180_000)
