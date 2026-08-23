@@ -52,6 +52,18 @@ export const GROWN_ARMS = {
       'fades with them. Works on contact; taxed to death (L-041, L-042).',
     cfg: { seedEdges: 12000, seedSpanMax: 44 },
   },
+  durable: {
+    label: 'Durable · scaffold + earned durability',
+    note:
+      'The scaffold plus one economy fix: a connection that proves itself ' +
+      'pays less and less rent (rent/(1+n/25)) — use it and it becomes ' +
+      'cheap to keep. Unproven edges still pay full price and die, so ' +
+      'selection keeps only the earning routes (~10% of the inheritance) — ' +
+      'and that is enough: the first sustained, rising learning this hard ' +
+      'geometry has ever shown (tails 0.48/0.64/0.59 across seeds, ' +
+      '002-M1g). Not yet the 0.80 gate. Try seeds 2 or 3.',
+    cfg: { seedEdges: 12000, seedSpanMax: 44, rentN0: 25 },
+  },
 } satisfies Record<string, GrownArmSpec>
 
 export type GrownArm = keyof typeof GROWN_ARMS
