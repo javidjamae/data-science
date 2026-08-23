@@ -101,6 +101,20 @@ export interface GrownConfig extends SubstrateConfig {
   /** cap on outgoing edges per node; design §10 risk 3 requires that binding
    * this cap be reported, never silently truncated */
   maxOutDegree: number
+
+  /**
+   * Innate scaffold: random edges present at t=0. `0` is the recorded
+   * from-zero organism. Biology's overproduction stage plus innate long
+   * tracts (thalamocortical axons are born, not grown to their targets);
+   * proposed by Javid 2026-08-22 — random interconnections as a starting
+   * point, then strengthening/rewiring/rent take over. **Weakens the
+   * "from zero" claim and must be reported wherever used** (design §10
+   * risk 1's own caveat).
+   */
+  seedEdges: number
+  /** max span of innate edges — the whole sheet by default, because innate
+   * tracts may be long. Growth remains bounded by rMax. */
+  seedSpanMax: number
 }
 
 /** The pre-registered M1 configuration: uniform reward field, uniform
@@ -161,6 +175,9 @@ export const defaultGrownConfig: GrownConfig = {
   lambdaG: 4,
   sleepEvery: 20,
   maxOutDegree: 32,
+
+  seedEdges: 0,
+  seedSpanMax: 44,
 }
 
 /** Reward-cortex placements for M2's counterbalancing (design §8: the

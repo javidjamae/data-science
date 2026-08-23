@@ -151,10 +151,17 @@ export class GrownOrganism implements OrganismLike {
     this.drive = new Float32Array(n)
     this.fireRate = new Float32Array(n)
 
-    // Zero edges at t=0. Nothing is wired; everything below has to be grown.
-    const maxDelay = latencyForSpan(cfg.rMax, cfg.conductionSpeed, cfg.latency)
+    // Zero edges at t=0 by default — everything must be grown. With
+    // `seedEdges > 0`, an innate random scaffold is present at birth instead
+    // (spans up to seedSpanMax, unlike growth's rMax): the overproduction
+    // stage, subject to the same rent, death and rewiring as anything grown.
+    const maxDelay = latencyForSpan(
+      Math.max(cfg.rMax, cfg.seedEdges > 0 ? cfg.seedSpanMax : cfg.rMax),
+      cfg.conductionSpeed,
+      cfg.latency
+    )
     this.edges = new EdgeSet(n, maxDelay)
-    this.edges.setStructure([])
+    this.edges.setStructure(this.innateScaffold())
 
     this.activity = new ActivityField(cfg.width, cfg.height, cfg.activityD, cfg.activityDecay)
     this.rewardProfile =
@@ -168,6 +175,40 @@ export class GrownOrganism implements OrganismLike {
 
     this.growthScratch = new Float32Array(this.lattice.growthOffsets.length)
     this.growthTargets = new Int32Array(this.lattice.growthOffsets.length)
+  }
+
+  /** The innate random scaffold (empty unless cfg.seedEdges > 0). Same
+   * legality rules as growth: nothing targets the clamped input cortex, no
+   * output→output, no self-edges, no duplicates. Sign is a coin flip. */
+  private innateScaffold(): Edge[] {
+    const { cfg } = this
+    if (cfg.seedEdges <= 0) return []
+    const lat = this.lattice
+    const seeds: Edge[] = []
+    const present = new Set<number>()
+    let guard = 0
+    while (seeds.length < cfg.seedEdges && guard++ < cfg.seedEdges * 50) {
+      const pre = Math.floor(this.rng() * lat.size)
+      const post = Math.floor(this.rng() * lat.size)
+      if (pre === post) continue
+      if (lat.role[post] === ROLE_INPUT) continue
+      if (lat.role[pre] === ROLE_OUTPUT && lat.role[post] === ROLE_OUTPUT) continue
+      const span = lat.span(pre, post)
+      if (span > cfg.seedSpanMax) continue
+      const key = pre * lat.size + post
+      if (present.has(key)) continue
+      present.add(key)
+      seeds.push({
+        pre,
+        post,
+        w: this.rng() < 0.5 ? cfg.birthWeight : -cfg.birthWeight,
+        e: 0,
+        n: 0,
+        d: latencyForSpan(span, cfg.conductionSpeed, cfg.latency),
+        born: 0,
+      })
+    }
+    return seeds
   }
 
   // ─────────────────────────────────────────────────────────── one tick of life
