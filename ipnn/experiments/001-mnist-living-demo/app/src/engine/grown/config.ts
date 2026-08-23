@@ -115,6 +115,23 @@ export interface GrownConfig extends SubstrateConfig {
   /** max span of innate edges — the whole sheet by default, because innate
    * tracts may be long. Growth remains bounded by rMax. */
   seedSpanMax: number
+
+  /**
+   * Earned durability (H-023's one-line form): an edge's rent scales as
+   * rent/(1 + n/rentN0), so a connection that has proven itself becomes
+   * cheap to keep — use-dependent stabilization, the economics of
+   * myelination. `0` disables (flat rent — the recorded behavior). Unproven
+   * edges still pay full price, so rent stays *informative* (L-027).
+   */
+  rentN0: number
+  /**
+   * Juvenile grace (H-022's smallest form): for its first `graceSleeps`
+   * rewirings an edge pays no rent and cannot die — a fair audition, long
+   * enough to be discovered and have a wrong birth-sign corrected before the
+   * landlord arrives. `0` disables (the recorded ~24-trial audition, which
+   * L-042 showed bulldozes inherited structure before it can be used).
+   */
+  graceSleeps: number
 }
 
 /** The pre-registered M1 configuration: uniform reward field, uniform
@@ -178,6 +195,8 @@ export const defaultGrownConfig: GrownConfig = {
 
   seedEdges: 0,
   seedSpanMax: 44,
+  rentN0: 0,
+  graceSleeps: 0,
 }
 
 /** Reward-cortex placements for M2's counterbalancing (design §8: the

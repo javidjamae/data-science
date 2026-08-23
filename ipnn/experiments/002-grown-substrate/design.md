@@ -454,6 +454,10 @@ differences are attributable to plumbing rather than to a new unit model.
 | `rent` ρ | 9e−5 | weight decay per edge per tick | ρ=0 collapses the system (0.444, runaway to 32k edges) |
 | `birthWeight` | 0.15 | weight a new edge is born with | with `gain`, the per-hop SNR; also sets how long an edge lives unearned |
 | `deathThreshold` θ | 0.02 | \|w\| below which an edge is removed | with rent and `sleepEvery`, the lifetime of an unearning edge |
+| `seedEdges` (added 2026-08-22) | 0 | innate random edges at birth, spans up to `seedSpanMax` | L-041: long-range innateness produced the first learning on this geometry; **weakens the from-zero claim, must be reported** |
+| `seedSpanMax` (added 2026-08-22) | 44 | max span of innate edges | innate tracts may be long, unlike growth (rMax) |
+| `rentN0` (added 2026-08-23) | 0 = off | earned durability: rent scales as rent/(1+n/rentN0) | H-023's one-line form — proven structure stops being taxed to death (L-042) |
+| `graceSleeps` (added 2026-08-23) | 0 = off | juvenile grace: no rent, no death for an edge's first G rewirings | H-022's smallest form — a fair audition before the bulldozer |
 
 **Growth** — how it builds. Undirected among candidates, which is L-014.
 

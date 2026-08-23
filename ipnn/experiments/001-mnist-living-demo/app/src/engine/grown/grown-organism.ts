@@ -291,17 +291,26 @@ export class GrownOrganism implements OrganismLike {
     this.inhibition +=
       cfg.inhibitionRate * (interiorActive / Math.max(1, interiorCount) - cfg.targetSparsity)
 
-    // 6. eligibility, against the ARRIVAL — and rent, paid by every edge every
-    //    tick whether it earned anything or not
+    // 6. eligibility, against the ARRIVAL — and rent. Flat by default; with
+    //    the economy fixes on, juveniles are rent-exempt (a fair audition)
+    //    and proven edges pay less the more evidence they carry (earned
+    //    durability) — so the cleanup pressure stays, but structure that has
+    //    demonstrated its worth stops being taxed to death (L-042).
     const lam = cfg.traceDecay
     const rent = cfg.rent
+    const rentN0 = cfg.rentN0
+    const grace = cfg.graceSleeps
+    const sleepsNow = this.stats_.sleeps
     const E = this.edges
     for (let s = 0; s < E.count; s++) {
       const j = E.post[s]
       E.e[s] = lam * E.e[s] + (E.arrived[s] ? this.poolFired[j] - this.p[j] : 0)
+      let r = rent
+      if (grace > 0 && sleepsNow - E.born[s] < grace) r = 0
+      else if (rentN0 > 0) r = rent / (1 + E.n[s] / rentN0)
       const w = E.w[s]
-      if (w > 0) E.w[s] = w > rent ? w - rent : 0
-      else if (w < 0) E.w[s] = w < -rent ? w + rent : 0
+      if (w > 0) E.w[s] = w > r ? w - r : 0
+      else if (w < 0) E.w[s] = w < -r ? w + r : 0
     }
 
     // 7. emission — every node that fired schedules its outgoing spikes to
@@ -438,9 +447,12 @@ export class GrownOrganism implements OrganismLike {
     const all = this.edges.toEdges()
 
     // death: an edge that stopped earning has been decaying under rent since
-    // its last reward, and eventually cannot pay
+    // its last reward, and eventually cannot pay. Juveniles (within their
+    // grace) are exempt — every edge gets its audition before the bulldozer.
     for (const ed of all) {
-      if (Math.abs(ed.w) < cfg.deathThreshold) this.stats_.edgesDied++
+      const juvenile =
+        cfg.graceSleeps > 0 && this.stats_.sleeps - ed.born < cfg.graceSleeps
+      if (!juvenile && Math.abs(ed.w) < cfg.deathThreshold) this.stats_.edgesDied++
       else kept.push(ed)
     }
 
