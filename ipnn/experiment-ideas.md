@@ -813,6 +813,237 @@ Backlog only. Not scheduled, not designed, no `design.md`. **Experiment 003
 first** — if 001 cannot transfer between two tasks in private, there is nothing
 to enter into a public arena.
 
+## I. The World — one body, many rooms
+
+**Origin:** Javid, 2026-08-27 **[J]**, thinking out loud. Raw idea; nothing
+built. Full capture in
+[journal 2026-08-27-0023](./journal/entries/2026-08-27-0023-the-world.md).
+
+> "Maybe the grid is the world, the eye is a layer that perceives the world,
+> and there is a hand and a mouth. The hand can touch the grid and interact
+> with it (in different ways depending on the game). And the mouth is not on
+> the grid but is maybe a smaller grid or array, where it can communicate
+> different outputs. … The idea is that it's an ecosystem we define that allows
+> us to create numerous scenarios / games, and then the entity just exists in
+> this world and we continue to monitor how it interacts with the world and
+> give it games / challenges."
+
+### Why this is its own track and not a subsection of §B, §G or §H
+
+Three existing tracks each own one piece: §B1 owns motor access, §G owns a
+world bigger than the sense, §H owns the games and their scoring. **None of
+them owns the *contract*.** Each was written as a capability to bolt onto
+whatever the current experiment is, which means every experiment redefines the
+world it runs in and results stop being comparable across games. This track's
+artefact is a **body and world specification** that all subsequent experiments
+target — infrastructure, deliberately, with the risk that implies (below).
+
+### The body: four interfaces, two in and two out
+
+| Organ | Direction | What it is |
+|---|---|---|
+| **Eye** | in | A small window (8×8) onto the world. Sees a *region*, not the whole thing. |
+| **Clock** | in | A separate small sense carrying time-of-day. Not appended to the eye — a **second sense**, which is what the project has claimed to be about since `vision.md` was written and has never actually had. |
+| **Hand** | out → world | A position on the grid and an action at that position (write / erase). Changes what the eye can later see. |
+| **Mouth** | out → teacher | A separate array, **not on the grid**, carrying the answer. |
+
+**The eye/hand/mouth split is the architectural content of this idea [J].** The
+organism has one channel for *acting on the world* and a different channel for
+*communicating about it*, and they are different organs. That is
+[H-018](./journal/HYPOTHESES.md)'s perception-versus-communication factoring
+made structural instead of hypothetical — the separation stops being something
+we hope the network discovers and becomes something the body has.
+Registered as [H-030](./journal/HYPOTHESES.md).
+
+### Time of day [J]
+
+> "We can introduce a 'time of day' element where the grid has different
+> properties throughout the day, and maybe even has a row that shows its 'time
+> of day' by enabling one box every 100 ticks. Then we can play time-based
+> games where something is shown for 5 'seconds' … and then the AI has to say
+> something or has to touch the displayed element."
+
+Three separate things this buys, worth separating because they have different
+gates:
+
+1. **A slow variable that lives in the world.** [H-003](./journal/HYPOTHESES.md)
+   says slow learning requires a slow variable and 002 has none. A world clock
+   does not give the *organism* a slow variable — but it gives it a slow,
+   **perceivable** one, which is a different and cheaper attack on the same
+   problem: the organism no longer has to invent long timescales, only to read
+   them.
+2. **Ambient rule context.** 005's cue strip announces the protocol
+   explicitly. A time-of-day phase that changes the world's rules is the same
+   factoring with the instruction removed — the cue is a property of the world
+   rather than a message about it. Strictly harder than 005 and strictly
+   easier than the unannounced flip that 001 fails flat (L-033).
+3. **Timing games at all.** Duration, delay, "it was shown for five seconds",
+   peak-interval — a whole family of tasks that are impossible in a world with
+   no time. And they pass [H-009](./journal/HYPOTHESES.md) trivially: interval
+   timing is measured in pigeons, rats, monkeys and humans, and scalar timing
+   theory (Gibbon 1977) is the comparative-psychology home for it.
+
+#### Correction, 2026-08-27 00:40 **[J]** — the Sun, not a clock strip
+
+Claude proposed implementing this as a dedicated **clock sense**: an N-cell
+strip, one cell lit, advancing every T ticks, read directly by the organism.
+Javid rejected it:
+
+> "The clock is a property of the world, like the Sun. It has to produce some
+> change in the world and give a mechanism for the AI to develop a reference
+> frame. But time itself cannot be internal to the AI."
+
+He is right, and the reason is sharp enough to record: **a clock sense is an
+instruction, a sun is a phenomenon.** A dedicated time-wire hands the organism
+the answer, which is the same error 005's cue strip makes — and worse, it makes
+the decisive experiment impossible. If time arrives on its own channel, you can
+never ask whether the organism *built* a sense of time; you only ever measure
+whether it can read a wire. The correct design has time **inferable from what
+the world does**, never piped in.
+
+This also adds a **third** category to H-018's shown-versus-inferred pair:
+
+| How context arrives | Example | Status |
+|---|---|---|
+| **Shown** — announced through a dedicated channel | 005's cue strip; the rejected clock sense | Designed, parked |
+| **Inferred from a world regularity** | **The Sun** — perceptible, reliable, ambient | **New, this correction** |
+| **Inferred from reward alone** | Unannounced rule flip | Measured: 001 fails flat (L-033) |
+
+The middle row is how animals actually do it, and it was missing from the
+project's map.
+
+#### The mechanism: what a sun does to a 16×16 world
+
+A sun is a **position that moves and illuminates**. The minimal version:
+the sun occupies a position on the world's edge, it lights a band of the grid
+around it, and **outside the lit band the world reads dark**. It advances one
+step every T ticks and wraps.
+
+Everything the project has been trying to buy separately falls out of that one
+mechanism:
+
+- **Time is inferable** — from where the light is, or from what you can and
+  cannot currently see.
+- **Knowing the time costs a glance.** The organism must *look* to find out, in
+  the same sense it looks at anything else. There is no free channel.
+- **Position and time become coupled.** The same place looks different at
+  different hours, which is exactly the feature-at-location-at-time binding §G
+  says a reference frame is *for*.
+- **There is now a reason to move** — go where the light is, or wait for the
+  light to come to you.
+- **There is now a reason to remember.** What was over there when it was lit is
+  not visible now. That is §B1 rung 3's external-memory test with a *natural*
+  motivation replacing an artificial distractor interval.
+- **Prediction becomes free and useful** — the light will be *there* next, so
+  what was seen there earlier is about to become visible again. §G rung 4's
+  "prediction as a second learning signal" gets something reliable to predict
+  that needs no motor system at all.
+- **Night exists.** A phase in which nothing is visible — and 002 *already* has
+  a sleep phase in which all structural change happens. The world's night and
+  the organism's sleep can be the same event, which converts a metaphor into a
+  measurable claim ([H-033](./journal/HYPOTHESES.md)).
+
+#### The experiment this makes possible, and the clock strip made impossible
+
+Take the sun away. Hold the world in constant conditions and see whether timed
+behaviour **persists and free-runs**. That is the actual protocol used on every
+organism from cyanobacteria to humans, and if behaviour persists then the
+organism grew an internal oscillator **from an external regularity** — which is
+[H-003](./journal/HYPOTHESES.md)'s slow variable, not given but *developed*.
+Registered as [H-032](./journal/HYPOTHESES.md).
+
+Registered as [H-029](./journal/HYPOTHESES.md) (**superseded** — mechanism
+corrected) and [H-031](./journal/HYPOTHESES.md) (the sun).
+
+### Settled design, 2026-08-27 00:51 **[J]** — the sun gates vision, touch is unconditional
+
+> "Do the squares go dark (not visible to the eye) when the sun is down, but
+> the AI can still touch and feel them? So they're there, but not visible, but
+> still touchable? So we get into the idea of two senses working together,
+> along with a time element, along with a mouth to 'speak' what it sees /
+> hears?"
+
+**Vision is distal and conditional; touch is proximal and unconditional.** The
+sun controls what can be *seen*, never what is *there*. Decisions recorded in
+[journal 2026-08-27-0051](./journal/entries/2026-08-27-0051-two-senses.md):
+
+| | Decision |
+|---|---|
+| **D1** | World validation runs on **001** — harness work, within the doctrine, not an exception. Any claim about the *organism* still runs on the grown substrate |
+| **D2** | The sun gates **vision only**; objects stay tangible in the dark |
+| **D3** | Darkness reads as **emptiness**, not a distinct "unknown" token — a special symbol would be the world *telling* it what it cannot see |
+| **D4** | Touch is **one cell** at the hand's position; 3×3 only as a recorded fallback |
+| **D5** | The hand enters as a **sense** before it enters as an **effector** — feel is afferent and safe, write/erase carries §B1's reward-hacking risk and waits behind the operant gate |
+| **D6** | Eye and hand are **teacher-positioned** in v0 (§G rung 1). No motor, no efference copy |
+| **D7** | Touch works **in daylight too** — load-bearing: if the channels never co-occur, cross-modal binding is impossible by construction |
+| **D8** | Full illumination is the **default**, so the recorded-behaviour control is free |
+
+**What the split buys, and it is the reason to do it:** vision is wide, cheap
+and daytime-only; touch is narrow, slow and always. So the same object arrives
+through different channels depending on the hour, and carrying a
+daylight-learned discrimination into the dark **requires having bound the two
+together**. This is the multi-sense claim `vision.md` has made since it was
+written, finally in testable form — and it is a symmetry with
+[H-018](./journal/HYPOTHESES.md): H-018 factors perception from *communication*
+(output channel changes, knowledge stays); this factors knowledge from
+*modality* (input channel changes, knowledge stays).
+
+Note also that it is a third kind of transfer, distinct from both of 003's:
+[L-029](./journal/LEARNINGS.md)'s union (same outputs, different stimuli) and
+its corrected contradiction (reversal). Cross-modal is **same stimulus, same
+answer, different channel** — nothing about the knowledge changes, only the
+road it arrives on.
+
+### The game ladder
+
+| # | Game | Channels | Question | Null it must beat |
+|---|---|---|---|---|
+| **0** | `identify` (full light) | eye, mouth | **calibration** | **must match 001/003 recorded curves** |
+| 1 | `look-around` | eye+pos, mouth | is the world bigger than the sense? | one-glimpse control must **fail** |
+| 2 | `feel` | touch+pos, mouth | identify by touch alone? | shuffled touch positions |
+| 3 | `see-then-feel` | eye → touch | **cross-modal transfer** | learned-by-touch-from-scratch control |
+| 4 | `night-shift` | both, sun running | same game, day vs night | uniformly-lit world, matched difficulty |
+| 5 | `when` | both, sun | does behaviour depend on phase? | constant-sun arm |
+| 6 | `free-run` | both, sun removed | **does the rhythm persist?** (H-032) | never-entrained control |
+
+**Rung 3 is the headline** — the first rung whose result would be worth writing
+up, and the reason the rest of the world exists. **Rung 0 is the gate**, and
+rungs 0–2 need no mechanism the project does not already have.
+
+**The confound that kills rung 3 if unhandled:** an organism that learns
+"answer only when lit" produces perfectly time-correlated behaviour containing
+no timekeeping and no cross-modal binding at all. Rung 4's matched-difficulty
+uniformly-lit arm must run before rung 3 is believed.
+
+### The shape of the ask
+
+The world is **larger than the eye** (Javid: 64×64 or 128×128 with an 8×8 eye),
+so the organism turns its head; the world has **properties that vary with
+phase**; games are **scenarios defined on top of one unchanging contract**; and
+the organism **just lives there**, continuously, being given challenges and
+rewarded. §H supplies the scoring; this track supplies the place.
+
+### The named risk: this is infrastructure
+
+The [2026-08-21 novelty audit](./journal/entries/2026-08-21-0050-novelty-audit-and-the-missing-i.md)
+caught this project **building outward — UI, demos, journal discipline — while
+its distinguishing mechanism stayed unbuilt** (L-012). A world specification is
+exactly that shape of work: satisfying, obviously useful, and not the
+mechanism. The mitigation is the gate below, not good intentions.
+
+**Entry gate for any implementation of this track:** the new world must
+reproduce a recorded result before it earns a second game. If `identify` in the
+world does not match 001/003's recorded curves on the same seeds, the world is
+wrong and nothing built on it means anything.
+
+### Status
+
+Backlog. Simplified v0 under discussion — see the journal entry. The standing
+priority is unchanged: a growth model that converges (doctrine,
+[2026-08-22-2022](./journal/entries/2026-08-22-2022-001-is-not-the-ipnn.md)).
+An organism that cannot yet learn one three-way task does not need a bigger
+world; it needs to work.
+
 ## E. Already registered (index only — claims live in their own docs)
 
 - **M1b — etaPool=0 ablation:** is the pool contributing anything yet?

@@ -36,14 +36,25 @@ journal/
 5. **Negative results are mandatory content.** A failed attempt is logged
    with the same rigor as a success — usually more, since diagnosis is where
    learnings come from.
-6. **Thoughts are first-class, not just iterations.** A realisation, a change
-   of direction, a new hypothesis or a reframing of what we are even trying to
-   measure is worth recording *the day it happens*, whether or not any code
-   ran. File it as a `theory` entry, and register any new hypothesis in
-   [HYPOTHESES.md](./HYPOTHESES.md) with an `H-###`. The reason is plain: the
-   ideas that change a project's direction are almost never the ones that
-   arrive attached to a result, and if they only ever live in a conversation
-   they will be re-derived from scratch in three months, usually worse.
+6. **Thoughts and questions are first-class, not just iterations.** A
+   realisation, a change of direction, a new hypothesis or a reframing of what
+   we are even trying to measure is worth recording *the day it happens*,
+   whether or not any code ran. File it as a `theory` entry, and register any
+   new hypothesis in [HYPOTHESES.md](./HYPOTHESES.md) with an `H-###`. The
+   reason is plain: the ideas that change a project's direction are almost
+   never the ones that arrive attached to a result, and if they only ever live
+   in a conversation they will be re-derived from scratch in three months,
+   usually worse.
+
+   **Questions count, and they may be filed with no answer attached** (added
+   2026-08-26 **[J]**). An open question — "what are we actually measuring?",
+   "has someone already solved this?", "why is that the right currency?" — is
+   recorded the day it is asked, attributed like any other idea, and **quoted
+   verbatim where the wording is the content**. A question is where a direction
+   change starts, and it is the part most likely to evaporate: by the time it
+   has an answer, the answer gets written down and the question that produced
+   it does not. Entries of this kind carry a *questions, as asked* section and
+   are not obliged to resolve them.
 
 7. **Attribution: who thought of it.** See the section below. Every hypothesis,
    and every idea in an entry that materially changed the direction, carries a
@@ -168,6 +179,12 @@ field that learned it the hard way:
 
 | Entry | Iteration | Outcome |
 |---|---|---|
+| [2026-08-27-0100 — Rooms](./entries/2026-08-27-0100-rooms.md) | Theory [J]: light is the primitive, the sun is one instance, rooms are the unit | **Time-legibility becomes a property of the place** — a lit windowless room is as timeless as a basement office. So H-032's free-running test stops being an intervention and becomes a **transition between two rooms that each exist for their own reasons**: nothing switched off, organism never handled. A *moving* light carries time, a *gradient* light carries space, uniform static carries neither and is the control for both. **Intensity = firing probability** [J→C] — no interface change, fits an already-stochastic substrate, and makes a `dim` room the first task where iterative consideration (the project's unbuilt namesake, L-012) should pay → H-035. Rooms **enumerated, never swept** (L-040); H-034, H-035 registered |
+| [2026-08-27-0051 — Dark but touchable](./entries/2026-08-27-0051-two-senses.md) | Decisions [J]: world validation on 001, and what the sun actually does | **The sun gates vision only — objects stay tangible in the dark.** Vision distal + conditional, touch proximal + unconditional → the same object arrives on different channels by the hour, so daylight-learned competence at night **requires** cross-modal binding. This is `vision.md`'s multi-sense claim in testable form, and a symmetry with H-018 (that factors knowledge from *communication*; this factors it from *modality*). A third kind of transfer, distinct from L-029's union and its corrected contradiction: **same stimulus, same answer, different channel**. D1–D8 recorded, incl. darkness reads as emptiness (a special token would be the world telling it what it can't see) and the hand enters as a **sense** before an **effector**. 7-rung game ladder; rung 3 `see-then-feel` is the headline, rung 0 is the gate |
+| [2026-08-27-0040 — The Sun](./entries/2026-08-27-0040-the-sun.md) | Theory [J]: Claude proposed a clock *sense*; Javid rejected it — time is a property of the world | **A clock strip is an instruction, a sun is a phenomenon.** The rejected design would have made the decisive experiment impossible — with time on its own wire you can only measure whether it *reads* a wire, never whether it *built* a sense of time. Adds a **third** category to H-018's shown/inferred pair: *inferred from a perceptible world regularity* (how animals actually do it), which was missing from the map. Sun = position + moving lit band; time, reference frames, memory pressure, a reason to move and a free prediction signal all fall out of one mechanism — flagged as suspicious for exactly that reason. H-029 superseded; H-031/032/033 registered, incl. **free-running** as the sharpest test of H-003 |
+| [2026-08-27-0023 — The world, the body, and a clock](./entries/2026-08-27-0023-the-world.md) | Theory [J]: Javid designs a habitat out loud — grid-as-world, eye, hand, mouth, time of day | Three existing tracks (§G bigger-world, §B1 motor, §H games) each owned a piece and **none owned the contract** → new track **§I, The World**. Two genuinely new: **eye/hand/mouth as anatomy** makes H-018's perception/communication split structural instead of hypothetical (H-030), and a **perceivable world clock** attacks H-003 from the world's side — read a slow variable instead of holding one (H-029). Entry gate written before any design exists: *the world must reproduce a recorded result before it earns a second game*. Infrastructure risk (L-012) named in the track |
+| [2026-08-27-0000 — "It just lives in its world" — is that novel?](./entries/2026-08-27-0000-is-a-living-ai-novel.md) | Theory [J]: set the record aside — what is the *theoretical* gain if the living model works, and is the framing new? | **The aspiration is not novel and isn't close** — developmental robotics (Weng, Science 2001), Ring 1994, NELL, Sutton's Alberta Plan, HTM, ART. Javid's sharpening — *within-lifetime* structural change, not evolutionary culling [J] — narrows it to GNG/Cascade-Correlation/dynamic-sparse-training/DEEP R/synaptic sampling, still populated. The Bayesian-synapse half is **occupied** (BCPNN; Aitchison 2021) and Kappel/Maass's dynamic connectome already got to Bayesian *structure*. Real theoretical gain restated in 5 points; **"living" made falsifiable → H-028**, the periodically-retrained control. Novelty explicitly demoted as a goal (L-011) |
+| [2026-08-26-2341 — Adaptability: the measure we never named](./entries/2026-08-26-2341-adaptability-the-measure.md) | Theory [J]: a standardised world, a series of games, and what "adapt" actually measures | **"Adaptability" appears zero times in the docs** — the thing Javid described is **ladder rung 7, Harlow's learning set**, never run and never cited. His "pretty good right from the start" is an *intercept*, a different currency from H-011's *rate* → H-026. The whole meta-RL/AdA/domain-randomisation literature was missing from related-work.md → added, banner-marked unsearched; its adaptation is **amortised** over a task family → H-027. Journal rule 6 extended to questions [J]. No experiment promoted; on the measured record (L-030/L-033/L-039) IPNN is *behind* on this measure |
 | [2026-08-23-0258 — M1i: the scaffold ablation](./entries/2026-08-23-0258-scaffold-ablation.md) | Everything Slow does, minus the birth wiring [J] | **Chance forever, zero routes created** (0.20–0.33, w2 0/0/0) vs 0.99×3 with the scaffold. Growth keeps and refines routes; it cannot originate them — no pay for half a bridge. Scaffold-free = the guided-growth experiment; L-047 |
 | [2026-08-23-0247 — M1h confirmation](./entries/2026-08-23-0247-confirmation.md) | Held-out seeds 4–6, 8,000 trials | **Holds — no shrinkage**: floors rise to 0.64–0.66, three of six runs at 0.97–1.00. Stuck seeds sit at exactly **2/3** — two patterns mastered, third unroutable: coverage, not level, is what's left → scaffold selection; L-046 |
 | [2026-08-23-0217 — 002-M1h: grow slower](./entries/2026-08-23-0217-durable-ladder.md) | Javid's knob hypotheses on the working config [J]: slower, stronger, prune-less, longer runs | **Grow slower wins**: sleepEvery 80 → two seeds at 0.99; att1 → 0.98; slow+strong best min 0.59 with a 1.00 — first near-perfect organisms on the hard geometry. Prune-slower fails (3rd congestion result); rentN0=25 a measured optimum. Gate not met — seed variance (1.00 v 0.34) is the named bottleneck → scaffold selection next; held-out confirmation launched; L-045, H-025 |

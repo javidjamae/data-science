@@ -44,6 +44,106 @@ positioning: everybody wanted this; it remains unsolved at scale.
   Systems that improved through interaction while operating. *Relation:* the
   "living machine" framing predates AI as a field.
 
+## The "living AI" program — everyone who has wanted this (added 2026-08-27)
+
+**Honesty banner:** written from model knowledge on 2026-08-27 in answer to
+Javid's question "it just lives in its world … always on and learning like a
+human — is that not novel?"
+([2026-08-27-0000](./journal/entries/2026-08-27-0000-is-a-living-ai-novel.md)).
+**Not from a live search.** Every entry is *unverified against literature*.
+
+The [old online-learning tradition](#the-old-online-learning-tradition-the-lineage-ipnn-actually-belongs-to)
+section above covers the *learning rules*. This section covers the *framing* —
+an agent that has no training phase, lives in a world, and develops through its
+own history. That framing is not a gap in the field. It is a named research
+program with a fifty-year lineage and several active flagships.
+
+| Program | The claim, in their words | Where it sits relative to IPNN |
+|---|---|---|
+| **Developmental robotics / epigenetic robotics** — Weng et al., *Autonomous Mental Development by Robots and Animals*, **Science 2001**; Lungarella, Metta, Pfeifer & Sandini survey 2003; the iCub platform | A robot whose competence is not programmed or trained but **develops through open-ended lifelong interaction with its environment**, with no task specified in advance | **The closest named program to Javid's framing, and it is 25 years old.** Differs in substrate (conventional learning algorithms inside a robot) rather than in aspiration |
+| **Continual / lifelong learning** — Ring, *Continual Learning in Reinforcement Learning Domains* (PhD, 1994); Thrun & Mitchell, *Lifelong Robot Learning* (1995) | An agent that learns continually, never resets, and uses everything learned so far to learn the next thing faster | Ring's 1994 thesis is essentially this project's goal statement, written 32 years earlier |
+| **Never-Ending Learning** — NELL (Carlson et al. 2010; Mitchell et al., *CACM* 2018) | A system deliberately left **running continuously for years**, learning and self-correcting the whole time | Same "no stopping point" commitment; symbolic/text domain, not a sensorimotor organism |
+| **The Alberta Plan** — Sutton, Bowling & Pilarski (2022); Sutton's OaK architecture | AI research should target a **continually-learning agent in an unending stream of experience** — explicitly rejecting the train-then-deploy framing | The most direct contemporary statement of "there is no stop-train-retry", from the person who wrote the RL textbook |
+| **Open-endedness** — Stanley, Lehman & Clune (2017); POET (Wang et al. 2019) | Systems that generate their own ever-harder challenges rather than being handed a fixed benchmark | Javid's "life involves learning and playing games" is this, at organism scale rather than population scale |
+| **Artificial curiosity / intrinsic motivation** — Schmidhuber (1991, PowerPlay 2011); Oudeyer & Kaplan | The agent supplies its own reward and its own curriculum, so it keeps learning with no external teacher | Already cited in this file for the reward question; belongs here too, as the answer to "who sets the challenges" |
+| **Hawkins / Numenta (HTM)** | Continuous online learning, **no train/inference split**, one cortical algorithm across senses | Cited at the top of this file as closest-in-spirit. Worth restating here: the no-split claim is *theirs*, published, and predates this project |
+| **Grossberg — ART (1976–87)** | Continuous learning with no train/test split, built around the **stability–plasticity dilemma** | The dilemma has a name because it was identified fifty years ago and never closed |
+| **Neuromorphic on-chip learning** — Intel Loihi, SpiNNaker | Always-on local plasticity in hardware, at power budgets that make continuous learning affordable | The hardware half of the same bet; already cited under Hardware |
+
+### Within-lifetime structural change vs evolutionary topology search [J]
+
+Javid's sharpening, 2026-08-27: *"It's not that we're picking a hardcoded
+wiring and evolving or culling offspring, like some evolutionary algorithms
+might do. It's actually ADAPTING its neural structure to learn and adapt to its
+learnings and environment."* This is a real boundary and it moves the claim, so
+the prior art splits in two.
+
+**Across-lifetime (what this is NOT):** NEAT (Stanley & Miikkulainen 2002) and
+neuroevolution generally, Neural Architecture Search, Neural Developmental
+Programs (Najarro, Sudhakaran & Risi 2023). Topology is searched by a
+population under a fitness function; the individual's structure is fixed once
+built.
+
+**Within-lifetime (the actual neighbourhood), and it is populated:**
+
+- **Growing Neural Gas** (Fritzke 1995) and the self-organising-map family —
+  adds and removes nodes and edges online, driven by accumulated local error.
+  The oldest close analogue: topology grown from the data stream itself.
+- **Cascade-Correlation** (Fahlman & Lebiere 1990) — recruits new hidden units
+  when learning stalls, during training.
+- **Dynamic sparse training** — SET (Mocanu et al. 2018), RigL (Evci et al.
+  2020): prune-and-regrow connections *throughout* training rather than after
+  it. A large and active area.
+- **DEEP R** (Bellec et al. 2018) and **synaptic sampling / the dynamic
+  connectome** (Kappel, Habenschuss, Legenstein & Maass) — already cited under
+  Structural plasticity; both rewire online in a running network.
+- **Progressive Networks** (Rusu et al. 2016), **Dynamically Expandable
+  Networks** (Yoon et al. 2018) — add capacity for a new task, but are *told*
+  where the task boundary is.
+
+**What separates this project from that list**, stated as the conjunction
+because no element separates it alone: every system above is steered by a
+**gradient or a loss inside a training loop**, and most are given **task
+boundaries**. Here structural change is steered by **local reward and a
+metabolic economy in which failure to pay is death**, in an organism that is
+never not running, with no task boundary supplied and no global objective to
+differentiate. *Unverified* — dynamic sparse training is a large enough
+literature that a reward-driven, boundary-free variant plausibly exists.
+
+**Reference frames** — Javid's *"it learns reference frames over time
+(hopefully)"* — is **Hawkins' central claim**, cited at the top of this file:
+cortical columns learning reference frames is the Thousand Brains theory. This
+project may not claim the idea. What would differ is the **origin**: Numenta
+posits grid-cell-like modules as machinery; backlog
+[§G](./experiment-ideas.md) asks whether a reference frame can be *grown* by an
+organism that starts with none. Nobody should read "learns reference frames" as
+novel; "grows the machinery that represents them, from zero edges" is the
+claim, and it is unbuilt.
+
+### What this does *not* settle
+
+Prior art of an aspiration is not prior art of a mechanism. Every program above
+wanted the same thing and each is limited by a specific mechanism failure —
+credit assignment that degrades with scale, stability-versus-plasticity,
+capacity that must be rationed. The right reading is
+[L-011](./journal/LEARNINGS.md): **prior art is a check on claims, not a source
+of designs.** It should change what this project *claims* and not one line of
+what it *builds*.
+
+**What this project may not claim, as of this entry:** that always-on learning,
+the absence of a train/deploy split, an agent living in a world, or
+self-directed play are new ideas. They are not, and several are older than
+deep learning.
+
+**The smallest claim that survives the above** — *unverified*, and stated as a
+conjunction because no single element survives alone: an always-on,
+reward-only, gradient-free organism **whose wiring is grown rather than given,
+under a metabolic economy in which failure to pay is death**, receiving no task
+boundaries, and evaluated on measures that would apply to an animal. Progressive
+Networks (Rusu et al. 2016) add capacity per task but are *told* where the task
+boundary is; DEEP R and synaptic sampling rewire online but on a given
+topology; developmental robotics develops behaviour on a fixed network. The
+conjunction is what has not turned up.
 ## Learning without backprop
 
 - **Three-factor learning rules / reward-modulated Hebbian plasticity
@@ -65,6 +165,17 @@ positioning: everybody wanted this; it remains unsolved at scale.
   updates; has been run on neuromorphic hardware. *Relation:* nearest
   neighbor to "Beta-confidence" synapses; worth reading closely before
   claiming novelty there.
+- **Aitchison, Jegminat, Menendez, Pfister, Pouget & Latham 2021 — *Synaptic
+  plasticity as Bayesian inference* (Nature Neuroscience)** (added 2026-08-27,
+  *unverified — not searched*). Each synapse represents a **posterior
+  distribution** over its own weight, and the **uncertainty modulates the
+  learning rate**: uncertain synapses move fast, confident ones move slowly.
+  *Relation:* this is IPNN's Beta-confidence gating, published, with
+  experimental support. Combined with BCPNN above, the "Bayesian synapse"
+  half of the architecture must be treated as **occupied**, and the honest
+  novelty question moves to whether *structure* is driven by the same
+  posterior — see the dynamic-connectome entry under Structural plasticity,
+  which is where that too was got to first.
 
 ## Stochastic and recurrent settling networks
 
@@ -259,6 +370,82 @@ has been applied across species — which is the admissibility test (H-009).
 as the primary gates rather than as commentary on an accuracy number.
 **What it does not claim:** any novelty in them. The only unusual choice is
 the refusal to let a benchmark-style accuracy figure be the gate.
+
+## Adaptation and fast transfer in RL (added 2026-08-26)
+
+**Honesty banner:** this section was written from model knowledge on
+2026-08-26, **not from a live literature search**, in answer to Javid's
+question "do RL models already do well at adaptability?"
+([2026-08-26-2341](./journal/entries/2026-08-26-2341-adaptability-the-measure.md)).
+Every claim here is *unverified against literature* until someone runs the
+search. It is filed anyway because its absence was itself the finding: the map
+had a hole exactly where the project's own goal statement lives.
+
+The project's goal — [rung 7](./vision.md#the-ladder-of-evidence), "adapt,
+don't relearn" — has a large and active ML literature under four different
+names, none of which appeared anywhere in this file until now.
+
+### The names it goes by
+
+| Name | Core claim | Canonical references |
+|---|---|---|
+| **Meta-learning / "learning to learn"** | Train across a *distribution of tasks* so a new draw from it is solved in few gradient steps or few episodes | MAML (Finn, Abbeel, Levine 2017); Reptile (Nichol 2018); RL² (Duan 2016) and *Learning to reinforcement learn* (Wang 2016); PEARL (Rakelly 2019) |
+| **Zero-shot / few-shot policy generalisation** | Measure performance on *held-out levels*, not training levels — and RL agents turned out to memorise levels badly | Procgen / CoinRun (Cobbe 2019–20); Kirk et al., *A Survey of Zero-shot Generalisation in Deep RL* (JAIR 2023) |
+| **Domain randomisation / sim-to-real** | Randomise the physics during training so the real object is *in distribution* on first contact | Tobin 2017; OpenAI Dactyl + Automatic Domain Randomization (2019) |
+| **Continual / lifelong RL** | Keep the earlier tasks while learning later ones — and keep the *ability* to learn at all | EWC (Kirkpatrick 2017); GEM and the BWT/FWT metrics (Lopez-Paz & Ranzato 2017); primacy bias (Nikishin 2022); dormant neurons (Sokar 2023); **loss of plasticity** (Dohare et al., *Nature* 2024) |
+
+Two results are the closest analogues of what this project says it wants:
+
+- **AdA — *Human-Timescale Adaptation in an Open-Ended Task Space*
+  (DeepMind, 2023).** An agent in XLand 2.0 meets genuinely held-out tasks and
+  improves within a handful of episodes, at roughly the rate a human tester
+  does. This is the strongest published "comes in new and is decent
+  immediately" result. *Relation:* it is the existence proof that the
+  behaviour is achievable — and the honest reading of its cost is below.
+- **In-context learning in large models.** Adaptation with **no weight change
+  at all**: the new task is absorbed through the input channel. *Relation:*
+  this is structurally the same claim as [H-018](./journal/HYPOTHESES.md)'s
+  "rule as a sense" — condition the output on a cue rather than re-fit the
+  mapping — arrived at from the opposite direction and at nine orders of
+  magnitude more scale.
+
+### The distinction that actually matters: amortised vs earned
+
+Nearly all of the above buys adaptation speed by **paying for it up front, in
+task coverage.** Domain randomisation makes the new ball fast to handle by
+having trained on ten thousand balls; meta-RL adapts fast *within its
+meta-training distribution* and degrades sharply outside it; AdA's minutes-long
+adaptation sits on top of an enormous procedurally generated task space and a
+correspondingly enormous number of environment steps. The adaptation is real;
+it is **amortised**, not free, and it is bounded by the family it was amortised
+over.
+
+Two things follow for this project:
+
+1. **A fast-adapting entrant is not evidence of the mechanism this project is
+   after** unless the game is outside the family it was trained on. That makes
+   *held-out game family*, not *held-out game*, the load-bearing control in
+   backlog [§H](./experiment-ideas.md#h-the-games--an-evaluation-ecosystem-not-another-benchmark).
+   Registered as [H-027](./journal/HYPOTHESES.md).
+2. **The retention half is genuinely unsolved, and is where the field is
+   weakest.** Catastrophic forgetting is old news; the sharper 2024 result is
+   *loss of plasticity* — networks trained through long task sequences
+   progressively lose the ability to learn anything new, which is
+   [L-034](./journal/LEARNINGS.md) arrived at independently in a completely
+   different substrate. Meta-RL benchmarks almost universally score
+   first-exposure efficiency on a fresh agent and do not score what the agent
+   still knows from task 1.
+
+**What this project takes:** the vocabulary (few-shot, zero-shot, meta-train
+distribution, BWT/forgetting), and the amortisation control as a hard
+requirement on §H. **What it does not claim:** that fast adaptation is novel,
+or that anything here beats meta-RL at adapting. On the measured record it
+does not — see [L-030](./journal/LEARNINGS.md), [L-033](./journal/LEARNINGS.md),
+[L-039](./journal/LEARNINGS.md). **What it claims may be different:** the
+*source* of the adaptation — a factoring built into the substrate rather than
+coverage bought with experience — and the insistence on scoring acquisition
+and retention on the same organism, which the RL adaptation literature and the
+continual-learning literature currently do separately.
 
 ## The three "open seams" — all three checked 2026-08-22, all three occupied
 
